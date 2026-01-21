@@ -1,0 +1,6 @@
+@SchemaStar_HostAddress = http://localhost:5123
+
+GET {{SchemaStar_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
