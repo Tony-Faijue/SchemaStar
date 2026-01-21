@@ -77,8 +77,10 @@ namespace SchemaStar.Controllers
             }
 
             //Update fields
+            //Make sure to update field if it is provided
             user.Username = request.Username;
             user.Email = request.Email;
+
 
             try
             {
