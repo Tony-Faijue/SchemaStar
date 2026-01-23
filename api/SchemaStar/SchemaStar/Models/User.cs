@@ -15,7 +15,7 @@ public partial class User
     public ulong Id { get; set; }
     
     [Required]
-    [Column("public_id")]
+    [Column("public_id", TypeName = "binary(16)")] //Force EF Core to treat it as fixed-length binary instead of varbinary
     [MaxLength(16)]
     public byte[] PublicId { get; set; } = null!;
 
