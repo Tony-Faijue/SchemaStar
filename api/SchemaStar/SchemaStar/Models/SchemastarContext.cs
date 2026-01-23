@@ -42,7 +42,8 @@ public partial class SchemastarContext : DbContext
             entity.Property(e => e.EdgeType)
                 .HasDefaultValueSql("'directed'")
                 .HasColumnType("enum('directed','undirected')")
-                .HasColumnName("edge_type");
+                .HasColumnName("edge_type")
+                .HasConversion<string>(); //Convert enum to string, since default is int
             entity.Property(e => e.FromNodeId).HasColumnName("from_node_id");
             entity.Property(e => e.PublicId)
                 .HasMaxLength(16)
@@ -117,7 +118,8 @@ public partial class SchemastarContext : DbContext
             entity.Property(e => e.State)
                 .HasDefaultValueSql("'unlocked'")
                 .HasColumnType("enum('locked','pinned','unlocked')")
-                .HasColumnName("state");
+                .HasColumnName("state")
+                .HasConversion<string>(); //Convert enum to string, since default is int
             entity.Property(e => e.UpdatedAt)
                 .ValueGeneratedOnAddOrUpdate()
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
