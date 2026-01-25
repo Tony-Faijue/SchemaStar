@@ -12,6 +12,7 @@ builder.Services.AddOpenApi();
 
 //Register the Dbcontext classes in DI Container
 string connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection String not found");
+//Register with MySQL
 builder.Services.AddDbContext<SchemastarContext>(o => o.UseMySQL(connectionString));
 
 
