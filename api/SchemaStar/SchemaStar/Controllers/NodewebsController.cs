@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SchemaStar.DTOs.Nodeweb_DTOs;
 using SchemaStar.Models;
 
 namespace SchemaStar.Controllers
@@ -22,16 +23,34 @@ namespace SchemaStar.Controllers
 
         // GET: api/Nodewebs
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Nodeweb>>> GetNodewebs()
+        public async Task<ActionResult<IEnumerable<NodewebResponseDTO>>> GetNodewebs()
         {
-            return await _context.Nodewebs.ToListAsync();
+            return await _context.Nodewebs.Select(n => new NodewebResponseDTO
+            { 
+                PublicId = new Guid (n.PublicId),
+                NodeWebName = n.NodeWebName,
+                CreatedAt = n.CreatedAt,
+                UpdatedAt = n.UpdatedAt,
+                LastLayoutAt = n.LastLayoutAt,
+            }).ToListAsync();
         }
 
-        // GET: api/Nodewebs/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Nodeweb>> GetNodeweb(ulong id)
+        // GET: api/Nodewebs/{guid}
+        [HttpGet("{publicId}")]
+        public async Task<ActionResult<NodewebResponseDTO>> GetNodeweb(Guid publicId)
         {
-            var nodeweb = await _context.Nodewebs.FindAsync(id);
+            byte[] publicIdBytes = publicId.ToByteArray();
+
+            var nodeweb = await _context.Nodewebs
+                .Where(n => n.PublicId == publicIdBytes)
+                .Select(n => new NodewebResponseDTO
+                {
+                    PublicId = new Guid(n.PublicId),
+                    NodeWebName = n.NodeWebName,
+                    CreatedAt = n.CreatedAt,
+                    UpdatedAt = n.UpdatedAt,
+                    LastLayoutAt = n.LastLayoutAt,
+                }).FirstOrDefaultAsync();
 
             if (nodeweb == null)
             {
@@ -43,15 +62,28 @@ namespace SchemaStar.Controllers
 
         // PUT: api/Nodewebs/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutNodeweb(ulong id, Nodeweb nodeweb)
+        [HttpPut("{publicId}")]
+        public async Task<IActionResult> UpdateNodeweb(Guid publicId, NodewebRequestDTO request)
         {
-            if (id != nodeweb.Id)
+            byte[] publicIdBytes = publicId.ToByteArray();
+            var nodeweb = await _context.Nodewebs.FirstOrDefaultAsync(n => n.PublicId == publicIdBytes);
+           
+            if (nodeweb == null)
             {
-                return BadRequest();
+                return NotFound();
             }
 
-            _context.Entry(nodeweb).State = EntityState.Modified;
+            //Check for duplicate nodeweb names per the user
+            bool isDuplicate = await _context.Nodewebs.AnyAsync(n =>
+             n.UserId == nodeweb.UserId &&
+             n.NodeWebName == request.NodeWebName && //check if request name matches existing one
+             n.PublicId != publicIdBytes
+            );
+
+            if (isDuplicate) { return BadRequest("Nodeweb name already exist, duplicate found."); }
+
+            //Update the name
+            nodeweb.NodeWebName = request.NodeWebName;
 
             try
             {
@@ -59,14 +91,11 @@ namespace SchemaStar.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!NodewebExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return Conflict("Record was updated elsewhere [database]");
+            }
+            catch (DbUpdateException) 
+            {
+                return BadRequest("Unable to save, make sure node web name is unqiue.");
             }
 
             return NoContent();
@@ -75,10 +104,23 @@ namespace SchemaStar.Controllers
         // POST: api/Nodewebs
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Nodeweb>> PostNodeweb(Nodeweb nodeweb)
+        public async Task<ActionResult<NodewebResponseDTO>> PostNodeweb(NodewebRequestDTO request)
         {
+            ulong currentUserId = 0; //Implement logic for getting authenticated user
+
+            //Check if nodeweb with the request name already created for the user
+            bool isDuplicate = await _context.Nodewebs.
+                AnyAsync(n => n.UserId == currentUserId && n.NodeWebName == request.NodeWebName);
+
+            if (isDuplicate) { return Conflict(new { message = $"A NodeWeb name '{request.NodeWebName} already exists for this user.'" }); }
+
+            var nodeweb = new Nodeweb
+            {
+                UserId = currentUserId,
+                NodeWebName = request.NodeWebName,
+            };
+
             _context.Nodewebs.Add(nodeweb);
-            await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetNodeweb", new { id = nodeweb.Id }, nodeweb);
         }

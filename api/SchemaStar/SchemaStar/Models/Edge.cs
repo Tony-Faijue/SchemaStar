@@ -18,7 +18,7 @@ public partial class Edge
     public byte[] PublicId { get; set; } = null!;
 
     [Column("edge_type")]
-    public EdgeType EdgeType { get; set; } = EdgeType.Directed;
+    public EdgeType? EdgeType { get; set; }
 
     [Required]
     [Column("from_node_id")]
