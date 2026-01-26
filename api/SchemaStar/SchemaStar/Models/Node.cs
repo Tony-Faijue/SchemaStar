@@ -70,7 +70,7 @@ public partial class Node
     public int Height { get; set; } = 152; //Default for text node
 
     [Column("state")]
-    public NodeState State { get; set; } = NodeState.Unlocked; //Uses Enum for state management
+    public NodeState? State { get; set; }  //Uses Enum for state management
 
     [Required]
     [Column("created_by")]
