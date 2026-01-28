@@ -125,11 +125,13 @@ namespace SchemaStar.Controllers
             return CreatedAtAction("GetNodeweb", new { id = nodeweb.Id }, nodeweb);
         }
 
-        // DELETE: api/Nodewebs/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteNodeweb(ulong id)
+        // DELETE: api/Nodewebs/{guid}
+        [HttpDelete("{publicId}")]
+        public async Task<IActionResult> DeleteNodeweb(Guid publicId)
         {
-            var nodeweb = await _context.Nodewebs.FindAsync(id);
+            byte[] publicIdBytes = publicId.ToByteArray();
+
+            var nodeweb = await _context.Nodewebs.FirstOrDefaultAsync(n => n.PublicId == publicIdBytes);
             if (nodeweb == null)
             {
                 return NotFound();

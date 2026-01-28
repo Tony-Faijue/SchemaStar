@@ -37,18 +37,20 @@ public partial class Node
 
     [Column("node_image_mime")]
     [StringLength(64)]
+    [RegularExpression(@"^image/(jpeg|png|gif|bmp|webp)$", ErrorMessage = "Invalid Image MIME type")]
     public string? NodeImageMime { get; set; }
 
     [Column("node_audio_mime")]
     [StringLength(64)]
+    [RegularExpression(@"^audio/(mpeg|wav|ogg|mp4|x-m4a)$", ErrorMessage = "Invalid Audio MIME type")]
     public string? NodeAudioMime { get; set; }
 
     [Column("node_image_size")]
-    [Range(0, 20971520, ErrorMessage="Image size cannot be greater than 20MB")]
+    [Range(1, 20971520, ErrorMessage="Image size cannot be greater than 20MB and must contain at least 1 byte")]
     public int? NodeImageSize { get; set; }
 
     [Column("node_audio_size")]
-    [Range(0, 52428800, ErrorMessage = "Audio size cannot be greater than 50MB")]
+    [Range(1, 52428800, ErrorMessage = "Audio size cannot be greater than 50MB and must contain at least 1 byte")]
     public int? NodeAudioSize { get; set; }
 
     [Column("position_x")]

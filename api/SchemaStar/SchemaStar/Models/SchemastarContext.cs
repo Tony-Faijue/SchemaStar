@@ -117,7 +117,7 @@ public partial class SchemastarContext : DbContext
                 .HasColumnName("public_id");
             entity.Property(e => e.State)
                 .HasDefaultValueSql("'unlocked'")
-                .HasColumnType("enum('locked','pinned','unlocked')")
+                .HasColumnType("enum('locked','pinned','unlocked')") //Used enum for limited number of states
                 .HasColumnName("state")
                 .HasConversion<string>(); //Convert enum to string, since default is int
             entity.Property(e => e.UpdatedAt)
@@ -149,7 +149,7 @@ public partial class SchemastarContext : DbContext
 
             entity.ToTable("nodeweb");
 
-            //Create composite index for uniques of nodewebnames for each user
+            //Create composite index for uniqueness of nodewebnames for each user
             entity.HasIndex(e => new { e.UserId, e.NodeWebName }, "idx_user_nodename_unique")
             .IsUnique();
 
