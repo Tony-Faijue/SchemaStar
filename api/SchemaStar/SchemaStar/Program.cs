@@ -15,6 +15,8 @@ string connectionString = builder.Configuration.GetConnectionString("DefaultConn
 //Register with MySQL
 builder.Services.AddDbContext<SchemastarContext>(o => o.UseMySQL(connectionString));
 
+//Register Problem Details Service for API Errors
+builder.Services.AddProblemDetails();
 
 
 var app = builder.Build();
@@ -24,6 +26,9 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
+// Add Middleware so that http status codes that do not return a JSON body will return a JSON body
+app.UseStatusCodePages();
 
 app.UseHttpsRedirection();
 
