@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SchemaStar.Models;
 using SchemaStar.DTOs;
+using SchemaStar.Exceptions;
 
 namespace SchemaStar.Controllers
 {
@@ -57,7 +58,9 @@ namespace SchemaStar.Controllers
 
             if (user == null)
             {
-                return NotFound();
+               // return NotFound();
+               //Use Custom NotFoundException
+                throw new NotFoundException("Users", publicId);
             }
 
             return user;
