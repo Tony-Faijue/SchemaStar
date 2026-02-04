@@ -104,7 +104,9 @@ namespace SchemaStar.Controllers
         {
             if (await _context.Users.AnyAsync(u => u.Email == request.Email || u.Username == request.Username))
             {
-                return Conflict("User with this email or username already exists.");
+                //return Conflict("User with this email or username already exists.");
+                //Custom 409 Conflict Exception
+                throw new ConflictException("Users");
             }
 
             var user = new User
