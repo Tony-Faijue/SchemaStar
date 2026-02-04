@@ -48,6 +48,7 @@ namespace SchemaStar.ExceptionHandlers
             UnauthorizedAccessException => (StatusCodes.Status401Unauthorized, "Unauthorized"),
 
             NotFoundException => (StatusCodes.Status404NotFound, "Resource Not Found"),
+            ConflictException => (StatusCodes.Status409Conflict, "Resource Already Exist"),
 
             AppException appException => ((int)appException.StatusCode, "Application Error"),
 
