@@ -1,7 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using SchemaStar.ExceptionHandlers;
+using SchemaStar.JWT;
 using SchemaStar.Models;
+using SchemaStar.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +32,8 @@ builder.Services.AddProblemDetails();
 //Custom Global Exception Handler for HTTP Status Codes
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
+//JWT Options & Authentications
+builder.Services.AddJwtAuthentication(builder.Configuration);
 
 var app = builder.Build();
 
