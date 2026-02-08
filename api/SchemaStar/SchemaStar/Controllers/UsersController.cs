@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using SchemaStar.Models;
 using SchemaStar.DTOs;
 using SchemaStar.Exceptions;
+using SchemaStar.Services;
 
 namespace SchemaStar.Controllers
 {
@@ -18,10 +19,13 @@ namespace SchemaStar.Controllers
     public class UsersController : ControllerBase
     {
         private readonly SchemastarContext _context;
+        //Custom User Service
+        private readonly IUserService _userService;
 
-        public UsersController(SchemastarContext context)
+        public UsersController(SchemastarContext context, IUserService userService)
         {
             _context = context;
+            _userService = userService;
         }
 
         // GET: api/Users
@@ -102,33 +106,8 @@ namespace SchemaStar.Controllers
         [HttpPost]
         public async Task<ActionResult<UserResponseDTO>> PostUser(RegisterUserRequestDTO request)
         {
-            if (await _context.Users.AnyAsync(u => u.Email == request.Email || u.Username == request.Username))
-            {
-                //return Conflict("User with this email or username already exists.");
-                //Custom 409 Conflict Exception
-                throw new ConflictException("Users");
-            }
-
-            var user = new User
-            {
-                Username = request.Username,
-                Email = request.Email,
-                //Use BCrypt for hashing
-                Pass = BCrypt.Net.BCrypt.HashPassword(request.Password)
-            };
-
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-
-            //Respsone DTO
-            var response = new UserResponseDTO
-            {
-                PublicId = new Guid(user.PublicId),
-                Username = user.Username,
-                Email = user.Email,
-                CreatedAt = user.CreatedAt,
-                UpdatedAt = user.UpdatedAt,
-            };
+            //Call RegisterUserSync form UserService
+            var response = await _userService.RegisterUserAsync(request);
 
             return CreatedAtAction(nameof(GetUser), new { publicId = response.PublicId }, response);
         }

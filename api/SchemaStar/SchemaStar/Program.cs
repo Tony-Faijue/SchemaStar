@@ -15,6 +15,9 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+//-------------Added UserService-------------
+builder.Services.AddScoped<IUserService, UserService>();
+
 //-------------Database Connection String & Database Context-------------
 
 //Register the Dbcontext classes in DI Container
