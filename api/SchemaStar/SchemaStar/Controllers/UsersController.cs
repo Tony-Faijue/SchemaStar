@@ -11,6 +11,7 @@ using SchemaStar.Models;
 using SchemaStar.DTOs;
 using SchemaStar.Exceptions;
 using SchemaStar.Services;
+using SchemaStar.DTOs.Authentication_DTOs;
 
 namespace SchemaStar.Controllers
 {
@@ -129,6 +130,14 @@ namespace SchemaStar.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
+        }
+
+        // api/Users/token
+        [HttpPost("token")]
+        public async Task<IActionResult> GetActionAsync(TokenRequestModel model)
+        {
+            var result = await _userService.GetTokenAsync(model);
+            return Ok(result);
         }
 
 
