@@ -19,3 +19,13 @@ Content-Type: application/json
 GET {{SchemaStar_HostAddress}}/api/users/{{publicId}}
 
 ###
+
+POST {{SchemaStar_HostAddress}}/api/users/token
+Content-Type: application/json
+
+{
+  "email": "test_user2@gmail.com",
+  "password": "Password1!"
+}
+
+###
