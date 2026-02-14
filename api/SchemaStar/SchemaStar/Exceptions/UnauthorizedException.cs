@@ -8,5 +8,10 @@ namespace SchemaStar.Exceptions
             : base(message, HttpStatusCode.Unauthorized)
         {
         }
+
+        public UnauthorizedException(string resourceName, object key)
+            : base($"Authentication failed for {resourceName} with identifier '{key}'. Please provide valid credentials.", HttpStatusCode.Unauthorized)
+        {
+        }
     }
 }

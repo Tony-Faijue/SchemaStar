@@ -47,8 +47,12 @@ namespace SchemaStar.ExceptionHandlers
             ArgumentException => (StatusCodes.Status400BadRequest, "Invalid argument provided"),
             UnauthorizedAccessException => (StatusCodes.Status401Unauthorized, "Unauthorized"),
 
+            ForbiddenException => (StatusCodes.Status403Forbidden, "Forbidden Request"),
             NotFoundException => (StatusCodes.Status404NotFound, "Resource Not Found"),
             ConflictException => (StatusCodes.Status409Conflict, "Resource Already Exist"),
+
+            ContentTooLargeException => (StatusCodes.Status413RequestEntityTooLarge, "Request Content too Large"),
+            UnsupportedMediaTypeException => (StatusCodes.Status415UnsupportedMediaType, "Unsupported Media Type"),
 
             AppException appException => ((int)appException.StatusCode, "Application Error"),
 
