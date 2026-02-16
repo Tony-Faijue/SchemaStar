@@ -1,0 +1,74 @@
+<div
+  class="relative overflow-hidden"
+  (mouseenter)="autoPlay.set(false)"
+  (mouseleave)="autoPlay.set(true)"
+>
+  <div class="relative h-[80vh] min-h-[500px]">
+    <!-- Hero Slides -->
+    @for (slide of slides; track $index) {
+      <div
+        class="absolute inset-0 tansition-opacity duration-700"
+        [class.opacity-100]="currentSlide() === $index"
+        [class.opacity-0]="currentSlide() !== $index"
+        [class.pointer-events-none]="currentSlide() !== $index"
+      >
+        <div class="absolute inset-0 bg-gray-800">
+          <img
+            [src]="slide.image"
+            [alt]="slide.title"
+            class="w-full h-full object-cover opacity-80"
+            (error)="handleImageError($event)"
+          />
+        </div>
+
+        <div class="container mx-auto px-6 h-full flex items-center">
+          <div
+            class="max-w-2xl text-white transition-all duration-700 delay-300"
+            [ngClass]="
+              currentSlide() === $index ? 'translate-x-0 opacity-100' : 'translate-x-10 opacity-0'
+            "
+          >
+            <h2 class="text-4xl md:text-5xl font-bold mb-4">{{ slide.title }}</h2>
+            <p class="text-xl md:text-2xl mb-8">{{ slide.description }}</p>
+            <a
+              [href]="slide.buttonUrl"
+              class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg text-lg font-semibold"
+            >
+              {{ slide.buttonText }}
+            </a>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Navigation Buttons -->
+    <button
+      (click)="prev()"
+      class="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 p-3 rounded-full text-white z-10"
+    >
+      <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-width="2" d="M15 19l-7-7 7-7" />
+      </svg>
+    </button>
+
+    <button
+      (click)="next()"
+      class="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 p-3 rounded-full text-white z-10"
+    >
+      <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-width="2" d="M9 5l7 7-7 7" />
+      </svg>
+    </button>
+
+    <!-- Indicators -->
+    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex space-x-2 z-10">
+      @for (slide of slides; track $index) {
+        <button
+          (click)="goTo($index)"
+          class="h-2 rounded-full transition-all"
+          [ngClass]="currentSlide() === $index ? 'bg-white w-6' : 'bg-white/50 w-2'"
+        ></button>
+      }
+    </div>
+  </div>
+</div>
