@@ -21,9 +21,11 @@
           />
         </div>
 
-        <div class="container mx-auto px-6 h-full flex items-center">
+        <div
+          class="container mx-auto px-6 h-full flex items-center justify-center lg:justify-start lg:ml-24"
+        >
           <div
-            class="max-w-2xl text-white transition-all duration-700 delay-300"
+            class="max-w-2xl text-white transition-all duration-700 delay-300 text-center lg:text-left"
             [ngClass]="
               currentSlide() === $index ? 'translate-x-0 opacity-100' : 'translate-x-10 opacity-0'
             "
