@@ -4,10 +4,13 @@ namespace SchemaStar.DTOs
 {
     public class UpdateUserRequestDTO
     {
-        [Required, StringLength(255)]
-        public string Username { get; set; } = null!;
+        [StringLength(255)]
+        public string? Username { get; set; }
 
-        [Required, StringLength(255), EmailAddress]
-        public string Email { get; set; } = null!;
+        [StringLength(255), EmailAddress]
+        public string? Email { get; set; }
+        
+        [Phone]
+        public string? PhoneNumber { get; set; }
     }
 }
