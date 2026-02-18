@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using SchemaStar.DTOs;
@@ -14,11 +14,14 @@ namespace SchemaStar.Services
 {
     public class UserService : IUserService
     {
-        private readonly SchemastarContext _context;
+        //Need to use UserManager & SignInManager
+        private readonly UserManager<User> _userManager;
+        private readonly SignInManager<User> _signInManager;
         private readonly JWTOptions _jwt;
-        public UserService(SchemastarContext context, IOptions<JWTOptions> jwt)
+        public UserService(UserManager<User> userManager, SignInManager<User> signInManager, IOptions<JWTOptions> jwt)
         {
-            _context = context;
+            _userManager = userManager;
+            _signInManager = signInManager;
             _jwt = jwt.Value;
         }
 
@@ -29,28 +32,45 @@ namespace SchemaStar.Services
         /// <returns> UserResponseDTO</returns>
         public async Task<UserResponseDTO> RegisterUserAsync(RegisterUserRequestDTO request)
         {
-            if (await _context.Users.AnyAsync(u => u.Email == request.Email || u.Username == request.Username))
+            //Check if the user already exists
+            //Check if the email exists
+            var existingUser = await _userManager.FindByEmailAsync(request.Email);
+            if (existingUser != null)
             {
                 //Custom 409 Conflict Exception
                 throw new ConflictException("Users");
             }
+            //Check if the username exists
+            existingUser = await _userManager.FindByNameAsync(request.Username);
+            if (existingUser != null) 
+            {
+                throw new ConflictException("Users");
+            }
+            //Generate a new GUID and convert it to MySQL binary format
+            var newGuid = Guid.NewGuid();
 
             var user = new User
             {
-                Username = request.Username,
+                UserName = request.Username,
                 Email = request.Email,
-                //Use BCrypt for hashing
-                Pass = BCrypt.Net.BCrypt.HashPassword(request.Password)
+                PublicId = newGuid.ToMySqlBinary()
             };
 
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+            //UserManager handles password hashing automatically
+            //Create the user
+            var result = await _userManager.CreateAsync(user, request.Password);
+            //Throw custom exception here if creation fails
+            if (!result.Succeeded) 
+            {
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                throw new InvalidOperationException($"User creation failed: {errors}");
+            }
 
             //Respsone DTO
             var response = new UserResponseDTO
             {
-                PublicId = new Guid(user.PublicId),
-                Username = user.Username,
+                PublicId = newGuid,
+                Username = user.UserName,
                 Email = user.Email,
                 CreatedAt = user.CreatedAt,
                 UpdatedAt = user.UpdatedAt,
@@ -62,19 +82,21 @@ namespace SchemaStar.Services
         public async Task<AuthenticationResponseDTO> GetTokenAsync(TokenRequestModel model)
         {
 
-            var authenticationResponseDTO = new AuthenticationResponseDTO();
-
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == model.Email);
+            var user = await _userManager.FindByEmailAsync(model.Email);
 
             if (user == null)
             {
                 throw new NotFoundException("Users");
             }
 
-            //Use the BCrypt Verify method for password verification
-            bool validPass = BCrypt.Net.BCrypt.Verify(model.Password, user.Pass);
+            //Use SignInManager for password check
+            var result = await _signInManager.CheckPasswordSignInAsync(
+                user,
+                model.Password,
+                lockoutOnFailure: false
+                );
 
-            if (!validPass)
+            if (!result.Succeeded)
             {
                 throw new UnauthorizedException("Users");
             }
@@ -87,22 +109,22 @@ namespace SchemaStar.Services
             {
                 IsAuthenticated = true,
                 Token = new JwtSecurityTokenHandler().WriteToken(jwtToken),
-                Email = user.Email,
-                UserName = user.Username
+                Email = user.Email!,
+                UserName = user.UserName!
             };
         }
 
         private JwtSecurityToken CreateJwtToken(User user) 
         {
             //Convert the binary to string for user public id
-            string publicIdString = new Guid(user.PublicId).ToString();
+            string publicIdString = user.PublicId.ToGuidFromMySqlBinary().ToString();
 
             //Create claims for the token information
             var claims = new List<Claim> 
             { 
-                new Claim(JwtRegisteredClaimNames.Sub, user.Username), //Subject
+                new Claim(JwtRegisteredClaimNames.Sub, user.UserName!), //Subject
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()), //Unique ID for the specific token
-                new Claim(JwtRegisteredClaimNames.Email, user.Email), //Email claim
+                new Claim(JwtRegisteredClaimNames.Email, user.Email!), //Email claim
                 new Claim("uid", publicIdString) //public id claim
             };
 

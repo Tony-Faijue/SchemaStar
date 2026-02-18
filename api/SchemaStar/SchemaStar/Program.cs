@@ -25,6 +25,9 @@ string connectionString = builder.Configuration.GetConnectionString("DefaultConn
 //Register with MySQL
 builder.Services.AddDbContext<SchemastarContext>(o => o.UseMySQL(connectionString));
 
+//Register AspNetCore Identity
+builder.Services.AddIdentityServices();
+
 //-------------Problem Details Service-------------
 
 //Register Problem Details Service for API Errors
@@ -53,6 +56,9 @@ app.UseExceptionHandler();
 app.UseStatusCodePages();
 
 app.UseHttpsRedirection();
+
+//Added Authentication
+app.UseAuthentication();
 
 app.UseAuthorization();
 
