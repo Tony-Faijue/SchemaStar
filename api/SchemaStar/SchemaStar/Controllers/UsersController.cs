@@ -12,6 +12,8 @@ using SchemaStar.Exceptions;
 using SchemaStar.Services;
 using SchemaStar.DTOs.Authentication_DTOs;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace SchemaStar.Controllers
 {
@@ -32,6 +34,8 @@ namespace SchemaStar.Controllers
         }
 
         // GET: api/Users
+        //Only admin role should access all users
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<UserResponseDTO>>> GetUsers()
         {
@@ -48,6 +52,7 @@ namespace SchemaStar.Controllers
         }
 
         // GET: api/Users/{publicId}
+        [Authorize]
         [HttpGet("{publicId}")]
         public async Task<ActionResult<UserResponseDTO>> GetUser(Guid publicId)
         {
@@ -75,9 +80,20 @@ namespace SchemaStar.Controllers
 
         // PATCH: api/Users/{publicId}
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize]
         [HttpPatch("{publicId}")]
         public async Task<ActionResult<UserResponseDTO>> UpdateUser(Guid publicId, UpdateUserRequestDTO request)
         {
+            //Verify the same user is updating themself
+            //Get the UID from the token claims
+            var tokenUid = User.FindFirstValue("uid");
+
+            //Compare uid token strings
+            if (tokenUid == null || !string.Equals(tokenUid, publicId.ToString(), StringComparison.OrdinalIgnoreCase)) 
+            {
+                throw new ForbiddenException("Users");
+            }
+
             byte[] publicIdBytes = publicId.ToMySqlBinary();
 
             var isChanged = request.Email != null || request.Username != null || request.PhoneNumber != null;
@@ -116,12 +132,13 @@ namespace SchemaStar.Controllers
             //Check if any value has changed and return a user response dto
             if (isChanged)
             {
-                return new UserResponseDTO
+                var response = new UserResponseDTO
                 {
                     PublicId = user.PublicId.ToGuidFromMySqlBinary(),
                     Username = user.UserName!,
                     Email = user.Email!
                 };
+                return Ok(response);
             }
 
             return NoContent();
@@ -129,6 +146,7 @@ namespace SchemaStar.Controllers
 
         // POST: api/Users (Register Users)
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [AllowAnonymous]
         [HttpPost]
         public async Task<ActionResult<UserResponseDTO>> PostUser(RegisterUserRequestDTO request)
         {
@@ -139,9 +157,20 @@ namespace SchemaStar.Controllers
         }
 
         // DELETE: api/Users/{publicId}
+        [Authorize]
         [HttpDelete("{publicId}")]
         public async Task<IActionResult> DeleteUser(Guid publicId)
         {
+            //Check to make sure the user is deleting themself
+            //Get the UID from the token claims
+            var tokenUid = User.FindFirstValue("uid");
+
+            //Compare uid token strings
+            if (tokenUid == null || !string.Equals(tokenUid, publicId.ToString(), StringComparison.OrdinalIgnoreCase))
+            {
+                throw new ForbiddenException("Users");
+            }
+
             byte[] publicIdBytes = publicId.ToMySqlBinary();
 
             var user = await _userManager
@@ -164,6 +193,7 @@ namespace SchemaStar.Controllers
         }
 
         // api/Users/token
+        [AllowAnonymous]
         [HttpPost("token")]
         public async Task<IActionResult> GetActionAsync(TokenRequestModel model)
         {
