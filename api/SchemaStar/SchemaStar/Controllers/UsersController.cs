@@ -73,25 +73,37 @@ namespace SchemaStar.Controllers
             };
         }
 
-        // PUT: api/Users/{publicId}
+        // PATCH: api/Users/{publicId}
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{publicId}")]
-        public async Task<IActionResult> UpdateUser(Guid publicId, UpdateUserRequestDTO request)
+        [HttpPatch("{publicId}")]
+        public async Task<ActionResult<UserResponseDTO>> UpdateUser(Guid publicId, UpdateUserRequestDTO request)
         {
             byte[] publicIdBytes = publicId.ToMySqlBinary();
+
+            var isChanged = request.Email != null || request.Username != null || request.PhoneNumber != null;
 
             var user = await _userManager
                 .Users
                 .FirstOrDefaultAsync(u => u.PublicId == publicIdBytes);
-            
+
             if (user == null)
             {
-                return NotFound();
+                throw new NotFoundException("Users");
             }
 
             //Update fields
-            user.UserName = request.Username;
-            user.Email = request.Email;
+            if (request.Username != null)
+            {
+                user.UserName = request.Username;
+            }
+            if (request.Email != null)
+            {
+                user.Email = request.Email;
+            }
+            if (request.PhoneNumber != null) 
+            {
+                user.PhoneNumber = request.PhoneNumber;
+            }
 
             var result = await _userManager.UpdateAsync(user);
 
@@ -100,6 +112,16 @@ namespace SchemaStar.Controllers
                 //Create Custom Excetpion
                 var errors = result.Errors.Select(e => e.Description);
                 return Conflict(new{ errors});
+            }
+            //Check if any value has changed and return a user response dto
+            if (isChanged)
+            {
+                return new UserResponseDTO
+                {
+                    PublicId = user.PublicId.ToGuidFromMySqlBinary(),
+                    Username = user.UserName!,
+                    Email = user.Email!
+                };
             }
 
             return NoContent();
@@ -116,7 +138,7 @@ namespace SchemaStar.Controllers
             return CreatedAtAction(nameof(GetUser), new { publicId = response.PublicId }, response);
         }
 
-        // DELETE: api/Users/{guid}
+        // DELETE: api/Users/{publicId}
         [HttpDelete("{publicId}")]
         public async Task<IActionResult> DeleteUser(Guid publicId)
         {
@@ -128,7 +150,7 @@ namespace SchemaStar.Controllers
             
             if (user == null)
             {
-                return NotFound();
+                throw new NotFoundException("Users");
             }
 
             var result = await _userManager.DeleteAsync(user);
