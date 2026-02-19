@@ -1,7 +1,21 @@
 @SchemaStar_HostAddress = https://localhost:7061
 
-@publicId=adacbfc3-4f2b-41a7-8cb0-1e9c30005dc8
+@publicId=1f56d50a-328c-4a1e-a23a-91e2b5396f88
+
 //---User Api Endpoints---
+
+# Get token Register/Login
+# @name login
+POST {{SchemaStar_HostAddress}}/api/users/token
+Content-Type: application/json
+
+{
+  "email": "test_user100@gmail.com",
+  "password": "Password1!"
+}
+
+###
+
 POST {{SchemaStar_HostAddress}}/api/users
 Content-Type: application/json
 
@@ -13,34 +27,30 @@ Content-Type: application/json
 
 ###
 GET {{SchemaStar_HostAddress}}/api/users
-
+Authorization: Bearer {{login.response.body.$.token}}
 ###
+
 GET {{SchemaStar_HostAddress}}/api/users/{{publicId}}
+Authorization: Bearer {{login.response.body.$.token}}
+
 
 ###
 
 PATCH {{SchemaStar_HostAddress}}/api/users/{{publicId}}
 Content-Type: application/json
+Authorization: Bearer {{login.response.body.$.token}}
 
 {
-  "username": "test_user4",
-  "email": "test_user4@gmail.com",
-  "phoneNumber": "1234567890"
+  "username": "test_user101",
+  "email": "test_user100@gmail.com",
+  "phoneNumber": "0001234567"
 }
 
 ###
 
 DELETE {{SchemaStar_HostAddress}}/api/users/{{publicId}}
+Authorization: Bearer {{login.response.body.$.token}}
 
 ###
 
-POST {{SchemaStar_HostAddress}}/api/users/token
-Content-Type: application/json
-
-{
-  "email": "test_user2@gmail.com",
-  "password": "Password1!"
-}
-
-###
 
