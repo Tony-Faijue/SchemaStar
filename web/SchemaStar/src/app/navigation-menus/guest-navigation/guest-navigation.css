@@ -1,1 +1,10 @@
 @import 'tailwindcss';
+
+.menu-item{
+    @apply font-medium px-4 py-2 border-2 border-transparent transition-all duration-200;
+}
+.menu-item:hover{
+    background-color: var(--color-base-purple);
+    @apply border-slate-900 text-zinc-100;
+    box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 1);
+}
