@@ -1,5 +1,5 @@
 @import 'tailwindcss';
 
 .schemastar-container {
-    @apply bg-amber-200 min-w-full min-h-full;
+    @apply bg-zinc-50 text-neutral-800 min-w-full min-h-full;
 }

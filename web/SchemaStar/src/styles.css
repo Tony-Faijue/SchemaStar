@@ -1,5 +1,15 @@
 @import 'tailwindcss';
 
+@theme {
+    /*-----------------Colors Themes-----------------*/
+    --color-light-purple:#9E87E1;
+    --color-light-medium-purple:#7A5ECD;
+    --color-base-purple:#5F3DC2;
+    --color-medium-purple:#431DB6;
+    --color-dark-purple:#2F0F8E;
+
+}
+
 .auth-btn{
     @apply w-45 bg-purple-400 hover:bg-purple-700 hover:shadow-sm hover:shadow-slate-100 text-zinc-100 font-semibold py-3 rounded-lg shadow-md transition-all duration-200 text-center;
 }
