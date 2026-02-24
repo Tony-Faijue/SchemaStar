@@ -1,0 +1,51 @@
+<div
+  class="bg-amber-100 border-2 border-base-purple rounded-t-lg min-h-screen flex items-center justify-center p-4"
+>
+  <div class="bg-white shadow-xl rounded-2xl w-full max-w-md p-6 sm:p-8">
+    <h1 class="text-3xl font-extrabold text-center text-zinc-800 mb-6">Login</h1>
+    <!-- FormGroup -->
+    <form [formGroup]="loginForm" (submit)="login()">
+      <div class="grid gap-4">
+        <div class="grid grid-cols-1 gap-4">
+          <!--Email-->
+          <div class="flex items-center space-x-4">
+            <label for="email" class="label-form w-32 text-right">Email</label>
+            <input
+              type="email"
+              id="email"
+              formControlName="email"
+              placeholder="youremail@example.com"
+              required
+              class="input-form input-form-focus"
+            />
+          </div>
+          <!--Password-->
+          <div class="flex items-center space-x-4">
+            <label for="password" class="label-form w-32 text-right">Password</label>
+            <input
+              type="password"
+              id="password"
+              formControlName="password"
+              placeholder="Password"
+              required
+              class="input-form input-form-focus"
+            />
+          </div>
+        </div>
+        <div class="flex justify-center">
+          <button type="submit" class="auth-btn">Login</button>
+        </div>
+      </div>
+      <!-- SignUp Redirect -->
+      <div>
+        <p class="text-center text-sm mt-2">
+          <!-- Redirect to register route -->
+          Don't have an account?
+          <a [routerLink]="['/register']" class="text-purple-600 font-medium hover:underline"
+            >Signup</a
+          >
+        </p>
+      </div>
+    </form>
+  </div>
+</div>

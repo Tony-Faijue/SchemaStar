@@ -1,0 +1,78 @@
+<div
+  class="bg-amber-100 border-2 border-base-purple rounded-t-lg min-h-screen flex items-center justify-center p-4"
+>
+  <div class="bg-white shadow-xl rounded-2xl w-full max-w-md p-6 sm:p-8">
+    <div class="user-form-bg">
+      <h1 class="heading-form-title">Create an Account</h1>
+      <!-- Form for user to register -->
+      <!-- Action calls the register fucntion of the register route -->
+      <form [formGroup]="registerForm" (submit)="registerUser()" class="space-y-5">
+        <!--UserName-->
+        <div>
+          <label for="name" class="block label-form mb-1">Username</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            formControlName="username"
+            placeholder="Username"
+            required
+            class="input-form input-form-focus"
+          />
+        </div>
+        <!--Email-->
+        <div>
+          <label for="email" class="block label-form mb-1">Email</label>
+          <input
+            type="text"
+            id="email"
+            name="email"
+            formControlName="email"
+            placeholder="youremail@example.com"
+            required
+            class="input-form input-form-focus"
+          />
+        </div>
+        <!--Passowrd-->
+        <div>
+          <label for="password" class="block label-form mb-1">Password</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            formControlName="password"
+            placeholder="Password"
+            required
+            class="input-form input-form-focus"
+          />
+        </div>
+        <!--Re-Confirm Password-->
+        <div>
+          <label for="repassword" class="block label-form mb-1">Confirm Password</label>
+          <input
+            type="password"
+            id="repassword"
+            name="repassword"
+            formControlName="repassword"
+            placeholder="Password"
+            required
+            class="input-form input-form-focus"
+          />
+        </div>
+        <!--Submit Button-->
+        <div class="flex justify-center">
+          <button class="auth-btn">Signup</button>
+        </div>
+        <!--Login Redirect-->
+        <div>
+          <p class="text-center text-sm text-zinc-800 mt-2">
+            Already have an account?
+            <a [routerLink]="['/login']" class="text-purple-600 font-medium hover:underline"
+              >Login</a
+            >
+          </p>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
