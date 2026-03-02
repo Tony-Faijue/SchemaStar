@@ -192,12 +192,29 @@ namespace SchemaStar.Controllers
             return NoContent();
         }
 
-        // api/Users/token
+        /// <summary>
+        /// Login with HttpOnly cookie (web)
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [AllowAnonymous]
         [HttpPost("token")]
-        public async Task<IActionResult> GetActionAsync(TokenRequestModel model)
+        public async Task<IActionResult> LoginWithCookie(TokenRequestModel model)
         {
-            var result = await _userService.GetTokenAsync(model);
+            var result = await _userService.GetTokenWithCookieAsync(model);
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Login with Bearer token (mobile and testing)
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [AllowAnonymous]
+        [HttpPost("token/bearer")]
+        public async Task<IActionResult> LoginWithBearer(TokenRequestModel model) 
+        {
+            var result = await _userService.GetTokenWithBearerAsync(model);
             return Ok(result);
         }
     }

@@ -15,6 +15,9 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+// Add HttpContextAccessor to access the current HTTP request and response
+builder.Services.AddHttpContextAccessor();
+
 //-------------Added UserService-------------
 builder.Services.AddScoped<IUserService, UserService>();
 
@@ -41,6 +44,9 @@ builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 //JWT Options & Authentications
 builder.Services.AddJwtAuthentication(builder.Configuration);
 
+//CORS configuration
+builder.Services.AddCorsConfiguration();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -56,6 +62,9 @@ app.UseExceptionHandler();
 app.UseStatusCodePages();
 
 app.UseHttpsRedirection();
+
+//Middleware Custom Cors Policy 
+app.UseCors("AllowAngular");
 
 //Added Authentication
 app.UseAuthentication();

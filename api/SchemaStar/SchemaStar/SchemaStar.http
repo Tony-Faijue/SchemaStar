@@ -4,8 +4,7 @@
 
 //---User Api Endpoints---
 
-# Get token Register/Login
-# @name login
+### Web Login (Cookie)
 POST {{SchemaStar_HostAddress}}/api/users/token
 Content-Type: application/json
 
@@ -14,8 +13,17 @@ Content-Type: application/json
   "password": "Password1!"
 }
 
-###
+### Mobile/Testing Login
+# @name login
+POST {{SchemaStar_HostAddress}}/api/users/token/bearer
+Content-Type: application/json
 
+{
+  "email": "test_user100@gmail.com",
+  "password": "Password1!"
+}
+
+### 
 POST {{SchemaStar_HostAddress}}/api/users
 Content-Type: application/json
 
@@ -52,5 +60,3 @@ DELETE {{SchemaStar_HostAddress}}/api/users/{{publicId}}
 Authorization: Bearer {{login.response.body.$.token}}
 
 ###
-
-
