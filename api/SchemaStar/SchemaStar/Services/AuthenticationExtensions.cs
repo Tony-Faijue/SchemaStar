@@ -45,9 +45,9 @@ namespace SchemaStar.Services
                     {
                         OnMessageReceived = context =>
                         {
-                            if (context.Request.Cookies.ContainsKey("X-Access-Token"))
+                            if (context.Request.Cookies.TryGetValue("authToken", out var token))
                             {
-                                context.Token = context.Request.Cookies["X-Access-Token"];
+                                context.Token = token;
                             }
                             return Task.CompletedTask;
                         }

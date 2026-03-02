@@ -6,6 +6,8 @@ namespace SchemaStar.Services
     public interface IUserService
     {
         Task<UserResponseDTO> RegisterUserAsync(RegisterUserRequestDTO request);
-        Task<AuthenticationResponseDTO> GetTokenAsync(TokenRequestModel model);
+        Task<CookieAuthResponseDTO> GetTokenWithCookieAsync(TokenRequestModel model);
+        Task<BearerAuthResponseDTO> GetTokenWithBearerAsync(TokenRequestModel model);
+
     }
 }

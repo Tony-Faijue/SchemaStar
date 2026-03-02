@@ -18,11 +18,13 @@ namespace SchemaStar.Services
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly JWTOptions _jwt;
-        public UserService(UserManager<User> userManager, SignInManager<User> signInManager, IOptions<JWTOptions> jwt)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public UserService(UserManager<User> userManager, SignInManager<User> signInManager, IOptions<JWTOptions> jwt, IHttpContextAccessor httpContextAccessor)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _jwt = jwt.Value;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         /// <summary>
@@ -79,40 +81,74 @@ namespace SchemaStar.Services
             return response;
         }
 
-        public async Task<AuthenticationResponseDTO> GetTokenAsync(TokenRequestModel model)
+        /// <summary>
+        /// Authenticate with HttpOnly cookie (web)
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        public async Task<CookieAuthResponseDTO> GetTokenWithCookieAsync(TokenRequestModel model)
         {
 
-            var user = await _userManager.FindByEmailAsync(model.Email);
-
-            if (user == null)
-            {
-                throw new NotFoundException("Users");
-            }
-
-            //Use SignInManager for password check
-            var result = await _signInManager.CheckPasswordSignInAsync(
-                user,
-                model.Password,
-                lockoutOnFailure: false
-                );
-
-            if (!result.Succeeded)
-            {
-                throw new UnauthorizedException("Users");
-            }
+            var user = await ValidateUseryAsync(model);
 
             //Generate the token for the verified user
             var jwtToken = CreateJwtToken(user);
+            var tokenString = new JwtSecurityTokenHandler().WriteToken(jwtToken);
+
+            //Set JWT in HttpOnly cookie
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true, //the cookie is not accessible by client side-script
+                Secure = true,  //sent through HTTPS
+                SameSite = SameSiteMode.Strict, //CRSF protection
+                Expires = DateTime.UtcNow.AddMinutes(_jwt.DurationInMinutes) //Duration of the Cookie
+            };
+
+            //append the cookie to the http response
+            _httpContextAccessor.HttpContext?.Response.Cookies.Append(
+                    "authToken", //Cookie name
+                    tokenString, //JWT Token
+                    cookieOptions
+                );
 
             //Return the response DTO
-            return new AuthenticationResponseDTO
+            return new CookieAuthResponseDTO
             {
                 IsAuthenticated = true,
-                Token = new JwtSecurityTokenHandler().WriteToken(jwtToken),
                 Email = user.Email!,
                 UserName = user.UserName!
             };
         }
+
+        /// <summary>
+        /// Authenticate with Bearer token (mobile)
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        public async Task<BearerAuthResponseDTO> GetTokenWithBearerAsync(TokenRequestModel model)
+        {
+
+            var user = await ValidateUseryAsync(model);
+
+            //Generate the token for the verified user
+            var jwtToken = CreateJwtToken(user);
+            var tokenString = new JwtSecurityTokenHandler().WriteToken(jwtToken);
+
+            //Return the response DTO
+            return new BearerAuthResponseDTO
+            {
+                IsAuthenticated = true,
+                Email = user.Email!,
+                UserName = user.UserName!,
+                Token = tokenString!
+            };
+        }
+
+        /// <summary>
+        /// Generates the JWT Token based on the user 
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
 
         private JwtSecurityToken CreateJwtToken(User user) 
         {
@@ -143,6 +179,36 @@ namespace SchemaStar.Services
                     expires: DateTime.UtcNow.AddMinutes(_jwt.DurationInMinutes), //Expiration Time
                     signingCredentials: creds //The signature
                 );
+        }
+
+        /// <summary>
+        /// Method to validate the user
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns>User object</returns>
+        /// <exception cref="NotFoundException"></exception>
+        /// <exception cref="UnauthorizedException"></exception>
+        private async Task<User> ValidateUseryAsync(TokenRequestModel model) 
+        {
+            var user = await _userManager.FindByEmailAsync(model.Email);
+
+            if (user == null)
+            {
+                throw new NotFoundException("Users");
+            }
+
+            //Use SignInManager for password check
+            var result = await _signInManager.CheckPasswordSignInAsync(
+                user,
+                model.Password,
+                lockoutOnFailure: false
+                );
+
+            if (!result.Succeeded)
+            {
+                throw new UnauthorizedException("Users");
+            }
+            return user;
         }
     }
 }
