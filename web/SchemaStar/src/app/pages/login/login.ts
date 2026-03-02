@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterLink } from "@angular/router";
-import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
+import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import { AuthenticationService } from '../../services/authentication-service';
 
 @Component({
   selector: 'app-login',
@@ -10,15 +11,25 @@ import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
 })
 export class Login {
 
-//FormGroup  
-loginForm: FormGroup = new FormGroup({
-  email: new FormControl(''),
-  password: new FormControl('')
-});
+  authenticationService = inject(AuthenticationService);
 
-login(){
-  //Call authentication service for logging in the user
-  console.log('Login Successful');
-  console.log('Email: ', this.loginForm.controls['email'].value)
-}
+  //FormGroup  
+  loginForm: FormGroup = new FormGroup({
+    email: new FormControl('', { 
+      nonNullable: true,
+      validators: [Validators.maxLength(255), Validators.required, Validators.email]
+    }),
+    password: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.minLength(8), Validators.maxLength(255), Validators.required, Validators.pattern(/^(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,}$/)]
+    })
+  });
+
+  /**
+   * Calls the AuthenticationService for logging in the existing user
+   */
+  login(){
+    //Call authentication service for logging in the user
+    this.authenticationService.loginUser(this.loginForm);
+  }
 }
