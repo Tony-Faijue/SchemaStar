@@ -29,7 +29,16 @@ export class Login {
    * Calls the AuthenticationService for logging in the existing user
    */
   login(){
-    //Call authentication service for logging in the user
-    this.authenticationService.loginUser(this.loginForm);
-  }
+    if (this.loginForm.valid){
+      this.authenticationService.loginUser(this.loginForm).subscribe({
+        next: (response) => {
+          console.log('Login Successful!', response);
+        },
+        error: (err) => {
+          console.error('Login failed', err);
+          alert('Invalid email or password');
+        }
+        });
+      }
+    }
 }
