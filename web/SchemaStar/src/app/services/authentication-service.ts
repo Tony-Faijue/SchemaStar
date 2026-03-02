@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs'; 
+import {SecretData} from '../../../environment';
 
 /**
  * Data to register a new user
@@ -24,11 +25,10 @@ export interface LoginUser {
  * Response data from an authenticated user
  */
 export interface AuthResponse{
-  message: string,
+  message?: string,
   isAuthenticated: boolean,
   username: string,
   email: string,
-  token: string
 }
 
 @Injectable({
@@ -37,17 +37,17 @@ export interface AuthResponse{
 export class AuthenticationService {
 
   //The url api endpoint for login and registeration
-  registerUserURL = 'example.com';
-  loginUserURL = 'example.com';
+  private registerUserURL = `${SecretData.baseuUrl}/api/users`;
+  private loginUserURL = `${SecretData.baseuUrl}/api/users/token`;
 
-  http = inject(HttpClient);
+  private http = inject(HttpClient);
 
   /**
    * 
    * @param registerForm registerForm for registering a new user
    * @returns an Observable of RegisterUser for the HTTP POST function
    */
-  registerUser(registerForm: FormGroup):Observable<AuthResponse> {
+   registerUser(registerForm: FormGroup):Observable<AuthResponse> {
     //Use of getRawValue() to return the object with strict types
     const formData = registerForm.getRawValue();
 
