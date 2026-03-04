@@ -145,6 +145,7 @@ namespace SchemaStar.Controllers
         }
 
         // POST: api/Users (Register Users)
+        // Register user with Cookie Token
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [AllowAnonymous]
         [HttpPost]
@@ -152,6 +153,15 @@ namespace SchemaStar.Controllers
         {
             //Call RegisterUserSync form UserService
             var response = await _userService.RegisterUserAsync(request);
+
+            //Immediately login the user
+            var loginModel = new TokenRequestModel
+            {
+                Email = request.Email,
+                Password = request.Password
+            };
+
+            await _userService.GetTokenWithCookieAsync(loginModel);
 
             return CreatedAtAction(nameof(GetUser), new { publicId = response.PublicId }, response);
         }
