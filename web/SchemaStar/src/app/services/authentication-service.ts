@@ -31,6 +31,13 @@ export interface AuthResponse{
   email: string,
 }
 
+/**
+ * Response message for logging out a user
+ */
+export interface LogoutResponse {
+  message: string
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -39,6 +46,7 @@ export class AuthenticationService {
   //The url api endpoint for login and registeration
   private registerUserURL = `${SecretData.baseuUrl}/api/users`;
   private loginUserURL = `${SecretData.baseuUrl}/api/users/token`;
+  private logoutUserUrl = `${SecretData.baseuUrl}/logout`;
 
   private http = inject(HttpClient);
 
@@ -74,6 +82,14 @@ export class AuthenticationService {
     }
 
     return this.http.post<AuthResponse>(this.loginUserURL, credentials);
+  }
+
+  /**
+   * 
+   * @returns the repsone message from logging out a user
+   */
+  logoutUser(): Observable<LogoutResponse>{
+    return this.http.post<LogoutResponse>(this.logoutUserUrl, {});
   }
 
 }
