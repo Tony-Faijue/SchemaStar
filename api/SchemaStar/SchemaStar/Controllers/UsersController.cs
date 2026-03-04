@@ -227,5 +227,16 @@ namespace SchemaStar.Controllers
             var result = await _userService.GetTokenWithBearerAsync(model);
             return Ok(result);
         }
+
+        /// <summary>
+        /// Logout user by clearing authentication cookie
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("logout")]
+        public IActionResult LogOutWithCookie() 
+        {
+            Response.Cookies.Delete("authToken");
+            return Ok(new { message = "Logged out successfully" });
+        }
     }
 }
