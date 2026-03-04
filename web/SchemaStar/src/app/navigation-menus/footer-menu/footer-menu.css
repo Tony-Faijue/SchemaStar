@@ -1,0 +1,5 @@
+@import 'tailwindcss';
+
+.footer-menu-item{
+    @apply hover:text-amber-200 hover:underline;
+}
