@@ -1,0 +1,36 @@
+@if (isOpen) {
+  <div
+    class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 transition-opacity"
+    (click)="close()"
+  ></div>
+  <div
+    class="fixed top-15 right-4 z-50 w-64 h-fit bg-zinc-50 rounded-2xl shadow-2xl border-border-zinc-200 flex flex-col overflow-hidden"
+  >
+    <div class="p-4 flex flex-col space-y-2">
+      <div class="px-3 py-2">
+        <div class="text-xs font-bold tracking-wide text-slate-400 uppercase">Account</div>
+      </div>
+      <a
+        href=""
+        class="group flex items-center justify-center-center justify-between px-4 py-3 rounded-xl transition-colors hover:bg-zinc-100 text-slate-700"
+      >
+        <span class="font-semibold group-hover:text-medium-purple">Profile</span
+        ><i class="fa-solid fa-user group-hover:text-medium-purple"></i>
+      </a>
+      <a
+        href=""
+        class="group flex items-center justify-center-center justify-between px-4 py-3 rounded-xl transition-colors hover:bg-zinc-100 text-slate-700"
+      >
+        <span class="font-semibold group-hover:text-medium-purple">Settings</span
+        ><i class="fa-solid fa-gear group-hover:text-medium-purple"></i>
+      </a>
+      <a
+        href=""
+        class="group flex items-center justify-between px-4 py-3 rounded-xl transition-colors hover:bg-red-50 text-red-600"
+      >
+        <span class="font-semibold">Logout</span>
+        <i class="fa-solid fa-right-from-bracket"></i>
+      </a>
+    </div>
+  </div>
+}

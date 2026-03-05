@@ -1,7 +1,7 @@
 <div class="flex flex-col h-screen">
   <!-- Top Nav Menu -->
   <header class="z-40 drop-shadow-md">
-    <app-user-menu />
+    <app-user-menu (click)="isUserMenuOpen = true" />
   </header>
   <!-- Side Dashboard Menu -->
   <div class="flex flex-1 overflow-hidden">
@@ -15,4 +15,5 @@
       </div>
     </main>
   </div>
+  <app-user-menu-drawer [isOpen]="isUserMenuOpen" (closeDrawer)="isUserMenuOpen = false" />
 </div>
