@@ -3,6 +3,7 @@ import { MainLayout } from './main-layout/main-layout';
 import { Welcome } from './pages/welcome/welcome';
 import { Login } from './pages/login/login';
 import { Register } from './pages/register/register';
+import { DashboardLayout } from './pages/dashboard/dashboard-layout/dashboard-layout';
 
 export const routes: Routes = [
     {
@@ -25,6 +26,10 @@ export const routes: Routes = [
             
         ]
 
+    },
+    {
+        path:'dashboard',
+        component: DashboardLayout,
     },
 
 ];
