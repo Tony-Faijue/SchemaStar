@@ -9,11 +9,20 @@
       <app-dashboard-side-menu />
     </aside>
     <!-- Main Content -->
-    <main class="flex-1 overflow-y-auto bg-gray-100 p-6">
-      <div class="justify-items-center">
-        <h1>Hello World</h1>
+    <main class="flex-1 overflow-y-auto bg-gray-100 p-6 space-y-2">
+      <div class="mx-auto w-fit">
+        <!-- Create Schema Button -->
+        <app-create-schema (click)="isCreateSchemaFormOpen = true" />
       </div>
+      <!-- Dashboard Main Content -->
+      <app-dashboard-main />
     </main>
   </div>
+  <!-- User Menu Drawer -->
   <app-user-menu-drawer [isOpen]="isUserMenuOpen" (closeDrawer)="isUserMenuOpen = false" />
+  <!-- Create Schema Form -->
+  <app-create-schema-form
+    [isOpen]="isCreateSchemaFormOpen"
+    (closeForm)="isCreateSchemaFormOpen = false"
+  />
 </div>

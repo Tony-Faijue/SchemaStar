@@ -12,7 +12,7 @@ export class UserMenuDrawer {
   @Output() closeDrawer = new EventEmitter<void>(); //tell the parent to close the drawer
 
   /**
-   * emit the closeDrawer event emitter to the parent component
+   * emit the closeDrawer event emitter to the parent component (dashboard layout component)
    */
   close(){
     this.closeDrawer.emit();

@@ -1,0 +1,34 @@
+@if (isOpen) {
+  <div
+    class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 transition-opacity flex items-center justify-center p-4"
+    (click)="close()"
+  >
+    <div
+      class="bg-slate-700 rounded-2xl form-shadow w-full max-w-md p-6 sm:p-8"
+      (click)="$event.stopPropagation()"
+    >
+      <h1 class="text-3xl font-extrabold text-center text-zinc-50 mb-6">Create New Schema</h1>
+      <!-- FormGroup -->
+      <form>
+        <div class="grid gap-4">
+          <div class="grid grid-cols-1">
+            <!--Schema Name-->
+            <div class="flex items-center space-x-4">
+              <input
+                type="text"
+                id="schema_name"
+                formControlName="schema_name"
+                placeholder="Enter Schema Name"
+                required
+                class="w-full input-form input-form-focus"
+              />
+            </div>
+          </div>
+          <div class="flex justify-end">
+            <button type="submit" class="confirm-schema-btn">Confirm</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+}
