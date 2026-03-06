@@ -1,0 +1,23 @@
+<div class="flex flex-row gap-x-4">
+  <!-- Search Bar -->
+  <div class="relative w-1/2 lg:w-3/4">
+    <input type="text" placeholder="Search" class="input-form input-form-focus" />
+    <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+      <i class="fa-solid fa-magnifying-glass fa-lg ml-2" style="color: rgb(42, 8, 53)"></i>
+    </div>
+  </div>
+  <!-- Search Filters -->
+  <div class="relative w-1/2 lg:w-1/4">
+    <select
+      name="searchOptions"
+      id="searchOptions"
+      class="bg-white w-full h-full border border-purple-600 focus:outline-none focus:border-purple-400 text-purple-500 rounded px-2 md:px-3 md:py-1 tracking-wider"
+    >
+      <option value="Recent" selected="true">Recent</option>
+      <option value="Asc">Ascending (A-Z)</option>
+      <option value="Desc">Descending (Z-A)</option>
+      <option value="Oldest">Oldest</option>
+      <option value="Newest">Newest</option>
+    </select>
+  </div>
+</div>

@@ -1,0 +1,5 @@
+@import 'tailwindcss';
+
+.create-schema-btn{
+    @apply w-45 bg-purple-500 hover:bg-purple-700 hover:shadow-sm hover:shadow-slate-100 text-zinc-100 font-semibold py-3 rounded-lg shadow-md transition-all duration-200 text-center;
+}
