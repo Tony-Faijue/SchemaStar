@@ -1,7 +1,7 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormGroup } from '@angular/forms';
-import { Observable } from 'rxjs'; 
+import { catchError, map, Observable, tap, of } from 'rxjs'; 
 import {SecretData} from '../../../environment';
 
 /**
@@ -43,10 +43,16 @@ export interface LogoutResponse {
 })
 export class AuthenticationService {
 
+  /**
+   * The current user state. EIther the user is authenticated or not (null).
+   */
+  public currentUser = signal<AuthResponse|null>(null);
+
   //The url api endpoint for login and registeration
   private registerUserURL = `${SecretData.baseuUrl}/api/users`;
   private loginUserURL = `${SecretData.baseuUrl}/api/users/token`;
   private logoutUserUrl = `${SecretData.baseuUrl}/logout`;
+  private checkAuthUrl = `${SecretData.baseuUrl}/me`;
 
   private http = inject(HttpClient);
 
@@ -92,4 +98,29 @@ export class AuthenticationService {
     return this.http.post<LogoutResponse>(this.logoutUserUrl, {});
   }
 
+/**
+ * 
+ * @returns an observable boolean true if the current user is authenticated, false otherwise
+ */
+  checkAuthStatus(): Observable<boolean> {
+    return this.http.get<AuthResponse>(this.checkAuthUrl).pipe(
+      //tap is used to perform a side effect
+      tap({
+          next: (user) => this.currentUser.set(user)
+      }),
+      map(() => true),
+      catchError((err) => {
+        this.currentUser.set(null);
+        return of (false);
+      })
+    );
+  }
+
+  /**
+   * 
+   * @returns true if the current user is authenticated, false otherwise
+   */
+  isLoggedIn(): boolean {
+    return this.currentUser()? true: false;
+  }
 }
