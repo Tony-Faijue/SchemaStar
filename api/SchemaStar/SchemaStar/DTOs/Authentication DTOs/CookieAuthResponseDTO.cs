@@ -5,9 +5,12 @@
     /// </summary>
     public class CookieAuthResponseDTO
     {
-        public string Message { get; set; } = null!;
-        public bool IsAuthenticated { get; set; }
-        public string UserName { get; set; } = null!;
+        public Guid PublicId { get; set; }
+        public bool IsAuthenticated { get; set; } = false;
         public string Email { get; set; } = null!;
+        public string Username { get; set; } = null!;
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
+
     }
 }
