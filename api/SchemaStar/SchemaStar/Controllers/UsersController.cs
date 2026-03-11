@@ -238,5 +238,32 @@ namespace SchemaStar.Controllers
             Response.Cookies.Delete("authToken");
             return Ok(new { message = "Logged out successfully" });
         }
+
+        /// <summary>
+        /// Gets the Current User Info only if the cookie is valid
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotFoundException"></exception>
+        [Authorize]
+        [HttpGet("me")]
+        public async Task<ActionResult<UserResponseDTO>> GetCurrentUserInfo() {
+            
+            var userEmail = User.FindFirstValue(ClaimTypes.Email);
+            var user = await _userManager.FindByEmailAsync(userEmail!);
+
+            if (user == null)
+            {
+                throw new NotFoundException("Users");
+            }
+
+            return new UserResponseDTO
+            {
+                PublicId = user.PublicId.ToGuidFromMySqlBinary(),
+                Username = user.UserName!,
+                Email = user.Email!,
+                CreatedAt = user.CreatedAt,
+                UpdatedAt = user.UpdatedAt,
+            };
+        }
     }
 }
