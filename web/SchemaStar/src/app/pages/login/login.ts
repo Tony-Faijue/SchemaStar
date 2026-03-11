@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { RouterLink } from "@angular/router";
+import { Router, RouterLink } from "@angular/router";
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import { AuthenticationService } from '../../services/authentication-service';
 
@@ -12,6 +12,7 @@ import { AuthenticationService } from '../../services/authentication-service';
 export class Login {
 
   authenticationService = inject(AuthenticationService);
+  private router = inject(Router);
 
   //FormGroup  
   loginForm: FormGroup = new FormGroup({
@@ -32,7 +33,11 @@ export class Login {
     if (this.loginForm.valid){
       this.authenticationService.loginUser(this.loginForm).subscribe({
         next: (response) => {
+          //authenticate the user and update the global state of current user
+          this.authenticationService.currentUser.set(response);
           console.log('Login Successful!', response);
+          //redirect to dashboard url'
+          this.router.navigate(['/dashboard']);
         },
         error: (err) => {
           console.error('Login failed', err);

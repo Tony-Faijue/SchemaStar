@@ -25,10 +25,12 @@ export interface LoginUser {
  * Response data from an authenticated user
  */
 export interface AuthResponse{
-  message?: string,
   isAuthenticated: boolean,
+  publicId: string,
   username: string,
   email: string,
+  createdAt: string,
+  updatedAt: string
 }
 
 /**
@@ -51,8 +53,8 @@ export class AuthenticationService {
   //The url api endpoint for login and registeration
   private registerUserURL = `${SecretData.baseuUrl}/api/users`;
   private loginUserURL = `${SecretData.baseuUrl}/api/users/token`;
-  private logoutUserUrl = `${SecretData.baseuUrl}/logout`;
-  private checkAuthUrl = `${SecretData.baseuUrl}/me`;
+  private logoutUserUrl = `${SecretData.baseuUrl}/users/logout`;
+  private checkAuthUrl = `${SecretData.baseuUrl}/users/me`;
 
   private http = inject(HttpClient);
 
