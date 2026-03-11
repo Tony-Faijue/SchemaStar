@@ -114,9 +114,12 @@ namespace SchemaStar.Services
             //Return the response DTO
             return new CookieAuthResponseDTO
             {
+                PublicId = user.PublicId.ToGuidFromMySqlBinary(),
                 IsAuthenticated = true,
                 Email = user.Email!,
-                UserName = user.UserName!
+                Username = user.UserName!,
+                CreatedAt = user.CreatedAt,
+                UpdatedAt = user.UpdatedAt,
             };
         }
 
