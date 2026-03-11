@@ -60,3 +60,7 @@ DELETE {{SchemaStar_HostAddress}}/api/users/{{publicId}}
 Authorization: Bearer {{login.response.body.$.token}}
 
 ###
+
+GET {{SchemaStar_HostAddress}}/api/users/me
+
+###
