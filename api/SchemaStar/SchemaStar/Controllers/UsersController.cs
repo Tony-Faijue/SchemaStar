@@ -239,7 +239,7 @@ namespace SchemaStar.Controllers
         /// <exception cref="NotFoundException"></exception>
         [Authorize]
         [HttpGet("me")]
-        public async Task<ActionResult<UserResponseDTO>> GetCurrentUserInfo() {
+        public async Task<ActionResult<CookieAuthResponseDTO>> GetCurrentUserInfo() {
             
             var userEmail = User.FindFirstValue(ClaimTypes.Email);
             var user = await _userManager.FindByEmailAsync(userEmail!);
@@ -249,11 +249,12 @@ namespace SchemaStar.Controllers
                 throw new NotFoundException("Users");
             }
 
-            return new UserResponseDTO
+            return new CookieAuthResponseDTO
             {
                 PublicId = user.PublicId.ToGuidFromMySqlBinary(),
-                Username = user.UserName!,
+                IsAuthenticated = true,
                 Email = user.Email!,
+                Username = user.UserName!,
                 CreatedAt = user.CreatedAt,
                 UpdatedAt = user.UpdatedAt,
             };
