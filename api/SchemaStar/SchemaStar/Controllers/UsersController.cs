@@ -154,14 +154,7 @@ namespace SchemaStar.Controllers
             //Call RegisterUserSync form UserService
             var response = await _userService.RegisterUserAsync(request);
 
-            //Immediately login the user
-            var loginModel = new TokenRequestModel
-            {
-                Email = request.Email,
-                Password = request.Password
-            };
-
-            await _userService.GetTokenWithCookieAsync(loginModel);
+            //Email Verification Logic
 
             return CreatedAtAction(nameof(GetUser), new { publicId = response.PublicId }, response);
         }
