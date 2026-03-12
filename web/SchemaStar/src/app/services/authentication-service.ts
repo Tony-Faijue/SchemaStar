@@ -22,10 +22,21 @@ export interface LoginUser {
 }
 
 /**
- * Response data from an authenticated user
+ * Response data from an authenticated user with cookie
  */
 export interface AuthResponse{
   isAuthenticated: boolean,
+  publicId: string,
+  username: string,
+  email: string,
+  createdAt: string,
+  updatedAt: string
+}
+
+/**
+ * Response data for user data
+ */
+export interface UserResponse {
   publicId: string,
   username: string,
   email: string,
@@ -61,9 +72,9 @@ export class AuthenticationService {
   /**
    * 
    * @param registerForm registerForm for registering a new user
-   * @returns an Observable of RegisterUser for the HTTP POST function
+   * @returns an Observable of UserResponse for the HTTP POST function
    */
-   registerUser(registerForm: FormGroup):Observable<AuthResponse> {
+   registerUser(registerForm: FormGroup):Observable<UserResponse> {
     //Use of getRawValue() to return the object with strict types
     const formData = registerForm.getRawValue();
 
@@ -73,7 +84,7 @@ export class AuthenticationService {
       password: formData.password
     }
 
-    return this.http.post<AuthResponse>(this.registerUserURL, newUser);
+    return this.http.post<UserResponse>(this.registerUserURL, newUser);
   }
 
   /**
