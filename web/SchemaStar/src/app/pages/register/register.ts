@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { FormGroup, FormControl, ReactiveFormsModule, Validators, ValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
 import { AuthenticationService } from '../../services/authentication-service';
 
@@ -12,6 +12,7 @@ import { AuthenticationService } from '../../services/authentication-service';
 export class Register {
 
   authenticationService = inject(AuthenticationService);
+  private router = inject(Router);
 
   /**
    * 
@@ -57,6 +58,16 @@ export class Register {
    */
   registerUser(): void{
     //Call Authentication service to register the user
-    this.authenticationService.registerUser(this.registerForm);
+    this.authenticationService.registerUser(this.registerForm).subscribe({
+      next: (response) => {
+        console.log('Registration Successfull!', response);
+        //redirect to login page
+        this.router.navigate(['/login']);
+      },
+      error: (err) => {
+        console.error('Registration', err);
+        alert('Registration Failed');
+      }
+    });
   }  
 }

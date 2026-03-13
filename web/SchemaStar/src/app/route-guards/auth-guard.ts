@@ -15,6 +15,6 @@ export const authGuard: CanActivateFn = (route, state) => {
 
   //Else ask if the credentials are still valid
   return authService.checkAuthStatus().pipe(
-    map(isAuth => isAuth ? true : router.parseUrl('/login')) //false redirect to login page
+    map(isAuth => isAuth ? true : router.createUrlTree(['/login'])) //false redirect to login page
   );
 };
