@@ -19,12 +19,14 @@ namespace SchemaStar.Services
         private readonly SignInManager<User> _signInManager;
         private readonly JWTOptions _jwt;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        public UserService(UserManager<User> userManager, SignInManager<User> signInManager, IOptions<JWTOptions> jwt, IHttpContextAccessor httpContextAccessor)
+        private readonly IWebHostEnvironment _webHostEnvironment; //For development & production context
+        public UserService(UserManager<User> userManager, SignInManager<User> signInManager, IOptions<JWTOptions> jwt, IHttpContextAccessor httpContextAccessor, IWebHostEnvironment webHostEnvironment)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _jwt = jwt.Value;
             _httpContextAccessor = httpContextAccessor;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         /// <summary>
@@ -95,13 +97,17 @@ namespace SchemaStar.Services
             var jwtToken = CreateJwtToken(user);
             var tokenString = new JwtSecurityTokenHandler().WriteToken(jwtToken);
 
+            //Environment Context Development or Production
+            bool isDev = _webHostEnvironment.IsDevelopment();
+
             //Set JWT in HttpOnly cookie
             var cookieOptions = new CookieOptions
             {
                 HttpOnly = true, //the cookie is not accessible by client side-script
-                Secure = true,  //sent through HTTPS
-                SameSite = SameSiteMode.Strict, //CRSF protection
-                Expires = DateTime.UtcNow.AddMinutes(_jwt.DurationInMinutes) //Duration of the Cookie
+                Secure = !isDev,  //true - sent through HTTPS for production, false for development
+                SameSite = isDev ? SameSiteMode.Lax : SameSiteMode.Strict, //Strict - CRSF protection, Lax for development
+                Expires = DateTime.UtcNow.AddMinutes(_jwt.DurationInMinutes), //Duration of the Cookie
+                Path = "/" //ensures the cookie is available for all routes
             };
 
             //append the cookie to the http response
