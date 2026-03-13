@@ -25,12 +25,15 @@ namespace SchemaStar.Controllers
         private readonly SchemastarContext _context;
         //Custom User Service
         private readonly IUserService _userService;
+        //Using Serilog Logger
+        private readonly ILogger<UsersController> _logger;
 
-        public UsersController(UserManager<User> userManager, IUserService userService, SchemastarContext context)
+        public UsersController(UserManager<User> userManager, IUserService userService, SchemastarContext context, ILogger<UsersController> logger)
         {
             _userManager = userManager;
             _userService = userService;
             _context = context;
+            _logger = logger;
         }
 
         // GET: api/Users
@@ -204,6 +207,8 @@ namespace SchemaStar.Controllers
         [HttpPost("token")]
         public async Task<IActionResult> LoginWithCookie(TokenRequestModel model)
         {
+            _logger.LogInformation("Login attempt for email: {Email}", model.Email);
+
             var result = await _userService.GetTokenWithCookieAsync(model);
             return Ok(result);
         }
