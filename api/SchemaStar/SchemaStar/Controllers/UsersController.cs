@@ -228,7 +228,10 @@ namespace SchemaStar.Controllers
         [HttpPost("logout")]
         public IActionResult LogOutWithCookie() 
         {
-            Response.Cookies.Delete("authToken");
+            Response.Cookies.Delete("authToken", new CookieOptions {
+                Path = "/",
+                HttpOnly = true
+            });
             return Ok(new { message = "Logged out successfully" });
         }
 
