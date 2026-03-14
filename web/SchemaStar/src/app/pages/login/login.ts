@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { Router, RouterLink } from "@angular/router";
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import { AuthenticationService } from '../../services/authentication-service';
+import { LoggerService } from '../../services/logger-service';
 
 @Component({
   selector: 'app-login',
@@ -10,6 +11,9 @@ import { AuthenticationService } from '../../services/authentication-service';
   styleUrl: './login.css',
 })
 export class Login {
+
+  //Logger service
+  private logger = inject(LoggerService);
 
   authenticationService = inject(AuthenticationService);
   private router = inject(Router);
@@ -31,17 +35,18 @@ export class Login {
    */
   login(){
     if (this.loginForm.valid){
+      //Log the login attempt
+      const email = this.loginForm.get('email')?.value;
+      this.logger.info('User attempt login: ', {email});
+
       this.authenticationService.loginUser(this.loginForm).subscribe({
         next: (response) => {
           //authenticate the user and update the global state of current user
           this.authenticationService.currentUser.set(response);
-          console.log('Login Successful!', response);
+          //Log the successful login
+          this.logger.info('Login successful', {user : response.publicId, email : response.email});
           //redirect to dashboard url'
           this.router.navigate(['/dashboard']);
-        },
-        error: (err) => {
-          console.error('Login failed', err);
-          alert('Invalid email or password');
         }
         });
       }
