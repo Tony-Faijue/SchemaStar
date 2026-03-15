@@ -5,6 +5,7 @@ import { Login } from './pages/login/login';
 import { Register } from './pages/register/register';
 import { DashboardLayout } from './pages/dashboard/dashboard-layout/dashboard-layout';
 import { authGuard } from './route-guards/auth-guard';
+import { SchemaLayout } from './pages/schema/schema-layout/schema-layout';
 
 export const routes: Routes = [
     {
@@ -29,9 +30,13 @@ export const routes: Routes = [
 
     },
     {
+        //Temporary for development with no guard
+        path: 'schema',
+        component: SchemaLayout
+    },
+    {
         path:'dashboard',
         component: DashboardLayout,
         canActivate: [authGuard]
     },
-
 ];
