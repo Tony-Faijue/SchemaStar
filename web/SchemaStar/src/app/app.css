@@ -1,5 +1,12 @@
 @import 'tailwindcss';
 
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
 .schemastar-container {
-    @apply bg-zinc-50 text-neutral-800 min-w-full min-h-full;
+    @apply bg-zinc-50 text-neutral-800;
+     height: 100%;
+     width: 100%;
 }

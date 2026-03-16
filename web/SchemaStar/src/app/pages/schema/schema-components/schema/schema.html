@@ -1,1 +1,33 @@
-<p class="border-2 border-purple-400 p-2">schema works!</p>
+<div class="w-full h-[600px] border-2 border-slate-700 bg-purple-300 p-2">
+  <!-- Example Use of Foblex Flow -->
+  <f-flow fDraggable class="h-full w-full">
+    <f-canvas>
+      <!-- Define node connections -->
+      <f-connection fOutputId="output1" fInputId="input1"></f-connection>
+      <!-- Node 1 -->
+      <div
+        fNode
+        fDragHandle
+        fNodeOutput
+        [fNodePosition]="{ x: 32, y: 32 }"
+        fOutputId="output1"
+        fOutputConnectableSide="right"
+        class="bg-white border-2 border-zinc-900 p-4 rounded shadow-lg cursor-move"
+      >
+        <span class="font-bold">Node 1</span>
+      </div>
+      <!-- Node 2 -->
+      <div
+        fNode
+        fDragHandle
+        fNodeInput
+        [fNodePosition]="{ x: 240, y: 32 }"
+        fInputId="input1"
+        fInputConnectableSide="left"
+        class="bg-white border-2 border-zinc-900 p-4 rounded shadow-lg cursor-move"
+      >
+        <span class="font-bold">Node 2</span>
+      </div>
+    </f-canvas>
+  </f-flow>
+</div>

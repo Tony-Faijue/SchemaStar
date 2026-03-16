@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
+import {FFlowModule} from '@foblex/flow';
 
 @Component({
   selector: 'app-schema',
-  imports: [],
+  imports: [FFlowModule],
   templateUrl: './schema.html',
   styleUrl: './schema.css',
 })
