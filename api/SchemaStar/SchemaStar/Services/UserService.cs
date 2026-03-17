@@ -42,13 +42,13 @@ namespace SchemaStar.Services
             if (existingUser != null)
             {
                 //Custom 409 Conflict Exception
-                throw new ConflictException("Users");
+                throw new ConflictException("User with this email already exist.");
             }
             //Check if the username exists
             existingUser = await _userManager.FindByNameAsync(request.Username);
             if (existingUser != null) 
             {
-                throw new ConflictException("Users");
+                throw new ConflictException("User with this username already exist.");
             }
             //Generate a new GUID and convert it to MySQL binary format
             var newGuid = Guid.NewGuid();

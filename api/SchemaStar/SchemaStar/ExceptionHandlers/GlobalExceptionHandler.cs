@@ -13,10 +13,15 @@ namespace SchemaStar.ExceptionHandlers
             Exception exception,
             CancellationToken cancelaltionToken)
         {
-            logger.LogError(exception, "Unhandled exception occured. TraceId: {TraceId}",
-                httpContext.TraceIdentifier);
 
-            var (statusCode, title) = MapException(exception);
+            var (level,statusCode, title) = MapException(exception);
+
+            //Global logger messages for exceptions
+            logger.Log(level, exception, "[{Method}] {Path} falied: {Message}. TraceId: {TraceId}",
+                httpContext.Request.Method,
+                httpContext.Request.Path,
+                exception.Message,
+                httpContext.TraceIdentifier);
 
             httpContext.Response.StatusCode = statusCode;
             httpContext.Response.ContentType = "application/problem+json";
@@ -41,22 +46,22 @@ namespace SchemaStar.ExceptionHandlers
         }
 
         // Map the exceptions to HTTP responses
-        private static (int StatusCode, string Title) MapException(Exception exception) => exception switch
+        private static (LogLevel Level, int StatusCode, string Title) MapException(Exception exception) => exception switch
         {
-            ArgumentNullException => (StatusCodes.Status400BadRequest, "Invalid argument provided"),
-            ArgumentException => (StatusCodes.Status400BadRequest, "Invalid argument provided"),
-            UnauthorizedAccessException => (StatusCodes.Status401Unauthorized, "Unauthorized"),
+            ArgumentNullException => (LogLevel.Warning, StatusCodes.Status400BadRequest, "Invalid argument provided"),
+            ArgumentException => (LogLevel.Warning, StatusCodes.Status400BadRequest, "Invalid argument provided"),
+            UnauthorizedAccessException => (LogLevel.Warning, StatusCodes.Status401Unauthorized, "Unauthorized"),
 
-            ForbiddenException => (StatusCodes.Status403Forbidden, "Forbidden Request"),
-            NotFoundException => (StatusCodes.Status404NotFound, "Resource Not Found"),
-            ConflictException => (StatusCodes.Status409Conflict, "Resource Already Exist"),
+            ForbiddenException => (LogLevel.Warning, StatusCodes.Status403Forbidden, "Forbidden Request"),
+            NotFoundException => (LogLevel.Warning, StatusCodes.Status404NotFound, "Resource Not Found"),
+            ConflictException => (LogLevel.Warning, StatusCodes.Status409Conflict, "Resource Already Exist"),
 
-            ContentTooLargeException => (StatusCodes.Status413RequestEntityTooLarge, "Request Content too Large"),
-            UnsupportedMediaTypeException => (StatusCodes.Status415UnsupportedMediaType, "Unsupported Media Type"),
+            ContentTooLargeException => (LogLevel.Warning, StatusCodes.Status413RequestEntityTooLarge, "Request Content too Large"),
+            UnsupportedMediaTypeException => (LogLevel.Warning, StatusCodes.Status415UnsupportedMediaType, "Unsupported Media Type"),
 
-            AppException appException => ((int)appException.StatusCode, "Application Error"),
+            AppException appException => (LogLevel.Warning,(int)appException.StatusCode, "Application Error"),
 
-            _ => (StatusCodes.Status500InternalServerError, "Internal Server Error")
+            _ => (LogLevel.Error, StatusCodes.Status500InternalServerError, "Internal Server Error")
         };
 
 
@@ -90,7 +95,11 @@ namespace SchemaStar.ExceptionHandlers
             }
 
             //In production, only expose message from custom safe exceptions
-            return exception is AppException ? exception.Message : null;
+            if (exception is AppException) 
+            {
+                return exception.Message;
+            }
+            return "An internal error has occured";
         }
 
     }
