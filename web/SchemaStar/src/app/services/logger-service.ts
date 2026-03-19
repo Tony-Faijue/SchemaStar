@@ -4,13 +4,12 @@ import { environment } from '../../../environment';
 
 export enum LogLevel {
   //Severity based
-  all = 6, 
-  fatal = 5, //application cannot continue
-  error = 4, //operation failed need investigation
-  warn = 3, //unexpected but recoverable
-  info = 2, //normal operations
-  debug = 1, //developer diagnostics
   none = 0,
+  fatal = 1, //application cannot continue
+  error = 2, //operation failed need investigation
+  warn = 3, //unexpected but recoverable
+  info = 4, //normal operations
+  debug = 5, //developer diagnostics
 }
 
 @Injectable({
@@ -20,13 +19,22 @@ export class LoggerService {
   
     //Need HttpClient to log information to backend be careful of circular dependency & log bloat
 
+    /**
+     * Only logs the level that are equal to it and below
+     * @param level the log level
+     * @returns true if the log level is less than the environment log level and does not equal a log level of none
+     */
+    private shouldLog(level: LogLevel): boolean {
+      return environment.logLevel >= level && environment.logLevel !== LogLevel.none;
+    }
+
   /**
    * Fatal Level Message
    * @param message error message to display
    * @param optionalParams optional parameters to be passed
    */
   fatal(message?: any, ...optionalParams: any[]){
-    if(environment.logLevel >= LogLevel.fatal){
+    if(this.shouldLog(LogLevel.fatal)){
       console.error(
         "%c FATAL ",
         "background: #8b0000; color: #ffffff; font-weight: bold; padding: 2px 5px;",
@@ -42,18 +50,18 @@ export class LoggerService {
    * @param optionalParams optional parameters to be passed
    */
   error(message?: any, ...optionalParams: any[]){
-    if (environment.logLevel >= LogLevel.error){
+    if (this.shouldLog(LogLevel.error)){
       console.error(message, ...optionalParams);
     }
   }
 
     /**
-   * Info Level Message
+   * Warn Level Message
    * @param message error message to display
    * @param optionalParams optional parameters to be passed
    */
-  info(message?: any, ...optionalParams: any[]){
-    if (environment.logLevel >= LogLevel.info){
+  warn(message?: any, ...optionalParams: any[]){
+    if (this.shouldLog(LogLevel.warn)){
       console.info(message, ...optionalParams);
     }
   }
@@ -64,7 +72,7 @@ export class LoggerService {
    * @param optionalParams optional parameters to be passed
    */
   debug(message?: any, ...optionalParams: any[]){
-    if (environment.logLevel >= LogLevel.debug){
+    if (this.shouldLog(LogLevel.debug)){
       console.debug(message, ...optionalParams);
     }
   }
@@ -75,7 +83,7 @@ export class LoggerService {
    * @param optionalParams optional parameters to be passed
    */
   log(message?: any, ...optionalParams: any[]){
-    if (environment.logLevel >= LogLevel.info){
+    if (this.shouldLog(LogLevel.info)){
       console.log(message, ...optionalParams);
     }
   }
@@ -86,7 +94,7 @@ export class LoggerService {
    * @param properties optional properties to be passed in the table
    */
   table(data?: any, properties?: string[]){
-    if (environment.logLevel >= LogLevel.debug){
+    if (this.shouldLog(LogLevel.debug)){
       console.table(data, properties);
     }
   }
@@ -97,7 +105,7 @@ export class LoggerService {
    * @param optionalParams optional parameters to be passed
    */
   trace(message?: any, ...optionalParams: any[]){
-    if (environment.logLevel >= LogLevel.debug){
+    if (this.shouldLog(LogLevel.debug)){
       console.trace(message, ...optionalParams);
     }
   }
