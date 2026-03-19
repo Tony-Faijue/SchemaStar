@@ -14,10 +14,16 @@ describe('App', () => {
     expect(app).toBeTruthy();
   });
 
-  it('should render title', () => {
+  it('should render container', () => {
     const fixture = TestBed.createComponent(App);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, SchemaStar');
+    expect(compiled.querySelector('.schemastar-container')).toBeTruthy();
+  });
+
+  it(`should have as title 'SchemaStar'`, () =>{
+    const fixture = TestBed.createComponent(App);
+    const app = fixture.componentInstance;
+    expect((app as any).title()).toEqual('SchemaStar');
   });
 });

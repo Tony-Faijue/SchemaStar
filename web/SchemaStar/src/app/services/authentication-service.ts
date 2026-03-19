@@ -100,7 +100,9 @@ export class AuthenticationService {
       password: formData.password
     }
 
-    return this.http.post<AuthResponse>(this.loginUserURL, credentials);
+    return this.http.post<AuthResponse>(this.loginUserURL, credentials).pipe(
+      tap(user => this.currentUser.set(user))
+    );
   }
 
   /**
@@ -108,7 +110,9 @@ export class AuthenticationService {
    * @returns the repsone message from logging out a user
    */
   logoutUser(): Observable<LogoutResponse>{
-    return this.http.post<LogoutResponse>(this.logoutUserUrl, {});
+    return this.http.post<LogoutResponse>(this.logoutUserUrl, {}).pipe(
+      tap(() => this.currentUser.set(null))
+    );
   }
 
 /**
