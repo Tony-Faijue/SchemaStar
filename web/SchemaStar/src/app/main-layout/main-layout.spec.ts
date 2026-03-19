@@ -1,6 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { MainLayout } from './main-layout';
+import { provideRouter } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 describe('MainLayout', () => {
   let component: MainLayout;
@@ -8,7 +11,13 @@ describe('MainLayout', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [MainLayout]
+      imports: [MainLayout],
+      //provide needed dependencies
+      providers: [
+        provideRouter([]),
+        provideHttpClient(),
+        provideHttpClientTesting()
+      ],
     })
     .compileComponents();
 

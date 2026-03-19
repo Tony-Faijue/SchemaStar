@@ -1,6 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { GuestNavigation } from './guest-navigation';
+import { provideRouter } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 describe('GuestNavigation', () => {
   let component: GuestNavigation;
@@ -8,7 +11,13 @@ describe('GuestNavigation', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [GuestNavigation]
+      imports: [GuestNavigation],
+      //provide needed dependencies
+      providers: [
+        provideRouter([]),
+        provideHttpClient(),
+        provideHttpClientTesting()
+      ],
     })
     .compileComponents();
 

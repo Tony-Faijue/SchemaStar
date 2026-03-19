@@ -41,8 +41,6 @@ export class Login {
 
       this.authenticationService.loginUser(this.loginForm).subscribe({
         next: (response) => {
-          //authenticate the user and update the global state of current user
-          this.authenticationService.currentUser.set(response);
           //Log the successful login
           this.logger.info('Login successful', {user : response.publicId, email : response.email});
           //redirect to dashboard url'
