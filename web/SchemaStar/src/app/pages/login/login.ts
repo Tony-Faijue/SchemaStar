@@ -33,11 +33,17 @@ export class Login {
     })
   });
 
+  // List of error messages
+  errorList = signal<string[]>([]);
+
   /**
    * Calls the AuthenticationService for logging in the existing user
    */
   login(){
     if (this.loginForm.valid){
+      //Clear error List
+      this.errorList.set([]);
+
       //Log the login attempt
       const email = this.loginForm.get('email')?.value;
       this.logger.log('User attempt login: ', {email});
@@ -61,30 +67,41 @@ export class Login {
         }
         });
       } else {
-        //Get all errors in the FormGroup
-        const allErrors = Object.keys(this.loginForm.controls).map(key => {
-          return {control: key, errors: this.loginForm.get(key)?.errors};
-        }).filter(x => x.errors !== null);
-        
-        this.logger.warn('Login attempt failed: Form is invalid', allErrors);
         //getControllerError messages show up
         this.loginForm.markAllAsTouched();
+
+        //Get all errors in the FormGroup
+        const allErrors: string[] = [];
+        
+        //Map each of the controls with array of errors for that control and then display them
+        Object.keys(this.loginForm.controls).forEach(key => {
+          const fieldErrors = this.getControlErrors(key);
+            fieldErrors.forEach(msg => {
+              const label = key.charAt(0).toUpperCase() + key.slice(1);
+              allErrors.push(`${label}: ${msg}`);
+            });
+        });
+
+        this.errorList.set(allErrors);
+        this.logger.warn('Login attempt failed: Form is invalid', allErrors);
       } 
     }
 
     /**
-     * Function to return error message for the controls in the form group
+     * Function to return string array of error messages for the controls in the form group
      * @param controlName 
-     * @returns string message about the error or null
+     * @returns string array of errror messages
      */
-    getControlError(controlName: string): string|null{
+    getControlErrors(controlName: string): string[]{
       const control = this.loginForm.get(controlName);
+      const errors: string[] = [];
+
       if (control?.touched && control.errors) {
-        if (control.errors['required']) return 'Field is required';
-        if (control.errors['email']) return 'Invalid email format';
-        if (control.errors['pattern']) return 'Password must include an uppercase, a number and a special character';
-        if (control.errors['minlength']) return 'Minimum 8 characters required';
+        if (control.errors['required']) errors.push('Field is required');
+        if (control.errors['email']) errors.push('Invalid email format');
+        if (control.errors['pattern']) errors.push('Password must include an uppercase, a number and a special character');
+        if (control.errors['minlength']) errors.push('Minimum 8 characters required');
       }
-      return null;
+      return errors;
     }
 }

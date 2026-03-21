@@ -44,6 +44,15 @@
           >
         </p>
       </div>
+      @if (errorList().length > 0) {
+        <div class="text-center">
+          <ul class="text-red-600 text-xs">
+            @for (error of errorList(); track error) {
+              <li>{{ error }}</li>
+            }
+          </ul>
+        </div>
+      }
     </form>
   </div>
 </div>
