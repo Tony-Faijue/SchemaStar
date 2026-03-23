@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormGroup, FormControl, ReactiveFormsModule, Validators, ValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
-import { AuthenticationService } from '../../services/authentication-service';
+import { AuthenticationService, RegisterUser } from '../../services/authentication-service';
 
 @Component({
   selector: 'app-register',
@@ -57,8 +57,16 @@ export class Register {
    * Calls the AuthenticationService to register a new user
    */
   registerUser(): void{
+    //Use of getRawValue() to return the object with strict types
+    const formData = this.registerForm.getRawValue();
+    const credentials: RegisterUser = {
+      username: formData.username,
+      email: formData.email,
+      password: formData.password
+    };
+
     //Call Authentication service to register the user
-    this.authenticationService.registerUser(this.registerForm).subscribe({
+    this.authenticationService.registerUser(credentials).subscribe({
       next: (response) => {
         console.log('Registration Successfull!', response);
         //redirect to login page
