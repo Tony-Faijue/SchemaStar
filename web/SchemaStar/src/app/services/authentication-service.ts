@@ -71,35 +71,19 @@ export class AuthenticationService {
 
   /**
    * 
-   * @param registerForm registerForm for registering a new user
+   * @param credentials credentials for registering a new user
    * @returns an Observable of UserResponse for the HTTP POST function
    */
-   registerUser(registerForm: FormGroup):Observable<UserResponse> {
-    //Use of getRawValue() to return the object with strict types
-    const formData = registerForm.getRawValue();
-
-    const newUser: RegisterUser = {
-      username: formData.username,
-      email: formData.email,
-      password: formData.password
-    }
-
-    return this.http.post<UserResponse>(this.registerUserURL, newUser);
+   registerUser(credentials: RegisterUser):Observable<UserResponse> {
+    return this.http.post<UserResponse>(this.registerUserURL, credentials);
   }
 
   /**
    * 
-   * @param loginForm loginForm for logging an exisiting user
+   * @param credentials the credentials for logging the user with a LoginUser Object
    * @returns an Observable of AuthResponse for the HTTP POST function
    */
-  loginUser(loginForm: FormGroup): Observable<AuthResponse> {
-    const formData = loginForm.getRawValue();
-
-    const credentials: LoginUser = {
-      email: formData.email,
-      password: formData.password
-    }
-
+  loginUser(credentials: LoginUser): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(this.loginUserURL, credentials).pipe(
       tap(user => this.currentUser.set(user))
     );

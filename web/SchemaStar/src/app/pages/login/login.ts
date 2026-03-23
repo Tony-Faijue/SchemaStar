@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { Router, RouterLink } from "@angular/router";
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import { AuthenticationService } from '../../services/authentication-service';
+import { AuthenticationService, LoginUser } from '../../services/authentication-service';
 import { LoggerService } from '../../services/logger-service';
 
 @Component({
@@ -47,8 +47,15 @@ export class Login {
       //Log the login attempt
       const email = this.loginForm.get('email')?.value;
       this.logger.log('User attempt login: ', {email});
+      
+      //Handle the form and send the data to log in the user
+      const formData = this.loginForm.getRawValue();
+      const credentials: LoginUser = {
+        email: formData.email,
+        password: formData.password
+      };
 
-      this.authenticationService.loginUser(this.loginForm).subscribe({
+      this.authenticationService.loginUser(credentials).subscribe({
         next: (response) => {
           //Log the successful login
           this.logger.log('Login successful', {user : response.publicId, email : response.email});
