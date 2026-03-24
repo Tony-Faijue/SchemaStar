@@ -41,13 +41,12 @@ export class Login {
    */
   login(){
     if (this.loginForm.valid){
+
+      this.logger.log('Login process started');
+
       //Clear error List
       this.errorList.set([]);
 
-      //Log the login attempt
-      const email = this.loginForm.get('email')?.value;
-      this.logger.log('User attempt login: ', {email});
-      
       //Handle the form and send the data to log in the user
       const formData = this.loginForm.getRawValue();
       const credentials: LoginUser = {
@@ -58,18 +57,16 @@ export class Login {
       this.authenticationService.loginUser(credentials).subscribe({
         next: (response) => {
           //Log the successful login
-          this.logger.log('Login successful', {user : response.publicId, email : response.email});
+          this.logger.log('Login successful', {user : response.publicId});
           //redirect to dashboard url'
           this.router.navigate(['/dashboard']);
         },
         error: (err) => {
           //401 Unauthorized error
           if (err.status === 401){
-            this.logger.warn('Failed login attempt: Invalid credentials', {
-              email: this.loginForm.value.email
-            });
+            this.logger.warn('Failed login: Invalid credentials');
           } else {
-            this.logger.error('Login operation failed due to server error', err);
+            this.logger.error('Login failed: Server Error', {status: err.status}); //Log the error type, not the sensitive input
           }
         }
         });
@@ -90,7 +87,7 @@ export class Login {
         });
 
         this.errorList.set(allErrors);
-        this.logger.warn('Login attempt failed: Form is invalid', allErrors);
+        this.logger.debug('Login prevented: Form validation failed', allErrors);
       } 
     }
 

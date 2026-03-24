@@ -1,4 +1,3 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environment';
 
@@ -62,7 +61,7 @@ export class LoggerService {
    */
   warn(message?: any, ...optionalParams: any[]){
     if (this.shouldLog(LogLevel.warn)){
-      console.info(message, ...optionalParams);
+      console.warn(message, ...optionalParams);
     }
   }
 
