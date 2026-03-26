@@ -20,13 +20,15 @@ namespace SchemaStar.Services
         private readonly JWTOptions _jwt;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IWebHostEnvironment _webHostEnvironment; //For development & production context
-        public UserService(UserManager<User> userManager, SignInManager<User> signInManager, IOptions<JWTOptions> jwt, IHttpContextAccessor httpContextAccessor, IWebHostEnvironment webHostEnvironment)
+        private readonly ILogger<UserService> _logger;
+        public UserService(UserManager<User> userManager, SignInManager<User> signInManager, IOptions<JWTOptions> jwt, IHttpContextAccessor httpContextAccessor, IWebHostEnvironment webHostEnvironment, ILogger<UserService> logger)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _jwt = jwt.Value;
             _httpContextAccessor = httpContextAccessor;
             _webHostEnvironment = webHostEnvironment;
+            _logger = logger;
         }
 
         /// <summary>
@@ -37,19 +39,17 @@ namespace SchemaStar.Services
         public async Task<UserResponseDTO> RegisterUserAsync(RegisterUserRequestDTO request)
         {
             //Check if the user already exists
-            //Check if the email exists
-            var existingUser = await _userManager.FindByEmailAsync(request.Email);
-            if (existingUser != null)
+            //Check if the email/username exists
+            var emailExists = await _userManager.FindByEmailAsync(request.Email) != null;
+            var userNameExists = await _userManager.FindByNameAsync(request.Username) != null;
+
+            if (emailExists || userNameExists)
             {
+                _logger.LogWarning("Registration Failed: credentials conflict");
                 //Custom 409 Conflict Exception
-                throw new ConflictException("User with this email already exist.");
+                throw new ConflictException("Registration Failed: email or username already in use");
             }
-            //Check if the username exists
-            existingUser = await _userManager.FindByNameAsync(request.Username);
-            if (existingUser != null) 
-            {
-                throw new ConflictException("User with this username already exist.");
-            }
+          
             //Generate a new GUID and convert it to MySQL binary format
             var newGuid = Guid.NewGuid();
 
@@ -66,8 +66,19 @@ namespace SchemaStar.Services
             //Throw custom exception here if creation fails
             if (!result.Succeeded) 
             {
+                //sanitize specific identity errors for conflict exceptions
+                var sensitiveErrorCodes = new HashSet<string> { "DuplicateEmail", "DuplicateUserName" };
+                var hasDuplicateConflict = result.Errors.Any(e => sensitiveErrorCodes.Contains(e.Code));
+
+                if (hasDuplicateConflict) 
+                {
+                    _logger.LogWarning("Registration failed: duplicate credential conflict");
+                    throw new ConflictException("Registration failed: email or username is already taken");
+                }
+
                 var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-                throw new InvalidOperationException($"User creation failed: {errors}");
+                _logger.LogWarning("Identity Store Error: with following {Errors}", errors);
+                throw new ValidationException($"Registration Failed: {errors}");
             }
 
             //Respsone DTO
@@ -79,6 +90,8 @@ namespace SchemaStar.Services
                 CreatedAt = user.CreatedAt,
                 UpdatedAt = user.UpdatedAt,
             };
+
+            _logger.LogInformation("New User successfully created");
 
             return response;
         }
@@ -95,6 +108,8 @@ namespace SchemaStar.Services
 
             //Generate the token for the verified user
             var jwtToken = CreateJwtToken(user);
+            _logger.LogInformation("JSON Web Token Generated");
+
             var tokenString = new JwtSecurityTokenHandler().WriteToken(jwtToken);
 
             //Environment Context Development or Production
@@ -116,6 +131,8 @@ namespace SchemaStar.Services
                     tokenString, //JWT Token
                     cookieOptions
                 );
+
+            _logger.LogInformation("Authentication successful: Cookie Issued");
 
             //Return the response DTO
             return new CookieAuthResponseDTO
@@ -141,7 +158,11 @@ namespace SchemaStar.Services
 
             //Generate the token for the verified user
             var jwtToken = CreateJwtToken(user);
+            _logger.LogInformation("JSON Web Token Generated");
+
             var tokenString = new JwtSecurityTokenHandler().WriteToken(jwtToken);
+
+            _logger.LogInformation("Authentication successful: Token Issued");
 
             //Return the response DTO
             return new BearerAuthResponseDTO
@@ -160,7 +181,28 @@ namespace SchemaStar.Services
         /// <returns></returns>
 
         private JwtSecurityToken CreateJwtToken(User user) 
-        {
+        {   //Check authentication configuration failures
+            if (string.IsNullOrEmpty(_jwt.Key)) 
+            {
+                _logger.LogCritical("JWT Key value is invalid or not configured! Authentication will fail!");
+                throw new InvalidOperationException("Internal authentication configuration error");
+            }
+            if (string.IsNullOrEmpty(_jwt.Issuer))
+            {
+                _logger.LogCritical("JWT Issuer is invalid or not configured! Authentication will fail!");
+                throw new InvalidOperationException("Internal authentication configuration error");
+            }
+            if (string.IsNullOrEmpty(_jwt.Audience))
+            {
+                _logger.LogCritical("JWT Audience is invalid or not configured! Authentication will fail!");
+                throw new InvalidOperationException("Internal authentication configuration error");
+            }
+            if (_jwt.DurationInMinutes <= 0) 
+            {
+                _logger.LogCritical("JWT DurationInMinutes is misconfigured: {Duration}", _jwt.DurationInMinutes);
+                throw new InvalidOperationException("Internal authentication configuration error");
+            }
+
             //Convert the binary to string for user public id
             string publicIdString = user.PublicId.ToGuidFromMySqlBinary().ToString();
 
@@ -195,27 +237,29 @@ namespace SchemaStar.Services
         /// </summary>
         /// <param name="model"></param>
         /// <returns>User object</returns>
-        /// <exception cref="NotFoundException"></exception>
         /// <exception cref="UnauthorizedException"></exception>
         private async Task<User> ValidateUseryAsync(TokenRequestModel model) 
         {
+            //prevent user enumeration with same message
             var user = await _userManager.FindByEmailAsync(model.Email);
 
             if (user == null)
             {
-                throw new NotFoundException("Users");
+                _logger.LogWarning("Validation failed: invalid credentials");
+                throw new UnauthorizedException("Invalid email or password");
             }
 
             //Use SignInManager for password check
             var result = await _signInManager.CheckPasswordSignInAsync(
                 user,
                 model.Password,
-                lockoutOnFailure: false
+                lockoutOnFailure: false //set to true in production
                 );
 
             if (!result.Succeeded)
             {
-                throw new UnauthorizedException("Users");
+                _logger.LogWarning("Validation failed: invalid credentials");
+                throw new UnauthorizedException("Invalid email or password");
             }
             return user;
         }
