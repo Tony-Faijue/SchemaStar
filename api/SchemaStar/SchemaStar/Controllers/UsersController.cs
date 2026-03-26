@@ -207,8 +207,6 @@ namespace SchemaStar.Controllers
         [HttpPost("token")]
         public async Task<IActionResult> LoginWithCookie(TokenRequestModel model)
         {
-            _logger.LogInformation("Login attempt for email: {Email}", model.Email);
-
             var result = await _userService.GetTokenWithCookieAsync(model);
             return Ok(result);
         }

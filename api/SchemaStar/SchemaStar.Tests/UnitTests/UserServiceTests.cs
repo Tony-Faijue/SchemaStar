@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using Castle.Core.Logging;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.CodeAnalysis.Elfie.Diagnostics;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using SchemaStar.DTOs;
@@ -32,6 +35,7 @@ public class UserServiceTests
         mockJwtOptions.Setup(x => x.Value).Returns(new JWTOptions());
         var mockHttpContext = new Mock<IHttpContextAccessor>();
         var mockWebEnv = new Mock<IWebHostEnvironment>();
+        var mockLogger = new Mock<ILogger<UserService>>();
 
         //Initialize user service with mocks of other dependencies
         _userService = new UserService(
@@ -39,7 +43,8 @@ public class UserServiceTests
             mockSignInManager.Object,
             mockJwtOptions.Object,
             mockHttpContext.Object,
-            mockWebEnv.Object
+            mockWebEnv.Object,
+            mockLogger.Object
          );
     }
 
@@ -57,14 +62,15 @@ public class UserServiceTests
         //Create a dummy existing user
         var existingUser = new User { Email = request.Email };
 
-        //Mock the FindByEmail action
+        //Mock the FindByEmail and FindByName actions 
         _mockUserManager.Setup(x => x.FindByEmailAsync(request.Email)).ReturnsAsync(existingUser);
-
+        _mockUserManager.Setup(x => x.FindByNameAsync(request.Username)).ReturnsAsync((User?)null);
         //--Act and Assert--
         await Assert.ThrowsAsync<ConflictException>(() => _userService.RegisterUserAsync(request));
 
-        //Additional verification to ensure the code stopped early not trying to findByName or create user
-        _mockUserManager.Verify(x => x.FindByNameAsync(It.IsAny<string>()), Times.Never);
+        //Additional verification to ensure FindByEmail and FindByName called once or create user
+        _mockUserManager.Verify(x => x.FindByEmailAsync(request.Email), Times.Once);
+        _mockUserManager.Verify(x => x.FindByNameAsync(request.Username), Times.Once);
         _mockUserManager.Verify(x => x.CreateAsync(It.IsAny<User>(), It.IsAny<string>()), Times.Never);
     }
     
@@ -82,22 +88,49 @@ public class UserServiceTests
         //Create a dummy existing user
         var existingUser = new User { UserName = request.Username };
 
-        //Email check happens before username check and returns null to continue
+        //Mock both FindBy async methods
         _mockUserManager.Setup(x => x.FindByEmailAsync(request.Email)).ReturnsAsync((User?)null);
-
-        //Mock the FindByName action
         _mockUserManager.Setup(x => x.FindByNameAsync(request.Username)).ReturnsAsync(existingUser);
 
         //--Act and Assert--
         await Assert.ThrowsAsync<ConflictException>(() => _userService.RegisterUserAsync(request));
 
-        //Additional verification to ensure the code checks emails once and does not create a user
-        _mockUserManager.Verify(x => x.FindByEmailAsync(It.IsAny<string>()), Times.Once);
+        //Additional verification to ensure the code checks both methods called onceand does not create a user
+        _mockUserManager.Verify(x => x.FindByEmailAsync(request.Email), Times.Once);
+        _mockUserManager.Verify(x => x.FindByNameAsync(request.Username), Times.Once);
+
         _mockUserManager.Verify(x => x.CreateAsync(It.IsAny<User>(), It.IsAny<string>()), Times.Never);
     }
 
     [Fact]
-    public async Task RegisterUserAysnc_WhenCreatingNewUserFails_ThrowsInvalidOperationException() 
+    public async Task RegisterUserAsync_WhenCreateAsyncReturnsDuplicateError_ThrowsConflictException() 
+    {
+        //--Arrange--
+        var request = new RegisterUserRequestDTO
+        {
+            Email = "testUser@example.com",
+            Username = "NewUser",
+            Password = "Password1!"
+        };
+        //Mock both methods
+        _mockUserManager.Setup(x => x.FindByEmailAsync(request.Email)).ReturnsAsync((User?)null);
+        _mockUserManager.Setup(x => x.FindByNameAsync(request.Username)).ReturnsAsync((User?)null);
+
+        var duplicateErrors = new[]
+        {
+            new IdentityError { Code = "DuplicateEmail", Description = "Email already taken."}
+        };
+
+        _mockUserManager.Setup(x => x.CreateAsync(It.IsAny<User>(), request.Password)).ReturnsAsync(IdentityResult.Failed(duplicateErrors));
+
+        //--Act and Assert--
+        await Assert.ThrowsAsync<ConflictException>(() => _userService.RegisterUserAsync(request));
+
+        _mockUserManager.Verify(x => x.CreateAsync(It.IsAny<User>(), request.Password), Times.Once);
+    }
+
+    [Fact]
+    public async Task RegisterUserAysnc_WhenCreatingNewUserFails_ThrowsValidationException() 
     {
         //--Arrange--
         var request = new RegisterUserRequestDTO
@@ -126,7 +159,7 @@ public class UserServiceTests
         _mockUserManager.Setup(x => x.CreateAsync(It.IsAny<User>(), request.Password)).ReturnsAsync(failedResult);
 
         //--Act and Assert--
-       var exception =  await Assert.ThrowsAsync<InvalidOperationException>(() => _userService.RegisterUserAsync(request));
+       var exception =  await Assert.ThrowsAsync<ValidationException>(() => _userService.RegisterUserAsync(request));
 
         //Assert error messages were formatted correctly
         Assert.Contains("Password is too weak.", exception.Message);
