@@ -17,7 +17,7 @@ namespace SchemaStar.Services
         //Need to use UserManager & SignInManager
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
-        private readonly JWTOptions _jwt;
+        private readonly IOptions<JWTOptions> _jwt; //wrap in IOptions
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IWebHostEnvironment _webHostEnvironment; //For development & production context
         private readonly ILogger<UserService> _logger;
@@ -25,7 +25,7 @@ namespace SchemaStar.Services
         {
             _userManager = userManager;
             _signInManager = signInManager;
-            _jwt = jwt.Value;
+            _jwt = jwt;
             _httpContextAccessor = httpContextAccessor;
             _webHostEnvironment = webHostEnvironment;
             _logger = logger;
@@ -121,7 +121,7 @@ namespace SchemaStar.Services
                 HttpOnly = true, //the cookie is not accessible by client side-script
                 Secure = !isDev,  //true - sent through HTTPS for production, false for development
                 SameSite = isDev ? SameSiteMode.Lax : SameSiteMode.Strict, //Strict - CRSF protection, Lax for development
-                Expires = DateTime.UtcNow.AddMinutes(_jwt.DurationInMinutes), //Duration of the Cookie
+                Expires = DateTime.UtcNow.AddMinutes(_jwt.Value.DurationInMinutes), //Duration of the Cookie
                 Path = "/" //ensures the cookie is available for all routes
             };
 
@@ -182,24 +182,24 @@ namespace SchemaStar.Services
 
         private JwtSecurityToken CreateJwtToken(User user) 
         {   //Check authentication configuration failures
-            if (string.IsNullOrEmpty(_jwt.Key)) 
+            if (string.IsNullOrEmpty(_jwt.Value.Key)) 
             {
                 _logger.LogCritical("JWT Key value is invalid or not configured! Authentication will fail!");
                 throw new InvalidOperationException("Internal authentication configuration error");
             }
-            if (string.IsNullOrEmpty(_jwt.Issuer))
+            if (string.IsNullOrEmpty(_jwt.Value.Issuer))
             {
                 _logger.LogCritical("JWT Issuer is invalid or not configured! Authentication will fail!");
                 throw new InvalidOperationException("Internal authentication configuration error");
             }
-            if (string.IsNullOrEmpty(_jwt.Audience))
+            if (string.IsNullOrEmpty(_jwt.Value.Audience))
             {
                 _logger.LogCritical("JWT Audience is invalid or not configured! Authentication will fail!");
                 throw new InvalidOperationException("Internal authentication configuration error");
             }
-            if (_jwt.DurationInMinutes <= 0) 
+            if (_jwt.Value.DurationInMinutes <= 0) 
             {
-                _logger.LogCritical("JWT DurationInMinutes is misconfigured: {Duration}", _jwt.DurationInMinutes);
+                _logger.LogCritical("JWT DurationInMinutes is misconfigured: {Duration}", _jwt.Value.DurationInMinutes);
                 throw new InvalidOperationException("Internal authentication configuration error");
             }
 
@@ -216,7 +216,7 @@ namespace SchemaStar.Services
             };
 
             //Create a Symmetric Key using the Secret string from appsettings.json
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwt.Key));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwt.Value.Key));
 
             //Define the algorithm HmacSha256 for signing the token
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -224,10 +224,10 @@ namespace SchemaStar.Services
             //Create and return the token
             return new JwtSecurityToken
                 (
-                    issuer: _jwt.Issuer, //Issuer
-                    audience: _jwt.Audience, //Audience
+                    issuer: _jwt.Value.Issuer, //Issuer
+                    audience: _jwt.Value.Audience, //Audience
                     claims: claims, //Data Payload
-                    expires: DateTime.UtcNow.AddMinutes(_jwt.DurationInMinutes), //Expiration Time
+                    expires: DateTime.UtcNow.AddMinutes(_jwt.Value.DurationInMinutes), //Expiration Time
                     signingCredentials: creds //The signature
                 );
         }
