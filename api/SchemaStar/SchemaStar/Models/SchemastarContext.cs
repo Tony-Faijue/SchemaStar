@@ -22,6 +22,7 @@ public partial class SchemastarContext : IdentityDbContext<User, IdentityRole<ul
     public virtual DbSet<Node> Nodes { get; set; } = null!;
 
     public virtual DbSet<Nodeweb> Nodewebs { get; set; } = null!;
+    public virtual DbSet<NodeAsset> NodeAssets { get; set; } = null!;
 
  
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -87,23 +88,11 @@ public partial class SchemastarContext : IdentityDbContext<User, IdentityRole<ul
                 .HasColumnName("created_at");
             entity.Property(e => e.CreatedBy).HasColumnName("created_by");
             entity.Property(e => e.Height).HasColumnName("height");
-            entity.Property(e => e.NodeAudioMime)
-                .HasMaxLength(64)
-                .HasColumnName("node_audio_mime");
-            entity.Property(e => e.NodeAudioSize).HasColumnName("node_audio_size");
-            entity.Property(e => e.NodeAudioUrl)
-                .HasMaxLength(512)
-                .HasColumnName("node_audio_url");
+
             entity.Property(e => e.NodeDescription)
                 .HasColumnType("text")
                 .HasColumnName("node_description");
-            entity.Property(e => e.NodeImageMime)
-                .HasMaxLength(64)
-                .HasColumnName("node_image_mime");
-            entity.Property(e => e.NodeImageSize).HasColumnName("node_image_size");
-            entity.Property(e => e.NodeImageUrl)
-                .HasMaxLength(512)
-                .HasColumnName("node_image_url");
+
             entity.Property(e => e.NodeName)
                 .HasMaxLength(255)
                 .HasColumnName("node_name");
@@ -229,6 +218,54 @@ public partial class SchemastarContext : IdentityDbContext<User, IdentityRole<ul
                 .IsRequired()
                 .HasMaxLength(255)
                 .HasColumnName("username");
+        });
+
+        modelBuilder.Entity<NodeAsset>(entity => 
+        {
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
+            entity.ToTable("node_asset");
+
+            entity.HasIndex(e => e.NodeId, "node_id");
+
+            entity.HasIndex(e => e.PublicId, "public_id").IsUnique();
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.NodeId).HasColumnName("node_id");
+
+            entity.Property(e => e.PublicId)
+                .HasMaxLength(16)
+                .IsFixedLength()
+                .IsRequired()
+                .HasColumnName("public_id");
+
+            entity.Property(e => e.NodeAssetType)
+                .HasDefaultValueSql("'link'")
+                .HasColumnName("asset_type")
+                .HasColumnType("enum('image', 'audio', 'video', 'link')")
+                .HasConversion<string>();
+
+            entity.Property(e => e.NodeAssetSource)
+                .HasDefaultValueSql("'external'")
+                .HasColumnName("asset_source")
+                .HasColumnType("enum('upload', 'external')")
+                .HasConversion<string>();
+
+            entity.Property(e => e.Url)
+                .HasMaxLength(2048)
+                .HasColumnName("url");
+
+            entity.Property(e => e.MimeType)
+                .HasMaxLength(127)
+                .HasColumnName("mime_type");
+
+            entity.Property(e => e.FileSize)
+                .HasColumnName("file_size");
+
+            entity.HasOne(d => d.Node)
+                .WithMany(p => p.NodeAssets)
+                .HasForeignKey(d => d.NodeId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("fk_node_assets_node");
         });
 
         //----------Identity Tables------------
