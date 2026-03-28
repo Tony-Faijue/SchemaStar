@@ -15,9 +15,6 @@ export class Login {
   //Logger service
   private logger = inject(LoggerService);
 
-  //Error message for UI
-  errorMessage = signal<string | null>(null);
-
   authenticationService = inject(AuthenticationService);
   private router = inject(Router);
 
