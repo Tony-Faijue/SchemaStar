@@ -246,14 +246,12 @@ namespace SchemaStar.Controllers
         [Authorize]
         [HttpGet("me")]
         public async Task<ActionResult<CookieAuthResponseDTO>> GetCurrentUserInfo() {
-            
-            var userEmail = User.FindFirstValue(ClaimTypes.Email);
-            var user = await _userManager.FindByEmailAsync(userEmail!);
 
-            if (user == null)
-            {
-                throw new NotFoundException("Users");
-            }
+            var userId = _userService.GetCurrentUserId();
+            if (userId == null) throw new UnauthorizedException("Current User is invalid");
+
+            var user = await _userManager.FindByIdAsync(userId.ToString()!);
+            if (user == null) throw new NotFoundException("User does not exists");
 
             return new CookieAuthResponseDTO
             {

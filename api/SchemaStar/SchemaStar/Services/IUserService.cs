@@ -8,6 +8,6 @@ namespace SchemaStar.Services
         Task<UserResponseDTO> RegisterUserAsync(RegisterUserRequestDTO request);
         Task<CookieAuthResponseDTO> GetTokenWithCookieAsync(TokenRequestModel model);
         Task<BearerAuthResponseDTO> GetTokenWithBearerAsync(TokenRequestModel model);
-
+        ulong? GetCurrentUserId();
     }
 }
