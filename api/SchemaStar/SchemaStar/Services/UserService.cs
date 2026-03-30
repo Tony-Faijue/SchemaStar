@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using SchemaStar.DTOs;
@@ -172,6 +173,18 @@ namespace SchemaStar.Services
                 UserName = user.UserName!,
                 Token = tokenString!
             };
+        }
+
+        /// <summary>
+        /// Gets the Current UserId with the current claims prinicipal
+        /// </summary>
+        /// <returns> ulong public id</returns>
+        public ulong? GetCurrentUserId() 
+        {
+            var userIdClaim = _httpContextAccessor.HttpContext?.User?
+                .FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            return ulong.TryParse(userIdClaim, out var id) ? id : null;
         }
 
         /// <summary>
