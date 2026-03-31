@@ -3,6 +3,7 @@ import { Router, RouterLink } from "@angular/router";
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import { AuthenticationService, LoginUser } from '../../services/authentication-service';
 import { LoggerService } from '../../services/logger-service';
+import { extractErrorMessage } from '../../http-interceptors/global-error-interceptor';
 
 @Component({
   selector: 'app-login',
@@ -59,12 +60,17 @@ export class Login {
           this.router.navigate(['/dashboard']);
         },
         error: (err) => {
+          //Global Error message
+          const serverErrorMessage = extractErrorMessage(err);
+         
           //401 Unauthorized error
           if (err.status === 401){
             this.logger.warn('Failed login: Invalid credentials');
           } else {
             this.logger.error('Login failed: Server Error', {status: err.status}); //Log the error type, not the sensitive input
           }
+          //Add global error message to display in UI
+          this.errorList.set([serverErrorMessage]);
         }
         });
       } else {
