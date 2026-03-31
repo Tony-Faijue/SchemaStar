@@ -6,6 +6,7 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from './http-interceptors/auth-interceptor';
 import { AuthenticationService } from './services/authentication-service';
 import { lastValueFrom } from 'rxjs';
+import { globalErrorInterceptor } from './http-interceptors/global-error-interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -13,7 +14,7 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideHttpClient(
-      withInterceptors([authInterceptor]) //custom Http Interceptor
+      withInterceptors([authInterceptor, globalErrorInterceptor]) //custom Http Interceptor & global error Interceptor
     ),
     //App Initializer to persist the global authenticated state after page reloads 
     provideAppInitializer(() => {
