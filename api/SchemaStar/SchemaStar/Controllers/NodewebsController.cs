@@ -48,7 +48,7 @@ namespace SchemaStar.Controllers
                     LastLayoutAt = n.LastLayoutAt,
                 }).ToList();
 
-            return Ok(response);
+            return response;
         }
 
         // GET: api/Nodewebs/{guid}
