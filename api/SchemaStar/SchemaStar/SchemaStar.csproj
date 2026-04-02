@@ -28,4 +28,8 @@
     <PackageReference Include="Serilog.Exceptions" Version="8.4.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Logs\" />
+  </ItemGroup>
+
 </Project>
