@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using SchemaStar.DataRepositories;
 using SchemaStar.ExceptionHandlers;
 using SchemaStar.JWT;
 using SchemaStar.Models;
@@ -33,6 +34,9 @@ try
 
     //-------------Added UserService-------------
     builder.Services.AddScoped<IUserService, UserService>();
+
+    //-------------Added NodewebRepository
+    builder.Services.AddScoped<INodewebRepository, NodewebRepository>();
 
     //-------------Database Connection String & Database Context-------------
 
