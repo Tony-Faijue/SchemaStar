@@ -239,13 +239,13 @@ namespace SchemaStar.Controllers
         }
 
         /// <summary>
-        /// Gets the Current User Info only if the cookie is valid
+        /// Gets the Current User Info if they are authenticated for Cookies/Bearer
         /// </summary>
         /// <returns></returns>
         /// <exception cref="NotFoundException"></exception>
-        [Authorize]
+        [Authorize(AuthenticationSchemes = "Bearer,Identity.Application")]
         [HttpGet("me")]
-        public async Task<ActionResult<CookieAuthResponseDTO>> GetCurrentUserInfo() {
+        public async Task<ActionResult<UserResponseDTO>> GetCurrentUserInfo() {
 
             var userId = _userService.GetCurrentUserId();
             if (userId == null) throw new UnauthorizedException("Current User is invalid");
@@ -253,14 +253,14 @@ namespace SchemaStar.Controllers
             var user = await _userManager.FindByIdAsync(userId.ToString()!);
             if (user == null) throw new NotFoundException("User does not exists");
 
-            return new CookieAuthResponseDTO
+            return new UserResponseDTO
             {
                 PublicId = user.PublicId.ToGuidFromMySqlBinary(),
-                IsAuthenticated = true,
                 Email = user.Email!,
                 Username = user.UserName!,
                 CreatedAt = user.CreatedAt,
                 UpdatedAt = user.UpdatedAt,
+                IsAuthenticated = true
             };
         }
     }

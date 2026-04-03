@@ -222,6 +222,7 @@ namespace SchemaStar.Services
             //Create claims for the token information
             var claims = new List<Claim> 
             { 
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()), //Add ulong datbase ID to the token
                 new Claim(JwtRegisteredClaimNames.Sub, user.UserName!), //Subject
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()), //Unique ID for the specific token
                 new Claim(JwtRegisteredClaimNames.Email, user.Email!), //Email claim
