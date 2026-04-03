@@ -11,5 +11,6 @@
         public DateTime CreatedAt { get; set; } //From MySQL Current TimeStamp
         public DateTime UpdatedAt { get; set; } //From MySQL Current TimeStamp
 
+        public bool? IsAuthenticated { get; set; }
     }
 }

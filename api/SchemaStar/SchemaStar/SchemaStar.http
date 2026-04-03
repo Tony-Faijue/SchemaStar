@@ -24,6 +24,9 @@ Content-Type: application/json
 }
 
 ### 
+
+@authToken = {{login.response.body.$.token}}
+
 POST {{SchemaStar_HostAddress}}/api/users
 Content-Type: application/json
 
@@ -35,21 +38,21 @@ Content-Type: application/json
 
 ###
 GET {{SchemaStar_HostAddress}}/api/users
-Authorization: Bearer {{login.response.body.$.token}}
+Authorization: Bearer {{authToken}}
 ###
 
 GET {{SchemaStar_HostAddress}}/api/users/{{publicId}}
-Authorization: Bearer {{login.response.body.$.token}}
+Authorization: Bearer {{authToken}}
 
 
 ###
 
 PATCH {{SchemaStar_HostAddress}}/api/users/{{publicId}}
 Content-Type: application/json
-Authorization: Bearer {{login.response.body.$.token}}
+Authorization: Bearer {{authToken}}
 
 {
-  "username": "test_user101",
+  "username": "test_user100",
   "email": "test_user100@gmail.com",
   "phoneNumber": "0001234567"
 }
@@ -57,10 +60,49 @@ Authorization: Bearer {{login.response.body.$.token}}
 ###
 
 DELETE {{SchemaStar_HostAddress}}/api/users/{{publicId}}
-Authorization: Bearer {{login.response.body.$.token}}
+Authorization: Bearer {{authToken}}
 
 ###
 
 GET {{SchemaStar_HostAddress}}/api/users/me
+Authorization: Bearer {{authToken}}
+
+###
+
+///-----Nodeweb APIs---------
+@nodewebId=0442e74c-e02d-4873-9122-6c7c6da5c2cf
+
+GET {{SchemaStar_HostAddress}}/api/nodewebs
+Authorization: Bearer {{authToken}}
+
+###
+
+
+GET {{SchemaStar_HostAddress}}/api/nodewebs/{{nodewebId}}
+Authorization: Bearer {{authToken}}
+
+###
+
+POST {{SchemaStar_HostAddress}}/api/nodewebs
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "nodewebName": "My First Schema"
+}
+
+###
+
+PATCH {{SchemaStar_HostAddress}}/api/nodewebs/{{nodewebId}}
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "nodewebName": "My Updated Schema"
+}
+
+###
+
+DELETE {{SchemaStar_HostAddress}}/api/nodewebs/{{nodewebId}}
 
 ###
