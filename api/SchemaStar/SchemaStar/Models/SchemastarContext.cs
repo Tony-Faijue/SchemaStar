@@ -49,20 +49,27 @@ public partial class SchemastarContext : IdentityDbContext<User, IdentityRole<ul
                 .HasConversion<string>(); //Convert enum to string, since default is int
             entity.Property(e => e.FromNodeId).HasColumnName("from_node_id");
 
+            entity.Property(e => e.UiMetadata)
+                .HasColumnType("json")
+                .HasColumnName("ui_metadata");
+
             entity.Property(e => e.PublicId)
                 .HasMaxLength(16)
                 .IsFixedLength()
                 .HasColumnName("public_id");
             entity.Property(e => e.ToNodeId).HasColumnName("to_node_id");
 
+            entity.Property(e => e.NodeWebId)
+                .HasColumnName("node_web_id");
+
             entity.HasOne(d => d.FromNode).WithMany(p => p.EdgeFromNodes)
                 .HasForeignKey(d => d.FromNodeId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Cascade) //Delete edge when node is deleted
                 .HasConstraintName("edge_ibfk_1");
 
             entity.HasOne(d => d.ToNode).WithMany(p => p.EdgeToNodes)
                 .HasForeignKey(d => d.ToNodeId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.NoAction)
                 .HasConstraintName("edge_ibfk_2");
         });
 
