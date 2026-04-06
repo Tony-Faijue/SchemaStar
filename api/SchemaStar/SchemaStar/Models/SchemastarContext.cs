@@ -238,6 +238,10 @@ public partial class SchemastarContext : IdentityDbContext<User, IdentityRole<ul
                 .IsRequired()
                 .HasColumnName("public_id");
 
+            entity.Property(e => e.NodeAssetName)
+                .HasMaxLength(255)
+                .HasColumnName("node_asset_name");
+
             entity.Property(e => e.NodeAssetType)
                 .HasDefaultValueSql("'link'")
                 .HasColumnName("asset_type")
@@ -260,6 +264,10 @@ public partial class SchemastarContext : IdentityDbContext<User, IdentityRole<ul
 
             entity.Property(e => e.FileSize)
                 .HasColumnName("file_size");
+
+            entity.Property(e => e.BlobPath)
+                .HasMaxLength(1024)
+                .HasColumnName("blob_path");
 
             entity.HasOne(d => d.Node)
                 .WithMany(p => p.NodeAssets)
