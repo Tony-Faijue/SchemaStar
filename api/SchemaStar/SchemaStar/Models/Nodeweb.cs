@@ -35,7 +35,7 @@ public partial class Nodeweb
     [Column("user_id")]
     public ulong UserId { get; set; }
 
-    [ForeignKey("UserId")]
+    [ForeignKey("NodeWebId")] //Fixed Foreign Key
     public virtual ICollection<Node> Nodes { get; set; } = new List<Node>();
 
     public virtual User User { get; set; } = null!;
