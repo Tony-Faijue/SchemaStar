@@ -1,5 +1,5 @@
-import { inject, Injectable, signal, Signal } from '@angular/core';
-import { SecretData } from '../../../environment';
+import { inject, Injectable, signal } from '@angular/core';
+import { SecretData } from '../../../../environment';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 
@@ -80,7 +80,11 @@ export class SchemaService {
     //separate id to url and name to body
     const url = this.getUrl(schema.publicId);
     const body = {nodeWebName: schema.nodeWebName};
-    return this.http.patch<SchemaResponse>(url, body);
+    return this.http.patch<SchemaResponse>(url, body).pipe(
+      tap((updatedSchema: SchemaResponse) => 
+        this.currentSchema.set(updatedSchema)
+      )
+    );
   }
 
   /**

@@ -3,8 +3,8 @@ import { TestBed } from '@angular/core/testing';
 import { RegisterSchema, SchemaResponse, SchemaService, UpdateSchema } from './schema-service';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
-import { authInterceptor } from '../http-interceptors/auth-interceptor';
-import { SecretData } from '../../../environment';
+import { authInterceptor } from '../../http-interceptors/auth-interceptor';
+import { SecretData } from '../../../../environment';
 
 describe('SchemaService', () => {
   let service: SchemaService;
@@ -89,8 +89,10 @@ describe('SchemaService', () => {
     const url = `${mockBaseUrl}/${updateSchema.publicId}`;
 
     //Act and Assert
-    service.patchSchema(updateSchema).subscribe();
-
+    service.patchSchema(updateSchema).subscribe(schemaResponse =>{
+      expect(service.currentSchema()).toEqual(schemaResponse); //assert currentSchema is set
+    });
+    
     //Verfiy
     const req = httpTestingController.expectOne(url);
     expect(req.request.method).toEqual('PATCH');
