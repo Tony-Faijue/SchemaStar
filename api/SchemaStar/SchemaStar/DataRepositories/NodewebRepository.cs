@@ -56,6 +56,21 @@ namespace SchemaStar.DataRepositories
 
             return await query.AnyAsync();
         }
+
+        /// <summary>
+        /// Eager loads the nodes, node assets and edges for the node web
+        /// </summary>
+        /// <param name="publicId"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public async Task<Nodeweb?> GetFullNodeWebByPublicIdAsync(byte[] publicId, ulong userId)
+        {
+            return await _context.Nodewebs
+                .Include(n => n.Nodes) //Eager Loading
+                    .ThenInclude(n => n.NodeAssets)
+                .Include(n => n.Edges)
+                .FirstOrDefaultAsync(n => n.PublicId == publicId && n.UserId == userId);
+        }
         /// <summary>
         /// Add nodeweb 
         /// </summary>
