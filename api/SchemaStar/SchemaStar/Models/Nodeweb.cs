@@ -38,5 +38,7 @@ public partial class Nodeweb
     [ForeignKey("NodeWebId")] //Fixed Foreign Key
     public virtual ICollection<Node> Nodes { get; set; } = new List<Node>();
 
+    public virtual ICollection<Edge> Edges { get; set; } = new List<Edge>();
+
     public virtual User User { get; set; } = null!;
 }
