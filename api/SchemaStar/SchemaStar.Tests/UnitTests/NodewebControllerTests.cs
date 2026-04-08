@@ -427,5 +427,74 @@ namespace SchemaStar.Tests.UnitTests
             _mockRepository.Verify(r => r.Delete(existingNodeweb), Times.Once);
             _mockRepository.Verify(r => r.SaveChangesAsync(), Times.Once);
         }
+
+        [Fact]
+        public async Task GetNodewebFull_WhenUserIdNull_ThrowsUnauthorizedException()
+        {
+            //Arrange
+            var publicId = Guid.NewGuid();
+            //Mock the needed services
+            _mockUserService.Setup(s => s.GetCurrentUserId()).Returns((ulong?)null);
+            //Act and Assert
+            await Assert.ThrowsAsync<UnauthorizedException>(() => _controller.GetNodewebFull(publicId));
+        }
+
+        [Fact]
+        public async Task GetNodewebFull_WhenNodewebDoesNotExist_ThrowsNotFoundException()
+        {
+            //Arrange
+            var userId = 1UL;
+            var publicId = Guid.NewGuid();
+
+            //Mock the needed services
+            _mockUserService.Setup(s => s.GetCurrentUserId()).Returns(userId);
+
+            _mockRepository.Setup(r => r.GetFullNodeWebByPublicIdAsync(It.IsAny<byte[]>(), userId))
+                .ReturnsAsync((Nodeweb)null);
+
+            //Act and Assert
+            await Assert.ThrowsAsync<NotFoundException>(() => _controller.GetNodewebFull(publicId));
+        }
+
+        [Fact]
+        public async Task GetNodewebFull_WhenGettingValidNodeweb_ReturnsNodewebFullResponseDTO()
+        {
+            //Arrange
+            var userId = 1UL;
+            var publicId = Guid.NewGuid();
+            var now = DateTime.UtcNow;
+
+            var node1 = new Node { PublicId = Guid.NewGuid().ToMySqlBinary(), NodeName = "Node 1" };
+            var node2 = new Node { PublicId = Guid.NewGuid().ToMySqlBinary(), NodeName = "Node 2" };
+            var edge = new Edge { PublicId = Guid.NewGuid().ToMySqlBinary(), FromNode = node1, ToNode = node2 };
+
+            var existingNodeweb = new Nodeweb
+            {
+                PublicId = publicId.ToMySqlBinary(),
+                NodeWebName = "Test_Nodeweb",
+                CreatedAt = now,
+                Nodes = new List<Node> {node1, node2},
+                Edges = new List<Edge>{edge}
+            };
+
+            //Mock the needed services
+            _mockUserService.Setup(s => s.GetCurrentUserId()).Returns(userId);
+
+            _mockRepository.Setup(r => r.GetFullNodeWebByPublicIdAsync(It.IsAny<byte[]>(), userId))
+                .ReturnsAsync(existingNodeweb);
+
+            //Act and Assert
+            var result = await _controller.GetNodewebFull(publicId);
+
+            var response = Assert.IsType<NodewebFullResponseDTO>(result.Value);
+
+            Assert.Equal(publicId, response.PublicId);
+            Assert.Equal("Test_Nodeweb", response.NodeWebName);
+            Assert.Equal(now, response.CreatedAt);
+            //Verify Nodes & Edges
+            Assert.Single(response.Edges);
+            Assert.Equal(2, response.Nodes.Count);
+            Assert.Equal(node1.PublicId.ToGuidFromMySqlBinary(), response.Edges[0].FromNodeId);
+        }
     }
 }
