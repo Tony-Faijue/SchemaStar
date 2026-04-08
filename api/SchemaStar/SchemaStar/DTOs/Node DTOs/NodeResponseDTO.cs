@@ -12,10 +12,9 @@ namespace SchemaStar.DTOs.Node_DTOs
         public int Width { get; set; }
         public int Height { get; set; }
         public NodeState State { get; set; }
-        public Guid CreatedBy { get; set; }
-        public Guid? UpdatedBy { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
-        public Guid NodeWebId { get; set; }
+
+        //public Guid NodeWebId { get; set; }
     }
 }

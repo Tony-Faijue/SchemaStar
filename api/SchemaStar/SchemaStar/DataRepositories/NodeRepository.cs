@@ -16,7 +16,7 @@ namespace SchemaStar.DataRepositories
         /// 
         /// </summary>
         /// <param name="publicId"></param>
-        /// <returns>returns the internal id given the publicId</returns>
+        /// <returns>returns the internal id given the publicId for the node</returns>
         public async Task<ulong?> GetInternalIdByPublicIdAsync(byte[] publicId, ulong userId)
         {
             return await _context.Nodes
@@ -39,7 +39,7 @@ namespace SchemaStar.DataRepositories
         }
 
         /// <summary>
-        /// Gets the specific node
+        /// Gets the specific node with the publicId
         /// </summary>
         /// <param name="publicId"></param>
         /// <param name="userId"></param>

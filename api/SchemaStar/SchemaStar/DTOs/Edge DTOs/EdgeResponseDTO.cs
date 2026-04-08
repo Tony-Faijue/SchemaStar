@@ -9,6 +9,7 @@ namespace SchemaStar.DTOs.Edge_DTOs
         public string? UiMetadata { get; set; }
         public Guid FromNodeId { get; set; }
         public Guid ToNodeId { get; set; }
-        public Guid NodeWebId { get; set; }
+
+        //public Guid NodeWebId { get; set; }
     }
 }

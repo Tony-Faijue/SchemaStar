@@ -79,13 +79,9 @@ public partial class SchemastarContext : IdentityDbContext<User, IdentityRole<ul
 
             entity.ToTable("node");
 
-            entity.HasIndex(e => e.CreatedBy, "created_by");
-
             entity.HasIndex(e => e.NodeWebId, "node_web_id");
 
             entity.HasIndex(e => e.PublicId, "public_id").IsUnique();
-
-            entity.HasIndex(e => e.UpdatedBy, "updated_by");
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.CreatedAt)
@@ -93,7 +89,6 @@ public partial class SchemastarContext : IdentityDbContext<User, IdentityRole<ul
                 .ValueGeneratedOnAdd()
                 .HasColumnType("timestamp")
                 .HasColumnName("created_at");
-            entity.Property(e => e.CreatedBy).HasColumnName("created_by");
             entity.Property(e => e.Height).HasColumnName("height");
 
             entity.Property(e => e.NodeDescription)
@@ -121,22 +116,11 @@ public partial class SchemastarContext : IdentityDbContext<User, IdentityRole<ul
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .HasColumnType("timestamp")
                 .HasColumnName("updated_at");
-            entity.Property(e => e.UpdatedBy).HasColumnName("updated_by");
             entity.Property(e => e.Width).HasColumnName("width");
-
-            entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.NodeCreatedByNavigations)
-                .HasForeignKey(d => d.CreatedBy)
-                .OnDelete(DeleteBehavior.Restrict)
-                .HasConstraintName("node_ibfk_1");
 
             entity.HasOne(d => d.NodeWeb).WithMany(p => p.Nodes)
                 .HasForeignKey(d => d.NodeWebId)
                 .HasConstraintName("node_ibfk_3");
-
-            entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.NodeUpdatedByNavigations)
-                .HasForeignKey(d => d.UpdatedBy)
-                .OnDelete(DeleteBehavior.SetNull)
-                .HasConstraintName("node_ibfk_2");
         });
 
         modelBuilder.Entity<Nodeweb>(entity =>

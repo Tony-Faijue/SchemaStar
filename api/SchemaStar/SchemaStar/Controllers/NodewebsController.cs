@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using SchemaStar.DataRepositories;
 using SchemaStar.DTOs.Nodeweb_DTOs;
 using SchemaStar.Exceptions;
+using SchemaStar.Mappers;
 using SchemaStar.Models;
 using SchemaStar.Services;
 
@@ -36,17 +37,17 @@ namespace SchemaStar.Controllers
         {
             var userId = _userService.GetCurrentUserId();
             if (userId == null) throw new UnauthorizedException("User does not have permission to access these NodeWebs");
-             
+
             var nodewebs = await _repository.GetAllNodewebsByUserIdAsync((ulong)userId);
 
             var response = nodewebs.Select(n => new NodewebResponseDTO
-                {
-                    PublicId = n.PublicId.ToGuidFromMySqlBinary(),
-                    NodeWebName = n.NodeWebName,
-                    CreatedAt = n.CreatedAt,
-                    UpdatedAt = n.UpdatedAt,
-                    LastLayoutAt = n.LastLayoutAt,
-                }).ToList();
+            {
+                PublicId = n.PublicId.ToGuidFromMySqlBinary(),
+                NodeWebName = n.NodeWebName,
+                CreatedAt = n.CreatedAt,
+                UpdatedAt = n.UpdatedAt,
+                LastLayoutAt = n.LastLayoutAt,
+            }).ToList();
 
             return response;
         }
@@ -67,13 +68,13 @@ namespace SchemaStar.Controllers
                 _logger.LogWarning("NodeWeb {PublicId} not found for User {UserId}", publicId, userId);
                 throw new NotFoundException("NodeWeb does exists for the user");
             }
-            
-            return new NodewebResponseDTO { 
+
+            return new NodewebResponseDTO {
                 PublicId = nodeweb.PublicId.ToGuidFromMySqlBinary(),
-                NodeWebName= nodeweb.NodeWebName,
+                NodeWebName = nodeweb.NodeWebName,
                 CreatedAt = nodeweb.CreatedAt,
                 UpdatedAt = nodeweb.UpdatedAt,
-                LastLayoutAt= nodeweb.LastLayoutAt,
+                LastLayoutAt = nodeweb.LastLayoutAt,
             };
         }
 
@@ -83,7 +84,7 @@ namespace SchemaStar.Controllers
         public async Task<IActionResult> UpdateNodeweb(Guid publicId, NodewebRequestDTO request)
         {
             var userId = _userService.GetCurrentUserId();
-            if (userId == null) throw new UnauthorizedException("User does not have permission to modify this NodeWeb"); 
+            if (userId == null) throw new UnauthorizedException("User does not have permission to modify this NodeWeb");
 
             byte[] publicIdBytes = publicId.ToMySqlBinary();
             var nodeweb = await _repository.GetNodewebByPublicIdAsync(publicIdBytes, (ulong)userId);
@@ -116,7 +117,7 @@ namespace SchemaStar.Controllers
                 _logger.LogError("Concurrency Error: Database update for NodeWeb {PublicId} conflicting with an existing update", nodeweb.PublicId);
                 throw new ConflictException("Record was updated elsewhere by another process");
             }
-            catch (DbUpdateException) 
+            catch (DbUpdateException)
             {
                 _logger.LogError("NodeWeb {PublicId} name is invalid make sure the name is unique", nodeweb.PublicId);
                 throw new ArgumentException("Unable to save, make sure node web name is unqiue.");
@@ -148,7 +149,7 @@ namespace SchemaStar.Controllers
             {
                 PublicId = newGuid.ToMySqlBinary(),
                 NodeWebName = request.NodeWebName,
-                UserId = (ulong) userId
+                UserId = (ulong)userId
             };
 
             var response = new NodewebResponseDTO
@@ -158,7 +159,7 @@ namespace SchemaStar.Controllers
                 CreatedAt = nodeweb.CreatedAt,
                 UpdatedAt = nodeweb.UpdatedAt,
             };
-            
+
             _repository.Add(nodeweb);
             await _repository.SaveChangesAsync();
 
@@ -183,13 +184,34 @@ namespace SchemaStar.Controllers
                 _logger.LogWarning("NodeWeb {PublicId} not found for User {UserId}", publicId, userId);
                 throw new NotFoundException("NodeWeb does not exists");
             }
-            
+
             _repository.Delete(nodeweb);
             await _repository.SaveChangesAsync();
 
             _logger.LogInformation("NodeWeb {PublicId} has been deleted by User {UserId}", nodeweb.PublicId, userId);
 
             return NoContent();
+        }
+
+        // GET: api/Nodewebs/publicId/full
+        [HttpGet("{publicId}/full")]
+        public async Task<ActionResult<NodewebFullResponseDTO>> GetNodewebFull(Guid publicId)
+        {
+            var userId = _userService.GetCurrentUserId();
+            if (userId == null) throw new UnauthorizedException("User does not have permission to access these NodeWebs");
+
+            byte[] publicIdBytes = publicId.ToMySqlBinary();
+
+            //Eager load the nodeweb
+            var nodeweb = await _repository.GetFullNodeWebByPublicIdAsync(publicIdBytes,(ulong)userId);
+
+             if (nodeweb == null)
+            {
+                _logger.LogWarning("NodeWeb {PublicId} not found for User {UserId}", publicId, userId);
+                throw new NotFoundException("NodeWeb does exists for the user");
+            }
+
+            return Ok(nodeweb.ToFullResponseDTO()); //use FullResponseDTO to get eager loaded Nodeweb
         }
 
     }
