@@ -46,13 +46,6 @@ public partial class Node
     [Column("state")]
     public NodeState State { get; set; } = NodeState.Unlocked;  //Uses Enum for state management
 
-    [Required]
-    [Column("created_by")]
-    public ulong CreatedBy { get; set; }
-
-    [Column("updated_by")]
-    public ulong? UpdatedBy { get; set; }
-
     [Column("created_at")]
     public DateTime CreatedAt { get; set; }
 
@@ -63,8 +56,6 @@ public partial class Node
     [Column("node_web_id")]
     public ulong NodeWebId { get; set; }
 
-    public virtual User CreatedByNavigation { get; set; } = null!;
-
     public virtual ICollection<Edge> EdgeFromNodes { get; set; } = new List<Edge>();
 
     public virtual ICollection<Edge> EdgeToNodes { get; set; } = new List<Edge>();
@@ -73,5 +64,4 @@ public partial class Node
 
     public virtual Nodeweb NodeWeb { get; set; } = null!;
 
-    public virtual User? UpdatedByNavigation { get; set; }
 }

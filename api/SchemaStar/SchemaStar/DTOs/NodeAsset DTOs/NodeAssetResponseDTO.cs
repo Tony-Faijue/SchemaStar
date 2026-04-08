@@ -12,6 +12,7 @@ namespace SchemaStar.DTOs.NodeAsset_DTOs
         public string? MimeType { get; set; }
         public int? FileSize { get; set; }
         public string? BlobPath { get; set; }
-        public Guid NodeId { get; set; }
+
+       // public Guid NodeId { get; set; }
     }
 }

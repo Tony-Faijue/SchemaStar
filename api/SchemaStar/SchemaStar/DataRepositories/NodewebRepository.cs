@@ -58,7 +58,7 @@ namespace SchemaStar.DataRepositories
         }
 
         /// <summary>
-        /// Eager loads the nodes, node assets and edges for the node web
+        /// Eager loads the nodes, node assets and edges for the nodeweb
         /// </summary>
         /// <param name="publicId"></param>
         /// <param name="userId"></param>

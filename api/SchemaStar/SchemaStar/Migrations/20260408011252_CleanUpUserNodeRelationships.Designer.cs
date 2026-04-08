@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SchemaStar.Models;
 
@@ -10,9 +11,11 @@ using SchemaStar.Models;
 namespace SchemaStar.Migrations
 {
     [DbContext(typeof(SchemastarContext))]
-    partial class SchemastarContextModelSnapshot : ModelSnapshot
+    [Migration("20260408011252_CleanUpUserNodeRelationships")]
+    partial class CleanUpUserNodeRelationships
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -24,9 +24,4 @@ public partial class User : IdentityUser<ulong>
     //Relationship: user can have many nodewebs
     public ICollection<Nodeweb> Nodewebs { get; set; } = new List<Nodeweb>();
 
-    public virtual ICollection<Node> NodeCreatedByNavigations { get; set; } = new List<Node>();
-
-    public virtual ICollection<Node> NodeUpdatedByNavigations { get; set; } = new List<Node>();
-
-
 }

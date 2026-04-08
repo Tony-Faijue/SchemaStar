@@ -1,0 +1,24 @@
+﻿using SchemaStar.DTOs.Edge_DTOs;
+using SchemaStar.Models;
+using SchemaStar.Services;
+
+namespace SchemaStar.Mappers
+{
+    /// <summary>
+    /// Mapper for Edge to convert Edge to EdgeResponseDTO
+    /// </summary>
+    public static class EdgeMapper
+    {
+        public static EdgeResponseDTO ToResponseDTO(this Edge edge)
+        {
+            return new EdgeResponseDTO
+            {
+                PublicId = edge.PublicId.ToGuidFromMySqlBinary(),
+                EdgeType = edge.EdgeType,
+                UiMetadata = edge.UiMetadata,
+                FromNodeId = edge.FromNode.PublicId.ToGuidFromMySqlBinary(),
+                ToNodeId = edge.ToNode.PublicId.ToGuidFromMySqlBinary(), //Edge repository must eager load to access these nodes
+            };
+        }
+    }
+}
