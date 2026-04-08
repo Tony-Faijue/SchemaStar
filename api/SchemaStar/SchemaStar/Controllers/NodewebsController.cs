@@ -193,7 +193,7 @@ namespace SchemaStar.Controllers
             return NoContent();
         }
 
-        // GET: api/Nodewebs/publicId/full
+        // GET: api/Nodewebs/{guid}/full
         [HttpGet("{publicId}/full")]
         public async Task<ActionResult<NodewebFullResponseDTO>> GetNodewebFull(Guid publicId)
         {
@@ -211,7 +211,8 @@ namespace SchemaStar.Controllers
                 throw new NotFoundException("NodeWeb does exists for the user");
             }
 
-            return Ok(nodeweb.ToFullResponseDTO()); //use FullResponseDTO to get eager loaded Nodeweb
+             var response = nodeweb.ToFullResponseDTO();
+             return response; //use FullResponseDTO to get eager loaded Nodeweb
         }
 
     }
