@@ -38,6 +38,7 @@ try
     //-------------Added Data Repositories
     builder.Services.AddScoped<INodewebRepository, NodewebRepository>();
     builder.Services.AddScoped<INodeRepository, NodeRepository>();
+    builder.Services.AddScoped<INodeAssetRepository, NodeAssetRepository>();
 
     //-------------Database Connection String & Database Context-------------
 
