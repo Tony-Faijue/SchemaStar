@@ -297,14 +297,6 @@ namespace SchemaStar.Tests.UnitTests
                 Height = 50,
             };
 
-            var node = new Node
-            {
-                PublicId = nodePublicId.ToMySqlBinary(),
-                NodeName = request.NodeName,
-                PositionY = request.PositionY,
-                Height = request.Height
-            };
-
             //Mock services
             _mockUserService.Setup(s => s.GetCurrentUserId()).Returns(userId);
 
