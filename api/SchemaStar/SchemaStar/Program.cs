@@ -35,8 +35,9 @@ try
     //-------------Added UserService-------------
     builder.Services.AddScoped<IUserService, UserService>();
 
-    //-------------Added NodewebRepository
+    //-------------Added Data Repositories
     builder.Services.AddScoped<INodewebRepository, NodewebRepository>();
+    builder.Services.AddScoped<INodeRepository, NodeRepository>();
 
     //-------------Database Connection String & Database Context-------------
 

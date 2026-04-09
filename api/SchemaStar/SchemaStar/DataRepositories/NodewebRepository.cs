@@ -13,6 +13,20 @@ namespace SchemaStar.DataRepositories
         }
 
         /// <summary>
+        /// Gets the internal for the nodeweb given the public id
+        /// </summary>
+        /// <param name="publicId"></param>
+        /// <param name="userId"></param>
+        /// <returns>the internal id</returns>
+        public async Task<ulong?> GetInternalIdByPublicIdAsync(byte[] publicId, ulong userId)
+        {
+            return await _context.Nodewebs
+                .Where(n => n.PublicId == publicId && n.UserId == userId)
+                .Select(n => (ulong?)n.Id)
+                .FirstOrDefaultAsync();
+        }
+
+        /// <summary>
         /// Gets all the nodewebs that belong to the user with userId
         /// </summary>
         /// <param name="userId"></param>

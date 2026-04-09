@@ -5,6 +5,7 @@ namespace SchemaStar.DataRepositories
 {
     public interface INodewebRepository
     {
+        Task<ulong?> GetInternalIdByPublicIdAsync(byte[] publicId, ulong userId);
         Task<IEnumerable<Nodeweb>> GetAllNodewebsByUserIdAsync(ulong userId);
         Task<Nodeweb?> GetNodewebByPublicIdAsync(byte[] publicId, ulong userId);
         Task<bool> ExistsByNameAsync(ulong userId, string name, byte[]? excludePublicId = null);
