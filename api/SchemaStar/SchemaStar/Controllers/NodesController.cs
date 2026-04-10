@@ -35,7 +35,7 @@ namespace SchemaStar.Controllers
         }
 
         // GET: api/Nodewebs/{nodeWebId}/Nodes
-        [HttpGet("api/Nodewebs/{nodeWebId}/Nodes")]
+        [HttpGet("/api/Nodewebs/{nodeWebId}/Nodes")]
         public async Task<ActionResult<IEnumerable<NodeResponseDTO>>> GetNodes(Guid nodeWebId)
         {
             var userId = _userService.GetCurrentUserId();
@@ -63,7 +63,7 @@ namespace SchemaStar.Controllers
             if (node == null)
             {
                 _logger.LogWarning("Node {PublicId} not found for User {UserId}", nodeId, userId);
-                throw new NotFoundException("Node does exists for the user");
+                throw new NotFoundException("Node does not exists for the user");
             }
 
             var response = node.ToResponseDTO();
@@ -116,7 +116,7 @@ namespace SchemaStar.Controllers
             if (nodeWebId == null)
             {
                 _logger.LogWarning("NodeWeb {PublicId} not found for User {UserId}", request.NodeWebId, userId);
-                throw new NotFoundException("NodeWeb does exists for the user");
+                throw new NotFoundException("NodeWeb does not exists for the user");
             }
 
             var newGuid = Guid.NewGuid();
@@ -182,7 +182,7 @@ namespace SchemaStar.Controllers
             if (node == null)
             {
                 _logger.LogWarning("Node {PublicId} not found for User {UserId}", publicId, userId);
-                throw new NotFoundException("Node does exists for the user");
+                throw new NotFoundException("Node does not exists for the user");
             }
 
             var response = node.ToFullResponseDTO();

@@ -2,7 +2,7 @@
 
 namespace SchemaStar.DTOs
 {
-    public class Edge_DTos
+    public class EdgeRequestDTO
     {
         public EdgeType? EdgeType { get; set; }
         public string? UiMetadata { get; set; }
