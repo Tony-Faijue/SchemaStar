@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SchemaStar.DataRepositories;
@@ -14,6 +15,7 @@ using System.Threading.Tasks;
 
 namespace SchemaStar.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class NodeAssetsController : ControllerBase
@@ -32,7 +34,7 @@ namespace SchemaStar.Controllers
         }
 
         // GET: api/Nodes/{nodeId}/NodeAssets
-        [HttpGet("api/Nodes/{nodeId}/NodeAssets")]
+        [HttpGet("/api/Nodes/{nodeId}/NodeAssets")]
         public async Task<ActionResult<IEnumerable<NodeAssetResponseDTO>>> GetNodeAssets(Guid nodeId)
         {
             var userId = _userService.GetCurrentUserId();
@@ -60,7 +62,7 @@ namespace SchemaStar.Controllers
             if (nodeAsset == null)
             {
                 _logger.LogWarning("NodeAsset {PublicId} not found for User {UserId}", nodeAssetId, userId);
-                throw new NotFoundException("NodeAsset does exists for the user");
+                throw new NotFoundException("NodeAsset does not exists for the user");
             }
 
             var response = nodeAsset.ToResponseDTO();
@@ -112,7 +114,7 @@ namespace SchemaStar.Controllers
             if (nodeId == null)
             {
                 _logger.LogWarning("Node {PublicId} not found for User {UserId}", request.NodeId, userId);
-                throw new NotFoundException("Node does exists for the user");
+                throw new NotFoundException("Node does not exists for the user");
             }
 
             var newGuid = Guid.NewGuid();

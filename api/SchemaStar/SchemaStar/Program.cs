@@ -39,6 +39,7 @@ try
     builder.Services.AddScoped<INodewebRepository, NodewebRepository>();
     builder.Services.AddScoped<INodeRepository, NodeRepository>();
     builder.Services.AddScoped<INodeAssetRepository, NodeAssetRepository>();
+    builder.Services.AddScoped<IEdgeRepository, EdgeRepository>();
 
     //-------------Database Connection String & Database Context-------------
 

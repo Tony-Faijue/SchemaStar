@@ -66,7 +66,7 @@ namespace SchemaStar.Controllers
             if (nodeweb == null)
             {
                 _logger.LogWarning("NodeWeb {PublicId} not found for User {UserId}", publicId, userId);
-                throw new NotFoundException("NodeWeb does exists for the user");
+                throw new NotFoundException("NodeWeb does not exists for the user");
             }
 
             return new NodewebResponseDTO {
@@ -208,7 +208,7 @@ namespace SchemaStar.Controllers
              if (nodeweb == null)
             {
                 _logger.LogWarning("NodeWeb {PublicId} not found for User {UserId}", publicId, userId);
-                throw new NotFoundException("NodeWeb does exists for the user");
+                throw new NotFoundException("NodeWeb does not exists for the user");
             }
 
              var response = nodeweb.ToFullResponseDTO();
