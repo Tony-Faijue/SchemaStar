@@ -154,7 +154,7 @@ namespace SchemaStar.Controllers
                 throw new NotFoundException("NodeWeb does not exists for the user");
             }
 
-            //Validatee the FromNode and get fromnode internal id and assign it for the edge
+            //Validate the FromNode and get fromnode internal id and assign it for the edge
             var fromNodeId = await _nodeRepository.GetInternalIdByPublicIdAsync(request.FromNodeId.ToMySqlBinary(), (ulong)userId);
             if (fromNodeId == null)
             {
@@ -162,7 +162,7 @@ namespace SchemaStar.Controllers
                 throw new NotFoundException("FromNode does not exists for the Edge");
             }
 
-            //Validatee the ToNode and get tomnode internal id and assign it for the edge
+            //Validate the ToNode and get tomnode internal id and assign it for the edge
             var toNodeId = await _nodeRepository.GetInternalIdByPublicIdAsync(request.ToNodeId.ToMySqlBinary(), (ulong)userId);
             if (toNodeId == null)
             {
