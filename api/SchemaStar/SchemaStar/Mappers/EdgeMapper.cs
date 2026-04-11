@@ -16,8 +16,8 @@ namespace SchemaStar.Mappers
                 PublicId = edge.PublicId.ToGuidFromMySqlBinary(),
                 EdgeType = edge.EdgeType,
                 UiMetadata = edge.UiMetadata,
-                FromNodeId = edge.FromNode.PublicId.ToGuidFromMySqlBinary(),
-                ToNodeId = edge.ToNode.PublicId.ToGuidFromMySqlBinary(), //Edge repository must eager load to access these nodes
+                FromNodeId = edge.FromNode?.PublicId.ToGuidFromMySqlBinary() ?? Guid.Empty,
+                ToNodeId = edge.ToNode?.PublicId.ToGuidFromMySqlBinary() ?? Guid.Empty //Edge repository eager loads, handles when nodes are null
             };
         }
     }
