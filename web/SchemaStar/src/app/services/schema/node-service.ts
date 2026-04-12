@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { SecretData } from '../../../../environment';
 import { Observable } from 'rxjs';
+import { NodeAssetResponse } from './node-asset-service';
 
 /**
  * State of the node
@@ -14,7 +15,7 @@ export enum NodeState {
 
 export interface NodeRequest{
   nodeName: string,
-  nodeDesc?: string,
+  nodeDescription?: string,
   positionX: number,
   positionY: number,
   width: number,
@@ -23,18 +24,37 @@ export interface NodeRequest{
   nodewebId: string,
 }
 
-export interface NodeResponse extends NodeRequest{
+export interface NodeResponse{
   publicId: string,
-  createdBy: string,
-  updatedBy?: string,
+  nodeName: string,
+  nodeDescription?: string,
+  positionX: number,
+  positionY: number,
+  width: number,
+  height: number,
+  state: NodeState,
   createdAt: string,
   updatedAt?: string,
+}
+
+export interface NodeResponseFull{
+  publicId: string,
+  nodeName: string,
+  nodeDescription?: string,
+  positionX: number,
+  positionY: number,
+  width: number,
+  height: number,
+  state: NodeState,
+  createdAt: string,
+  updatedAt?: string,
+  NodeAssets: NodeAssetResponse[]
 }
 
 export interface UpdateNode {
   publicId: string, 
   nodeName?: string,
-  nodeDesc?: string,
+  nodeDescription?: string,
   positionX?: number,
   positionY?: number,
   width?: number,
@@ -59,12 +79,22 @@ export class NodeService {
     return `${this.nodeUrl}/${id}`;
   }
 
-  /**
+   /**
    * 
-   * @returns all the Nodes
+   * @param id 
+   * @returns the node url with the nodeweb id for HTTP GET method
    */
-  getNodes():Observable<NodeResponse[]>{
-    return this.http.get<NodeResponse[]>(this.nodeUrl);
+  private getNodesUrl (id: string): string{
+    return `${SecretData.baseuUrl}/api/Nodewebs/${id}/Nodes`;
+  }
+
+  /**
+   * @param nodewebId
+   * @returns all the Nodes for the nodeweb
+   */
+  getNodes(nodewebId:string):Observable<NodeResponse[]>{
+    const url = this.getNodesUrl(nodewebId);
+    return this.http.get<NodeResponse[]>(url);
   }
 
   /**

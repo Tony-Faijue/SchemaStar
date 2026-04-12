@@ -16,26 +16,36 @@ export enum NodeAssetSource {
 }
 
 export interface NodeAssetRequest {
-  assetType: NodeAssetType,
-  assetSource: NodeAssetSource,
-  url: string,
-  mimeType: string,
-  FileSize?: number,
+  nodeAssetName?: string,
+  nodeAssetType: NodeAssetType,
+  nodeAssetSource: NodeAssetSource,
+  url?: string,
+  mimeType?: string,
+  fileSize?: number,
+  blobPath?: string,
   nodeId: string
 }
 
-export interface NodeAssetResponse extends NodeAssetRequest{
+export interface NodeAssetResponse{
   publicId: string,
+  nodeAssetName?: string,
+  nodeAssetType: NodeAssetType,
+  nodeAssetSource: NodeAssetSource,
+  url?: string,
+  mimeType?: string,
+  fileSize?: number,
+  blobPath?: string,
 }
 
 export interface UpdateNodeAsset{
-  publicId: string,
-  assetType: NodeAssetType,
-  assetSource: NodeAssetSource,
-  url: string,
-  mimeType: string,
-  FileSize?: number,
-  nodeId: string
+  publicId: string, 
+  nodeAssetName?: string,
+  assetType?: NodeAssetType,
+  assetSource?: NodeAssetSource,
+  url?: string,
+  mimeType?: string,
+  fileSize?: number,
+  blobPath?: string
 }
 
 @Injectable({
@@ -55,12 +65,22 @@ export class NodeAssetService {
     return `${this.nodeAssetUrl}/${id}`;
   }
 
-  /**
+   /**
    * 
-   * @returns all the Node Assets
+   * @param id 
+   * @returns the node asset url with the node id for HTTP GET method
    */
-  getNodeAssets():Observable<NodeAssetResponse[]>{
-    return this.http.get<NodeAssetResponse[]>(this.nodeAssetUrl);
+  private getNodeAssetsUrl (id: string): string{
+    return `${SecretData.baseuUrl}/api/Nodes/${id}/NodeAssets`;
+  }
+
+  /**
+   * @param nodeId
+   * @returns all the Node Assets for the node id
+   */
+  getNodeAssets(nodeId: string):Observable<NodeAssetResponse[]>{
+    const url = this.getNodeAssetsUrl(nodeId);
+    return this.http.get<NodeAssetResponse[]>(url);
   }
 
   /**
