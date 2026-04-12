@@ -13,18 +13,25 @@ export enum EdgeType {
 }
 
 export interface EdgeRequest{
-  edgeType: EdgeType
+  edgeType: EdgeType,
+  uiMetadata: string,
   fromNodeId: string,
-  toNodeId: string
+  toNodeId: string,
+  nodewebId: string
 }
 
-export interface EdgeResponse extends EdgeRequest{
-  publicId: string
+export interface EdgeResponse{
+  publicId: string,
+  edgeType?: EdgeType,
+  uiMetadata?: string,
+  fromNodeId: string,
+  toNodeId: string,
 }
 
 export interface UpdateEdge{
   publicId: string,
-  edgeType?: EdgeType
+  edgeType?: EdgeType,
+  uiMetadata?: string,
   fromNodeId?: string,
   toNodeId?: string
 }
@@ -46,12 +53,22 @@ export class EdgeService {
     return `${this.edgeUrl}/${id}`;
   }
 
-  /**
+   /**
    * 
-   * @returns all the Edges
+   * @param id 
+   * @returns the edge url with the nodeweb id for HTTP GET method
    */
-  getEdges():Observable<EdgeResponse[]>{
-    return this.http.get<EdgeResponse[]>(this.edgeUrl);
+  private getEdgesUrl (id: string): string{
+    return `${SecretData.baseuUrl}/api/Nodewebs/${id}/Edges`;
+  }
+
+  /**
+   * @param nodewebId
+   * @returns all the Edges for the given nodewebId for GET Method
+   */
+  getEdges(nodewebId: string):Observable<EdgeResponse[]>{
+    const url = this.getEdgesUrl(nodewebId);
+    return this.http.get<EdgeResponse[]>(url);
   }
 
   /**
