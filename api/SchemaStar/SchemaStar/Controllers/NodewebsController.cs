@@ -52,7 +52,7 @@ namespace SchemaStar.Controllers
             return response;
         }
 
-        // GET: api/Nodewebs/{guid}
+        // GET: api/nodewebs/{publicId}
         [HttpGet("{publicId}")]
         public async Task<ActionResult<NodewebResponseDTO>> GetNodeweb(Guid publicId)
         {
@@ -78,7 +78,7 @@ namespace SchemaStar.Controllers
             };
         }
 
-        // PATCH: api/Nodewebs/5
+        // PATCH: api/nodewebs/{publicId}
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPatch("{publicId}")]
         public async Task<IActionResult> UpdateNodeweb(Guid publicId, NodewebRequestDTO request)
@@ -126,7 +126,7 @@ namespace SchemaStar.Controllers
             return NoContent();
         }
 
-        // POST: api/Nodewebs
+        // POST: api/nodewebs
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<NodewebResponseDTO>> PostNodeweb(NodewebRequestDTO request)
@@ -168,7 +168,7 @@ namespace SchemaStar.Controllers
             return CreatedAtAction(nameof(GetNodeweb), new { publicId = response.PublicId }, response);
         }
 
-        // DELETE: api/Nodewebs/{guid}
+        // DELETE: api/nodewebs/{publicId}
         [HttpDelete("{publicId}")]
         public async Task<IActionResult> DeleteNodeweb(Guid publicId)
         {
@@ -193,7 +193,7 @@ namespace SchemaStar.Controllers
             return NoContent();
         }
 
-        // GET: api/Nodewebs/{guid}/full
+        // GET: api/nodewebs/{publicId}/full
         [HttpGet("{publicId}/full")]
         public async Task<ActionResult<NodewebFullResponseDTO>> GetNodewebFull(Guid publicId)
         {
