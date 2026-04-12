@@ -34,8 +34,8 @@ namespace SchemaStar.Controllers
             _nodeWebRepository = nodeWebRepository;
         }
 
-        // GET: api/Nodewebs/{nodeWebId}/Nodes
-        [HttpGet("/api/Nodewebs/{nodeWebId}/Nodes")]
+        // GET: api/nodewebs/{nodeWebId}/nodes
+        [HttpGet("/api/nodewebs/{nodeWebId}/nodes")]
         public async Task<ActionResult<IEnumerable<NodeResponseDTO>>> GetNodes(Guid nodeWebId)
         {
             var userId = _userService.GetCurrentUserId();
@@ -49,7 +49,7 @@ namespace SchemaStar.Controllers
             return response;
         }
 
-        // GET: api/Nodes/{nodeId}
+        // GET: api/nodes/{nodeId}
         [HttpGet("{nodeId}")]
         public async Task<ActionResult<NodeResponseDTO>> GetNode(Guid nodeId)
         {
@@ -71,7 +71,7 @@ namespace SchemaStar.Controllers
             return response;
         }
 
-        // PATCH: api/Nodes/{nodeId}
+        // PATCH: api/nodes/{nodeId}
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPatch("{nodeId}")]
         public async Task<IActionResult> UpdateNode(Guid nodeId, NodeUpdateRequestDTO request)
@@ -102,7 +102,7 @@ namespace SchemaStar.Controllers
             return NoContent();
         }
 
-        // POST: api/Nodes
+        // POST: api/nodes
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<NodeResponseDTO>> PostNode(NodeRequestDTO request)
@@ -142,7 +142,7 @@ namespace SchemaStar.Controllers
             return CreatedAtAction(nameof(GetNode), new { nodeId = response.PublicId }, response);
         }
 
-        // DELETE: api/Nodes/{guid}
+        // DELETE: api/nodes/{publicId}
         [HttpDelete("{publicId}")]
         public async Task<IActionResult> DeleteNode(Guid publicId)
         {
@@ -167,7 +167,7 @@ namespace SchemaStar.Controllers
             return NoContent();
         }
 
-        // GET: api/Nodes/{guid}/full
+        // GET: api/nodes/{publicId}/full
         [HttpGet("{publicId}/full")]
         public async Task<ActionResult<NodeFullResponseDTO>> GetNodeFull(Guid publicId)
         {

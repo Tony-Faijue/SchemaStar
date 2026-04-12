@@ -33,8 +33,8 @@ namespace SchemaStar.Controllers
             _nodeRepository = nodeRepository;
         }
 
-        // GET: api/Nodes/{nodeId}/NodeAssets
-        [HttpGet("/api/Nodes/{nodeId}/NodeAssets")]
+        // GET: api/nodes/{nodeId}/nodeassets
+        [HttpGet("/api/nodes/{nodeId}/nodeassets")]
         public async Task<ActionResult<IEnumerable<NodeAssetResponseDTO>>> GetNodeAssets(Guid nodeId)
         {
             var userId = _userService.GetCurrentUserId();
@@ -48,7 +48,7 @@ namespace SchemaStar.Controllers
             return response;
         }
 
-        // GET: api/NodeAssets/{nodeAssetId}
+        // GET: api/nodeassets/{nodeAssetId}
         [HttpGet("{nodeAssetId}")]
         public async Task<ActionResult<NodeAssetResponseDTO>> GetNodeAsset(Guid nodeAssetId)
         {
@@ -69,7 +69,7 @@ namespace SchemaStar.Controllers
             return response;
         }
 
-        // PATCH: api/NodeAssets/{nodeAssetId}
+        // PATCH: api/nodeassets/{nodeAssetId}
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPatch("{nodeAssetId}")]
         public async Task<IActionResult> UpdateNodeAsset(Guid nodeAssetId, NodeAssetUpdateRequestDTO request)
@@ -100,7 +100,7 @@ namespace SchemaStar.Controllers
             return NoContent();
         }
 
-        // POST: api/NodeAssets
+        // POST: api/nodeassets
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<NodeAssetResponseDTO>> PostNodeAsset(NodeAssetRequestDTO request)
@@ -140,7 +140,7 @@ namespace SchemaStar.Controllers
             return CreatedAtAction(nameof(GetNodeAsset), new { nodeAssetId = response.PublicId }, response);
         }
 
-        // DELETE: api/NodeAssets/{publicId}
+        // DELETE: api/nodeassets/{publicId}
         [HttpDelete("{publicId}")]
         public async Task<IActionResult> DeleteNodeAsset(Guid publicId)
         {

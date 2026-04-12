@@ -36,8 +36,8 @@ namespace SchemaStar.Controllers
             _nodeRepository = nodeRepository;
         }
 
-        // GET: api/Nodewebs/{nodeWebId}/Edges
-        [HttpGet("/api/Nodewebs/{nodeWebId}/Edges")]
+        // GET: api/nodewebs/{nodeWebId}/edges
+        [HttpGet("/api/nodewebs/{nodeWebId}/edges")]
         public async Task<ActionResult<IEnumerable<EdgeResponseDTO>>> GetEdges(Guid nodeWebId)
         {
             var userId = _userService.GetCurrentUserId();
@@ -51,7 +51,7 @@ namespace SchemaStar.Controllers
             return response;
         }
 
-        // GET: api/Edges/5
+        // GET: api/edges/{edgeId}
         [HttpGet("{edgeId}")]
         public async Task<ActionResult<EdgeResponseDTO>> GetEdge(Guid edgeId)
         {
@@ -72,7 +72,7 @@ namespace SchemaStar.Controllers
             return response;
         }
 
-        // PATCH: api/Edges/{edgeId}
+        // PATCH: api/edges/{edgeId}
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPatch("{edgeId}")]
         public async Task<IActionResult> UpdateEdge(Guid edgeId, EdgeUpdateRequestDTO request)
@@ -131,7 +131,7 @@ namespace SchemaStar.Controllers
             return NoContent();
         }
 
-        // POST: api/Edges
+        // POST: api/edges
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<EdgeResponseDTO>> PostEdge(EdgeRequestDTO request)
@@ -191,7 +191,7 @@ namespace SchemaStar.Controllers
             return CreatedAtAction(nameof(GetEdge), new { edgeId = response.PublicId }, response);
         }
 
-        // DELETE: api/Edges/{publicId}
+        // DELETE: api/edges/{publicId}
         [HttpDelete("{publicId}")]
         public async Task<IActionResult> DeleteEdge(Guid publicId)
         {

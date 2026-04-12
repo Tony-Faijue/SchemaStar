@@ -2,6 +2,18 @@
 
 @publicId=1f56d50a-328c-4a1e-a23a-91e2b5396f88
 
+@nodewebId=0442e74c-e02d-4873-9122-6c7c6da5c2cf
+
+@nodeId=e95ade47-3858-4b43-9d5d-d3a5ec142f5a
+
+@nodeassetId=e8f4a736-eed7-43f1-a2d4-8bb601437670
+
+@edgeId=f878312a-6925-41c8-acb1-974fbf828ab3
+
+//For Edges
+@fromNodeIdA=3634f236-2485-46af-b0d6-6fb346254a36
+@toNodeIdA=1f7623d9-d09b-419e-81ba-489a8cfb1760
+
 //---User Api Endpoints---
 
 ### Web Login (Cookie)
@@ -70,7 +82,6 @@ Authorization: Bearer {{authToken}}
 ###
 
 ///-----Nodeweb APIs---------
-@nodewebId=0442e74c-e02d-4873-9122-6c7c6da5c2cf
 
 GET {{SchemaStar_HostAddress}}/api/nodewebs
 Authorization: Bearer {{authToken}}
@@ -104,5 +115,164 @@ Authorization: Bearer {{authToken}}
 ###
 
 DELETE {{SchemaStar_HostAddress}}/api/nodewebs/{{nodewebId}}
+Authorization: Bearer {{authToken}}
+
+###
+
+GET {{SchemaStar_HostAddress}}/api/nodewebs/{{nodewebId}}/full
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+###
+
+///-----Node APIs---------
+
+GET {{SchemaStar_HostAddress}}/api/nodewebs/{{nodewebId}}/nodes
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+###
+
+GET {{SchemaStar_HostAddress}}/api/nodes/{{nodeId}}
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+###
+
+PATCH {{SchemaStar_HostAddress}}/api/nodes/{{nodeId}}
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "nodeName": "Updated Node",
+  "nodeDescription": "The Node has been updated",
+  "state": 1
+}
+
+###
+
+POST {{SchemaStar_HostAddress}}/api/nodes
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "nodeName": "My To Node",
+  "nodeDescription": "This is my To Node",
+  "positionX": 0,
+  "positionY": 5,
+  "width": 210,
+  "height": 210,
+  "state": 0,
+  "nodeWebId": "{{nodewebId}}"
+}
+
+###
+
+DELETE {{SchemaStar_HostAddress}}/api/nodes/{{nodeId}}
+Authorization: Bearer {{authToken}}
+
+###
+
+GET {{SchemaStar_HostAddress}}/api/nodes/{{nodeId}}/full
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+###
+
+///-----NodeAsset APIs---------
+
+GET {{SchemaStar_HostAddress}}/api/nodes/{{nodeId}}/nodeassets
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+###
+
+
+GET {{SchemaStar_HostAddress}}/api/nodeassets/{{nodeassetId}}
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+###
+
+
+PATCH {{SchemaStar_HostAddress}}/api/nodeassets/{{nodeassetId}}
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "nodeAssetName": "Updated Test NodeAsset",
+  "nodeAssetType": 0,
+  "nodeAssetSource": 0,
+  "fileSize": 7
+}
+
+###
+
+
+POST {{SchemaStar_HostAddress}}/api/nodeassets
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "nodeAssetName": "Test NodeAsset",
+  "nodeAssetType": 1,
+  "nodeAssetSource": 1,
+  "url": "example.com",
+  "nodeId": "{{nodeId}}"
+}
+
+###
+
+
+DELETE {{SchemaStar_HostAddress}}/api/nodeassets/{{nodeassetId}}
+Authorization: Bearer {{authToken}}
+
+###
+
+///-----Edge APIs---------
+
+
+GET {{SchemaStar_HostAddress}}/api/nodewebs/{{nodewebId}}/edges
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+###
+
+
+GET {{SchemaStar_HostAddress}}/api/edges/{{edgeId}}
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+###
+
+
+PATCH {{SchemaStar_HostAddress}}/api/edges/{{edgeId}}
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "edgeType": 0,
+  "fromNodeId": "{{fromNodeIdA}}",
+  "toNodeId": "{{toNodeIdA}}"
+}
+
+###
+
+POST {{SchemaStar_HostAddress}}/api/edges
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "edgeType": 1,
+  "fromNodeId": "{{nodeId}}",
+  "toNodeId": "{{toNodeIdA}}",
+  "nodeWebId": "{{nodewebId}}"
+}
+
+###
+
+DELETE {{SchemaStar_HostAddress}}/api/edges/{{edgeId}}
+Authorization: Bearer {{authToken}}
+
 
 ###
