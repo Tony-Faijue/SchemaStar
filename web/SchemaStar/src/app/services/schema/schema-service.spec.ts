@@ -1,26 +1,68 @@
 import { TestBed } from '@angular/core/testing';
 
-import { RegisterSchema, SchemaResponse, SchemaService, UpdateSchema } from './schema-service';
+import { RegisterSchema, SchemaResponse, SchemaResponseFull, SchemaService, UpdateSchema } from './schema-service';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from '../../http-interceptors/auth-interceptor';
 import { SecretData } from '../../../../environment';
+import { NodeResponse, NodeState } from './node-service';
+import { EdgeResponse, EdgeType } from './edge-service';
 
 describe('SchemaService', () => {
   let service: SchemaService;
   let httpTestingController: HttpTestingController
 
-  const mockBaseUrl = `${SecretData.baseuUrl}/api/Nodewebs`;
+  const mockBaseUrl = `${SecretData.baseuUrl}/api/nodewebs`;
 
-  const mockSchemaResponse: SchemaResponse = 
-    {
+  const node: NodeResponse = {
+        publicId: '123',
+        nodeName: 'Test_Node',
+        positionX: 0,
+        positionY: 0,
+        width: 150,
+        height: 200,
+        state: NodeState.Locked,
+        createdAt: '2026-02-18T20:52:02-06:00'
+  };
+
+  const node2: NodeResponse = {
+        publicId: '456',
+        nodeName: 'Test_Node2',
+        positionX: 0,
+        positionY: 0,
+        width: 150,
+        height: 200,
+        state: NodeState.Locked,
+        createdAt: '2026-02-18T20:52:02-06:00'
+  };
+
+  const edge: EdgeResponse = {
+    publicId: '789',
+    edgeType: EdgeType.Directed,
+    fromNodeId: node.publicId,
+    toNodeId: node2.publicId
+  };
+
+  const nodes:NodeResponse[] = [node, node2];
+  const edges:EdgeResponse[] = [edge];
+
+  const mockSchemaResponse: SchemaResponse = {
       publicId:'123',
       nodeWebName: 'Test_Schema',
       createdAt: '2026-02-18T20:52:02-06:00',
       updatedAt: '2026-02-18T20:52:02-06:00',
       lastLayoutAt: '2026-02-18T20:52:02-06:00'
-    };
+  };
 
+  const mockSchemaResponseFull: SchemaResponseFull = {
+      publicId:'123',
+      nodeWebName: 'Test_Schema',
+      createdAt: '2026-02-18T20:52:02-06:00',
+      updatedAt: '2026-02-18T20:52:02-06:00',
+      lastLayoutAt: '2026-02-18T20:52:02-06:00',
+      nodes: nodes,
+      edges: edges
+  };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -129,7 +171,7 @@ describe('SchemaService', () => {
   it('should delete an exisitng schema', () => {
     //Arrange
     const mockId = '123';
-    const url = `${mockBaseUrl}/${mockId}`
+    const url = `${mockBaseUrl}/${mockId}`;
 
     //Act and Assert
     service.deleteSchema(mockId).subscribe();
@@ -138,6 +180,27 @@ describe('SchemaService', () => {
     const req = httpTestingController.expectOne(url);
     expect(req.request.method).toBe('DELETE');
     req.flush(null);
+  });
+
+   it('should get the SchemaFullResponse for a schema and set the currentSchema signal with the id when getSchemaFull succeeds', () => {
+    //Arrange
+    const mockId = mockSchemaResponseFull.publicId;
+    const url = `${mockBaseUrl}/${mockId}/full`;
+
+    //Act and Assert
+    expect(service.currentSchema()).toBeNull(); //assert currentSchema is null
+
+    service.getSchemaFull(mockId).subscribe(schemaResponseFull => {
+      expect(schemaResponseFull).toEqual(mockSchemaResponseFull);
+      expect(service.currentSchema()).toEqual(mockSchemaResponseFull); //assert currentSchema is set
+      expect(schemaResponseFull.nodes.length).toBe(2);
+      expect(schemaResponseFull.edges.length).toBe(1);
+    });
+
+    //Verify
+    const req = httpTestingController.expectOne(url);
+    expect(req.request.method).toBe('GET');
+    req.flush(mockSchemaResponseFull);
   });
 
 });
