@@ -2,6 +2,8 @@ import { inject, Injectable, signal } from '@angular/core';
 import { SecretData } from '../../../../environment';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
+import { NodeResponse } from './node-service';
+import { EdgeResponse } from './edge-service';
 
 
 /**
@@ -30,15 +32,25 @@ export interface SchemaResponse{
   updatedAt: string
 }
 
+export interface SchemaResponseFull{
+  publicId: string,
+  nodeWebName: string,
+  lastLayoutAt: string,
+  createdAt: string,
+  updatedAt: string,
+  nodes: NodeResponse[],
+  edges: EdgeResponse[]
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class SchemaService {
  
-  public currentSchema = signal<SchemaResponse | null>(null);
+  public currentSchema = signal<SchemaResponse | SchemaResponseFull| null>(null);
 
   private http = inject(HttpClient);
-  private readonly schemaUrl = `${SecretData.baseuUrl}/api/Nodewebs`;
+  private readonly schemaUrl = `${SecretData.baseuUrl}/api/nodewebs`;
 
   /**
    * 
@@ -111,5 +123,19 @@ export class SchemaService {
    */
   clearCurrentSchema(): void{
     this.currentSchema.set(null);
+  }
+
+  /**
+   * Get the full Schema response with the given id
+   * @param id
+   */
+  getSchemaFull(id: string): Observable<SchemaResponseFull>{
+    const baseUrl = this.getUrl(id);
+    const url = `${baseUrl}/full`;
+    return this.http.get<SchemaResponseFull>(url).pipe(
+      tap((schema : SchemaResponseFull) => 
+        this.currentSchema.set(schema)
+      )
+    );
   }
 }

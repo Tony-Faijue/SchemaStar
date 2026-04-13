@@ -42,7 +42,7 @@ export interface UpdateEdge{
 export class EdgeService {
   
   private http = inject(HttpClient);
-  private readonly edgeUrl = `${SecretData.baseuUrl}/api/Edges`;
+  private readonly edgeUrl = `${SecretData.baseuUrl}/api/edges`;
 
   /**
    * 
@@ -59,7 +59,7 @@ export class EdgeService {
    * @returns the edge url with the nodeweb id for HTTP GET method
    */
   private getEdgesUrl (id: string): string{
-    return `${SecretData.baseuUrl}/api/Nodewebs/${id}/Edges`;
+    return `${SecretData.baseuUrl}/api/nodewebs/${id}/edges`;
   }
 
   /**

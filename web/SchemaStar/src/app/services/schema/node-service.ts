@@ -68,7 +68,7 @@ export interface UpdateNode {
 export class NodeService {
 
   private http = inject(HttpClient);
-  private readonly nodeUrl = `${SecretData.baseuUrl}/api/Nodes`;
+  private readonly nodeUrl = `${SecretData.baseuUrl}/api/nodes`;
 
   /**
    * 
@@ -85,7 +85,7 @@ export class NodeService {
    * @returns the node url with the nodeweb id for HTTP GET method
    */
   private getNodesUrl (id: string): string{
-    return `${SecretData.baseuUrl}/api/Nodewebs/${id}/Nodes`;
+    return `${SecretData.baseuUrl}/api/nodewebs/${id}/nodes`;
   }
 
   /**
@@ -136,6 +136,17 @@ export class NodeService {
   deleteNode(id: string): Observable<void>{
     const url = this.getUrl(id);
     return this.http.delete<void>(url);
+  }
+
+    /**
+   * 
+   * @param id 
+   * @returns the NodeResponseFull for the specified id
+   */
+  getNodeFull(id: string):Observable<NodeResponseFull>{
+    const baseUrl = this.getUrl(id);
+    const url = `${baseUrl}/full`;
+    return this.http.get<NodeResponseFull>(url);
   }
 
 }

@@ -40,8 +40,8 @@ export interface NodeAssetResponse{
 export interface UpdateNodeAsset{
   publicId: string, 
   nodeAssetName?: string,
-  assetType?: NodeAssetType,
-  assetSource?: NodeAssetSource,
+  nodeAssetType?: NodeAssetType,
+  nodeAssetSource?: NodeAssetSource,
   url?: string,
   mimeType?: string,
   fileSize?: number,
@@ -54,7 +54,7 @@ export interface UpdateNodeAsset{
 export class NodeAssetService {
   
   private http = inject(HttpClient);
-  private readonly nodeAssetUrl = `${SecretData.baseuUrl}/api/NodeAssets`;
+  private readonly nodeAssetUrl = `${SecretData.baseuUrl}/api/nodeassets`;
 
   /**
    * 
@@ -71,7 +71,7 @@ export class NodeAssetService {
    * @returns the node asset url with the node id for HTTP GET method
    */
   private getNodeAssetsUrl (id: string): string{
-    return `${SecretData.baseuUrl}/api/Nodes/${id}/NodeAssets`;
+    return `${SecretData.baseuUrl}/api/nodes/${id}/nodeassets`;
   }
 
   /**
