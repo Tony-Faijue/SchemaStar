@@ -34,6 +34,7 @@ namespace SchemaStar.DataRepositories
         public async Task<IEnumerable<Node>> GetNodesByNodeWebIdAsync(byte[] nodeWebPublicId, ulong userId)
         {
             return await _context.Nodes
+                .Include(n => n.NodeWeb) //Include parent Nodeweb
                 .Where(n => n.NodeWeb.PublicId == nodeWebPublicId && n.NodeWeb.UserId == userId)
                 .ToListAsync();
         }
@@ -47,6 +48,7 @@ namespace SchemaStar.DataRepositories
         public async Task<Node?> GetNodeByPublicIdAsync(byte[] publicId, ulong userId)
         {
             return await _context.Nodes
+                .Include (n => n.NodeWeb) //Include parent Nodeweb
                 .FirstOrDefaultAsync(n => n.PublicId == publicId && n.NodeWeb.UserId == userId);
         }
 
@@ -59,6 +61,7 @@ namespace SchemaStar.DataRepositories
         public async Task<Node?> GetFullNodeByPublicIdAsync(byte[] publicId, ulong userId)
         {
             return await _context.Nodes
+                .Include(n => n.NodeWeb) //Include parent Nodeweb
                 .Include(n => n.NodeAssets) //Eager Loading
                 .FirstOrDefaultAsync(n => n.PublicId == publicId && n.NodeWeb.UserId == userId);
         }

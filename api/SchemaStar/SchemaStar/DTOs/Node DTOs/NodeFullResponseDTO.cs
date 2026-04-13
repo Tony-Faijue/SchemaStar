@@ -15,6 +15,7 @@ namespace SchemaStar.DTOs.Node_DTOs
         public NodeState State { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
+        public Guid NodeWebId { get; set; }
 
         //Collection of NodeAssets for the Node
         public List<NodeAssetResponseDTO> NodeAssets { get; set; } = new List<NodeAssetResponseDTO>();

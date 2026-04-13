@@ -14,7 +14,6 @@ namespace SchemaStar.DTOs.Node_DTOs
         public NodeState State { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
-
-        //public Guid NodeWebId { get; set; }
+        public Guid NodeWebId { get; set; }
     }
 }

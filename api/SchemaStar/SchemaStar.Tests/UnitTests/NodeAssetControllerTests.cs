@@ -57,10 +57,12 @@ namespace SchemaStar.Tests.UnitTests
         {
             //Arrange
             var nodePublicId = Guid.NewGuid();
+            var node = new Node { PublicId = nodePublicId.ToMySqlBinary() };
+
             var userId = 1UL;
             var listOfNodeAssets = new List<NodeAsset> {
-                new NodeAsset { PublicId = Guid.NewGuid().ToMySqlBinary(), NodeAssetName = "NodeAsset 1" },
-                new NodeAsset { PublicId = Guid.NewGuid().ToMySqlBinary(), NodeAssetName = "NodeAsset 2" }
+                new NodeAsset { PublicId = Guid.NewGuid().ToMySqlBinary(), NodeAssetName = "NodeAsset 1", Node = node },
+                new NodeAsset { PublicId = Guid.NewGuid().ToMySqlBinary(), NodeAssetName = "NodeAsset 2", Node = node }
             };
 
             //Mock services
@@ -74,6 +76,7 @@ namespace SchemaStar.Tests.UnitTests
             var response = Assert.IsType<List<NodeAssetResponseDTO>>(result.Value);
             Assert.Equal(2, response.Count());
             Assert.Equal("NodeAsset 1", response[0].NodeAssetName);
+            Assert.Equal(nodePublicId, response[0].NodeId);
         }
 
         [Fact]
@@ -109,6 +112,9 @@ namespace SchemaStar.Tests.UnitTests
         public async Task GetNodeAsset_WhenGettingValidNodeAsset_ReturnsNodeAssetResponseDTO()
         {
             //Arrange
+            var nodePublicId = Guid.NewGuid();
+            var node = new Node { PublicId = nodePublicId.ToMySqlBinary() };
+
             var userId = 1UL;
             var publicId = Guid.NewGuid();
 
@@ -116,7 +122,8 @@ namespace SchemaStar.Tests.UnitTests
             {
                 PublicId = publicId.ToMySqlBinary(),
                 NodeAssetName = "Test_NodeAsset",
-                FileSize = 10
+                FileSize = 10,
+                Node = node
             };
 
             //Mock the needed services
@@ -133,6 +140,7 @@ namespace SchemaStar.Tests.UnitTests
             Assert.Equal(publicId, response.PublicId);
             Assert.Equal("Test_NodeAsset", response.NodeAssetName);
             Assert.Equal(10, response.FileSize);
+            Assert.Equal(nodePublicId, response.NodeId);
         }
 
         [Fact]
@@ -287,15 +295,18 @@ namespace SchemaStar.Tests.UnitTests
         public async Task PostNodeAsset_WhenNodeAssetCreationSucceeds_Returns201CreationActionResult()
         {
             //Arrange
-            var nodeAssetPublicId = Guid.NewGuid();
+            var nodePublicId = Guid.NewGuid();
             var nodeId = 1UL;
+
+            var node = new Node { Id = nodeId, PublicId = nodePublicId.ToMySqlBinary() };
 
             var userId = 1UL;
             var request = new NodeAssetRequestDTO
             {
                 NodeAssetName = "New NodeAsset",
                 FileSize = 50,
-                NodeAssetSource = Models.Enums.NodeAssetEnums.NodeAssetSource.Upload
+                NodeAssetSource = Models.Enums.NodeAssetEnums.NodeAssetSource.Upload,
+                NodeId = nodePublicId
             };
 
             //Mock services

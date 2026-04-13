@@ -186,7 +186,7 @@ namespace SchemaStar.Controllers
             _repository.Add(edge);
             await _repository.SaveChangesAsync();
 
-            var response = edge.ToResponseDTO();
+            var response = edge.ToResponseDTO(request.NodeWebId); //pass the NodeWebId from the request to the mapper
 
             return CreatedAtAction(nameof(GetEdge), new { edgeId = response.PublicId }, response);
         }

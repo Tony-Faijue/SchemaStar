@@ -62,6 +62,7 @@ namespace SchemaStar.Tests.UnitTests
             //Arrange
             var nodewebPublicId = Guid.NewGuid();
             var userId = 1UL;
+            var nodeWeb = new Nodeweb { PublicId = nodewebPublicId.ToMySqlBinary() };
 
             var fromNode = new Node { PublicId = Guid.NewGuid().ToMySqlBinary() };
             var toNode = new Node { PublicId = Guid.NewGuid().ToMySqlBinary() };
@@ -72,11 +73,13 @@ namespace SchemaStar.Tests.UnitTests
                     EdgeType = Models.Enums.EdgeType.Undirected,
                     FromNode = fromNode,
                     ToNode = toNode,
+                    Nodeweb = nodeWeb
                 },
                 new Edge { 
                     PublicId = Guid.NewGuid().ToMySqlBinary(),
                     FromNode = fromNode,
                     ToNode = toNode,
+                    Nodeweb = nodeWeb
                 }
             };
 
@@ -92,6 +95,7 @@ namespace SchemaStar.Tests.UnitTests
             Assert.Equal(2, response.Count());
             Assert.Equal(Models.Enums.EdgeType.Undirected, response[0].EdgeType);
             Assert.Equal(fromNode.PublicId.ToGuidFromMySqlBinary(), response[1].FromNodeId);
+            Assert.Equal(nodewebPublicId, response[0].NodeWebId);
         }
 
         [Fact]
@@ -127,6 +131,9 @@ namespace SchemaStar.Tests.UnitTests
         public async Task GetEdge_WhenGettingValidNodeAsset_ReturnsEdgeResponseDTO()
         {
             //Arrange
+            var nodeWebPublicId = Guid.NewGuid();
+            var nodeWeb = new Nodeweb { PublicId = nodeWebPublicId.ToMySqlBinary() };
+
             var userId = 1UL;
             var publicId = Guid.NewGuid();
 
@@ -138,7 +145,8 @@ namespace SchemaStar.Tests.UnitTests
                 PublicId = publicId.ToMySqlBinary(),
                 FromNode = fromNode,
                 ToNode = toNode,
-                EdgeType = Models.Enums.EdgeType.Undirected
+                EdgeType = Models.Enums.EdgeType.Undirected,
+                Nodeweb = nodeWeb
             };
 
             //Mock the needed services
@@ -155,6 +163,7 @@ namespace SchemaStar.Tests.UnitTests
             Assert.Equal(publicId, response.PublicId);
             Assert.Equal(Models.Enums.EdgeType.Undirected, response.EdgeType);
             Assert.Equal(fromNode.PublicId.ToGuidFromMySqlBinary(), response.FromNodeId);
+            Assert.Equal(nodeWebPublicId, response.NodeWebId);
         }
 
         [Fact]
@@ -480,10 +489,12 @@ namespace SchemaStar.Tests.UnitTests
         public async Task PostEdge_WhenEdgeSucceeds_Returns201CreationActionResult()
         {
             //Arrange
-            var userId = 1UL;
-            var publicId = Guid.NewGuid();
+            var nodewebPublicId = Guid.NewGuid();
+            var nodewebId = 5UL;
 
-            var nodewebId = Guid.NewGuid();
+            var nodeWeb = new Nodeweb { Id = nodewebId, PublicId = nodewebPublicId.ToMySqlBinary() }; 
+
+            var userId = 1UL;
 
             var fromNodeUL = 1UL;
             var toNodeUL = 2UL;
@@ -497,7 +508,7 @@ namespace SchemaStar.Tests.UnitTests
                 EdgeType = Models.Enums.EdgeType.Undirected,
                 FromNodeId = fromNodeId,
                 ToNodeId = toNodeId,
-                NodeWebId = nodewebId,
+                NodeWebId = nodewebPublicId,
             };
 
             //Mock services
@@ -522,6 +533,7 @@ namespace SchemaStar.Tests.UnitTests
             Assert.Equal(request.EdgeType, response.EdgeType);
             Assert.Equal(request.FromNodeId, response.FromNodeId);
             Assert.Equal(request.ToNodeId, response.ToNodeId);
+            Assert.Equal(nodewebPublicId, response.NodeWebId);
 
             //Verify
             _mockRepository.Verify(r => r.Add(It.Is<Edge>(e =>

@@ -56,10 +56,12 @@ namespace SchemaStar.Tests.UnitTests
         {
             //Arrange
             var nodeWebPublicId = Guid.NewGuid();
+            var nodeWeb = new Nodeweb { PublicId = nodeWebPublicId.ToMySqlBinary() };
+
             var userId = 1UL;
             var listOfNodes = new List<Node> {
-                new Node { PublicId = Guid.NewGuid().ToMySqlBinary(), NodeName = "Node 1" },
-                new Node { PublicId = Guid.NewGuid().ToMySqlBinary(), NodeName = "Node 2" }
+                new Node { PublicId = Guid.NewGuid().ToMySqlBinary(), NodeName = "Node 1", NodeWeb = nodeWeb },
+                new Node { PublicId = Guid.NewGuid().ToMySqlBinary(), NodeName = "Node 2", NodeWeb = nodeWeb }
             };
 
             //Mock services
@@ -73,6 +75,7 @@ namespace SchemaStar.Tests.UnitTests
             var response = Assert.IsType<List<NodeResponseDTO>>(result.Value);
             Assert.Equal("Node 1", response[0].NodeName);
             Assert.Equal(2, response.Count());
+            Assert.Equal(nodeWebPublicId, response[0].NodeWebId);
         }
 
         [Fact]
@@ -108,6 +111,9 @@ namespace SchemaStar.Tests.UnitTests
         public async Task GetNode_WhenGettingValidNode_ReturnsNodeResponseDTO()
         {
             //Arrange
+            var nodeWebPublicId = Guid.NewGuid();
+            var nodeWeb = new Nodeweb { PublicId = nodeWebPublicId.ToMySqlBinary() };
+
             var userId = 1UL;
             var publicId = Guid.NewGuid();
             var now = DateTime.UtcNow;
@@ -117,6 +123,7 @@ namespace SchemaStar.Tests.UnitTests
                 PublicId = publicId.ToMySqlBinary(),
                 NodeName = "Test_Node",
                 CreatedAt = now,
+                NodeWeb = nodeWeb
             };
 
             //Mock the needed services
@@ -133,6 +140,7 @@ namespace SchemaStar.Tests.UnitTests
             Assert.Equal(publicId, response.PublicId);
             Assert.Equal("Test_Node", response.NodeName);
             Assert.Equal(now, response.CreatedAt);
+            Assert.Equal(nodeWebPublicId, response.NodeWebId);
         }
 
         [Fact]
@@ -286,8 +294,10 @@ namespace SchemaStar.Tests.UnitTests
         public async Task PostNode_WhenNodeCreationSucceeds_Returns201CreationActionResult()
         {
             //Arrange
-            var nodePublicId = Guid.NewGuid();
+            var nodeWebPublicId = Guid.NewGuid();
             var nodeWebId = 1UL;
+
+            var nodeWeb = new Nodeweb { Id = nodeWebId, PublicId = nodeWebPublicId.ToMySqlBinary() };
 
             var userId = 1UL;
             var request = new NodeRequestDTO
@@ -295,6 +305,7 @@ namespace SchemaStar.Tests.UnitTests
                 NodeName = "New Node",
                 PositionY = 200,
                 Height = 50,
+                NodeWebId = nodeWebPublicId
             };
 
             //Mock services
@@ -312,7 +323,7 @@ namespace SchemaStar.Tests.UnitTests
             Assert.Equal(request.NodeName, response.NodeName);
             Assert.Equal(request.PositionY, response.PositionY);
             Assert.Equal(request.Height, response.Height);
-            Assert.NotEqual(Guid.Empty, response.PublicId);
+            Assert.Equal(nodeWebPublicId, response.NodeWebId);
 
             //Verify
             _mockRepository.Verify(r => r.Add(It.Is<Node>(n => n.NodeWebId == nodeWebId)), Times.Once);
@@ -411,15 +422,17 @@ namespace SchemaStar.Tests.UnitTests
             var userId = 1UL;
             var publicId = Guid.NewGuid();
 
-            var nodeAsset1 = new NodeAsset { PublicId = Guid.NewGuid().ToMySqlBinary(), NodeAssetName = "NodeAsset 1" };
-            var nodeAsset2 = new NodeAsset { PublicId = Guid.NewGuid().ToMySqlBinary(), NodeAssetName = "NodeAsset 2" };
-
             var existingNode = new Node
             {
                 PublicId = publicId.ToMySqlBinary(),
-                NodeName = "Test_Node",
-                NodeAssets = new List<NodeAsset> { nodeAsset1, nodeAsset2 },
+                NodeName = "Test_Node"
             };
+
+            var nodeAsset1 = new NodeAsset { PublicId = Guid.NewGuid().ToMySqlBinary(), NodeAssetName = "NodeAsset 1" };
+            var nodeAsset2 = new NodeAsset { PublicId = Guid.NewGuid().ToMySqlBinary(), NodeAssetName = "NodeAsset 2" };
+
+            existingNode.NodeAssets = new List<NodeAsset> { nodeAsset1, nodeAsset2 };
+            
 
             //Mock the needed services
             _mockUserService.Setup(s => s.GetCurrentUserId()).Returns(userId);

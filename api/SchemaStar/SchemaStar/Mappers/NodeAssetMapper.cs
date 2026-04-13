@@ -9,7 +9,7 @@ namespace SchemaStar.Mappers
     /// </summary>
     public static class NodeAssetMapper
     {
-        public static NodeAssetResponseDTO ToResponseDTO(this NodeAsset asset)
+        public static NodeAssetResponseDTO ToResponseDTO(this NodeAsset asset, Guid? nodeId = null)
         {
             return new NodeAssetResponseDTO
             {
@@ -21,6 +21,7 @@ namespace SchemaStar.Mappers
                 MimeType = asset.MimeType,
                 FileSize = asset.FileSize,
                 BlobPath = asset.BlobPath,
+                NodeId = nodeId ?? asset.Node.PublicId.ToGuidFromMySqlBinary(), //Use the parameter otherwise use the loaded parent object
             };
         }
     }
