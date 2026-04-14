@@ -2,7 +2,7 @@ import { inject, Injectable, signal } from '@angular/core';
 import { SecretData } from '../../../../environment';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
-import { NodeResponse } from './node-service';
+import { NodeResponse, NodeResponseFull } from './node-service';
 import { EdgeResponse } from './edge-service';
 
 
@@ -38,7 +38,7 @@ export interface SchemaResponseFull{
   lastLayoutAt: string,
   createdAt: string,
   updatedAt: string,
-  nodes: NodeResponse[],
+  nodes: NodeResponseFull[],
   edges: EdgeResponse[]
 }
 
