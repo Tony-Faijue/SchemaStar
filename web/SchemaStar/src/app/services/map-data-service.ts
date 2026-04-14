@@ -32,11 +32,16 @@ export class MapDataService {
   readonly nodesFull = computed<NodeResponseFull[]>(() => {
     const allNodes = this.nodes();
     const allAssets = this.assets();
-    //Map the node assets for each node filtering with the matching nodeId to the node's publicId
+
+    //Create buckets for each nodeId that contains the assets for it
+    const assetsByNodes = Map.groupBy(allAssets, a => a.nodeId);
+
     return allNodes.map(node => ({
       ...node, //spread operator to copy node response properties
-      NodeAssets: allAssets.filter(asset => asset.nodeId == node.publicId)
-    }));
+      NodeAssets: assetsByNodes.get(node.publicId) ?? []
+    }))
+    //Sort the nodes in alphabetical order
+    .sort((a, b) => a.nodeName.localeCompare(b.nodeName));
   });
 
   /**
@@ -46,12 +51,25 @@ export class MapDataService {
     const allSchemas = this.schemas();
     const allNodesFull = this.nodesFull();
     const allEdges = this.edges();
-    //Map the nodes and edges for each schema filtering with matching schema.publicId
-    return allSchemas.map(schema => ({
-      ...schema,
-      nodes: allNodesFull.filter(node => node.nodeWebId == schema.publicId),
-      edges: allEdges.filter(edge => edge.nodeWebId == schema.publicId)
-    }));
+    
+    //Map groupBy function to create an array/bucket for the value with the nodewebId
+    //{nodewebId, [node, node, node, ...]}
+    //Essentially creates a bucket with related object matching the nodewebId
+    const nodesBySchema = Map.groupBy(allNodesFull, n => n.nodeWebId);
+    const edgesBySchema = Map.groupBy(allEdges, e => e.nodeWebId);
+
+    return allSchemas.map(schema => {
+      //Sort the bucket
+      const sortedNodes = (nodesBySchema.get(schema.publicId) ?? [])
+        .sort((a , b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      
+        return{
+          ...schema,
+        //Get the bucket of items with the matching nodewebId/schemaPublicId and attach them
+        nodes: sortedNodes,
+        edges: edgesBySchema.get(schema.publicId) ?? []
+      };
+    });
   });
   
   /**
@@ -59,7 +77,7 @@ export class MapDataService {
    */
   readonly currentSchema = computed(() => {
     const id = this.selectedSchemaId();
-    return this.schemasFull().find(s => s.publicId == id) ?? null;
+    return this.schemasFull().find(s => s.publicId === id) ?? null;
   });
 
 
@@ -84,6 +102,13 @@ export class MapDataService {
    * Delete function remove an exisiting schema
    */
   deleteSchema(publicId: string){
+    //Collect all node ids that belong to the given schema to be removed
+    const nodeIdsToRemove = this.nodes()
+      .filter(n => n.nodeWebId === publicId)
+      .map(n => n.publicId);
+    //Set for Snapshot of nodes, O(n) look up, prevent weak cascade delete
+    const nodeIdsSet = new Set(nodeIdsToRemove);
+
     //update the schemas signal to not include schema that includes the publicId
     this.schemas.update(current => current.filter(s => s.publicId !== publicId));
     
@@ -94,10 +119,7 @@ export class MapDataService {
     this.edges.update(current => current.filter(e => e.nodeWebId !== publicId));
 
     //Remove assets belonging to nodes of this schema
-    this.assets.update(current => { //Filter by matching the remaining nodes that do contain a node id
-      const remainingNodeIds = new Set(this.nodes().map(n => n.publicId));
-      return current.filter(a => remainingNodeIds.has(a.nodeId));
-    });
+    this.assets.update(current => current.filter(a => !nodeIdsSet.has(a.nodeId))); //if the set does not contain the id keep it 
   }
 
   /**
@@ -122,7 +144,10 @@ export class MapDataService {
     //update the nodes signal to not include node that include the publicId
     this.nodes.update(current => current.filter(n => n.publicId !== publicId));
     
-    //Remove any edges connect to the node
+    //Remove assets connected to the node
+    this.assets.update(current => current.filter(a => a.nodeId !== publicId));
+
+    //Remove any edges connected to the node
     this.edges.update(current => current.filter(e => 
       e.fromNodeId !== publicId && e.toNodeId !== publicId
     ));
