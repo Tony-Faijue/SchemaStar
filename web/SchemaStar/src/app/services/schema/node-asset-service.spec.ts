@@ -18,6 +18,7 @@ describe('NodeAssetService', () => {
     nodeAssetType: NodeAssetType.Audio,
     nodeAssetSource: NodeAssetSource.External,
     url: 'example.com',
+    nodeId: '9898'
   }
 
   beforeEach(() => {
@@ -113,7 +114,7 @@ describe('NodeAssetService', () => {
     const req = httpTestingController.expectOne(mockBaseUrl);
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toEqual(newNodeAsset);
-    req.flush(newNodeAsset);
+    req.flush(mockNodeAssetResponse);
   });
 
   it('should delete an existing node asset', () =>{

@@ -35,6 +35,7 @@ export interface NodeAssetResponse{
   mimeType?: string,
   fileSize?: number,
   blobPath?: string,
+  nodeId: string
 }
 
 export interface UpdateNodeAsset{

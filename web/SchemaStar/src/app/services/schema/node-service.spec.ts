@@ -13,22 +13,6 @@ describe('NodeService', () => {
 
   const mockBaseUrl = `${SecretData.baseuUrl}/api/nodes`;
 
-  const myAsset1: NodeAssetResponse = {
-    publicId: '909',
-    nodeAssetName: 'asset_1',
-    nodeAssetType: NodeAssetType.Link,
-    nodeAssetSource: NodeAssetSource.External
-  }
-
-    const myAsset2: NodeAssetResponse = {
-    publicId: '908',
-    nodeAssetName: 'asset_2',
-    nodeAssetType: NodeAssetType.Audio,
-    nodeAssetSource: NodeAssetSource.Upload
-  }
-
-  const myAssets:NodeAssetResponse[] = [myAsset1, myAsset2];
-
   const mockNodeResponse: NodeResponse = 
   {
     publicId: '123',
@@ -38,9 +22,29 @@ describe('NodeService', () => {
     width: 150,
     height: 200,
     state: NodeState.Locked,
-    createdAt: '2026-02-18T20:52:02-06:00'
+    createdAt: '2026-02-18T20:52:02-06:00',
+    nodeWebId: '9999'
   }
 
+  const myAsset1: NodeAssetResponse = {
+    publicId: '909',
+    nodeAssetName: 'asset_1',
+    nodeAssetType: NodeAssetType.Link,
+    nodeAssetSource: NodeAssetSource.External,
+    nodeId: mockNodeResponse.publicId
+  }
+
+  const myAsset2: NodeAssetResponse = {
+    publicId: '908',
+    nodeAssetName: 'asset_2',
+    nodeAssetType: NodeAssetType.Audio,
+    nodeAssetSource: NodeAssetSource.Upload,
+    nodeId: mockNodeResponse.publicId
+  }
+
+  const myAssets:NodeAssetResponse[] = [myAsset1, myAsset2];
+
+ 
   const mockNodeResponseFull: NodeResponseFull = 
   {
     publicId: '123',
@@ -51,7 +55,8 @@ describe('NodeService', () => {
     height: 200,
     state: NodeState.Locked,
     createdAt: '2026-02-18T20:52:02-06:00',
-    NodeAssets: myAssets
+    NodeAssets: myAssets,
+    nodeWebId: '9999'
   }
 
   beforeEach(() => {
@@ -150,7 +155,7 @@ describe('NodeService', () => {
     const req = httpTestingController.expectOne(mockBaseUrl);
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toEqual(newNode);
-    req.flush(newNode);
+    req.flush(mockNodeResponse);
   });
 
   it('should delete an existing node', () =>{

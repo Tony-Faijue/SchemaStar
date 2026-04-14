@@ -15,4 +15,5 @@ export class MapDataService {
   nodes = signal<NodeResponse[]>([]);
   edges = signal<EdgeResponse[]>([]);
   nodeAssets = signal<NodeAssetResponse[]>([]);
+  
 }

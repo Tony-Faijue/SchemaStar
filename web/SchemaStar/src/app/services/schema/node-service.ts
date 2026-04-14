@@ -35,6 +35,7 @@ export interface NodeResponse{
   state: NodeState,
   createdAt: string,
   updatedAt?: string,
+  nodeWebId : string
 }
 
 export interface NodeResponseFull{
@@ -48,6 +49,7 @@ export interface NodeResponseFull{
   state: NodeState,
   createdAt: string,
   updatedAt?: string,
+  nodeWebId: string,
   NodeAssets: NodeAssetResponse[]
 }
 
