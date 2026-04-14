@@ -8,6 +8,8 @@ namespace SchemaStar.Mappers
     {
         public static NodeFullResponseDTO ToFullResponseDTO(this Node node)
         {
+            var nodePublicId = node.PublicId.ToGuidFromMySqlBinary();
+
             return new NodeFullResponseDTO
             {
                 PublicId = node.PublicId.ToGuidFromMySqlBinary(),
@@ -20,7 +22,7 @@ namespace SchemaStar.Mappers
                 State = node.State,
                 CreatedAt = node.CreatedAt,
                 UpdatedAt = node.UpdatedAt,
-                NodeAssets = node.NodeAssets.Select(n => n.ToResponseDTO()).ToList()
+                NodeAssets = node.NodeAssets.Select(n => n.ToResponseDTO(nodePublicId)).ToList() //pass the nodePublicId to the nodeassets
             };
         }
     }

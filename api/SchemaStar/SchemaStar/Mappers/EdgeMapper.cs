@@ -9,7 +9,7 @@ namespace SchemaStar.Mappers
     /// </summary>
     public static class EdgeMapper
     {
-        public static EdgeResponseDTO ToResponseDTO(this Edge edge)
+        public static EdgeResponseDTO ToResponseDTO(this Edge edge, Guid? nodeWebPublicId = null)
         {
             return new EdgeResponseDTO
             {
@@ -17,7 +17,8 @@ namespace SchemaStar.Mappers
                 EdgeType = edge.EdgeType,
                 UiMetadata = edge.UiMetadata,
                 FromNodeId = edge.FromNode?.PublicId.ToGuidFromMySqlBinary() ?? Guid.Empty,
-                ToNodeId = edge.ToNode?.PublicId.ToGuidFromMySqlBinary() ?? Guid.Empty //Edge repository eager loads, handles when nodes are null
+                ToNodeId = edge.ToNode?.PublicId.ToGuidFromMySqlBinary() ?? Guid.Empty, //Edge repository eager loads, handles when nodes are null
+                NodeWebId = nodeWebPublicId ?? edge.Nodeweb.PublicId.ToGuidFromMySqlBinary() ////Use the parameter otherwise use the loaded parent object
             };
         }
     }

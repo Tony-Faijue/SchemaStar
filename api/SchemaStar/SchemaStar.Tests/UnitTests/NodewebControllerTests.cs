@@ -464,18 +464,20 @@ namespace SchemaStar.Tests.UnitTests
             var publicId = Guid.NewGuid();
             var now = DateTime.UtcNow;
 
-            var node1 = new Node { PublicId = Guid.NewGuid().ToMySqlBinary(), NodeName = "Node 1" };
-            var node2 = new Node { PublicId = Guid.NewGuid().ToMySqlBinary(), NodeName = "Node 2" };
-            var edge = new Edge { PublicId = Guid.NewGuid().ToMySqlBinary(), FromNode = node1, ToNode = node2 };
-
             var existingNodeweb = new Nodeweb
             {
                 PublicId = publicId.ToMySqlBinary(),
                 NodeWebName = "Test_Nodeweb",
                 CreatedAt = now,
-                Nodes = new List<Node> {node1, node2},
-                Edges = new List<Edge>{edge}
             };
+
+            var node1 = new Node { PublicId = Guid.NewGuid().ToMySqlBinary(), NodeName = "Node 1", NodeWeb = existingNodeweb };
+            var node2 = new Node { PublicId = Guid.NewGuid().ToMySqlBinary(), NodeName = "Node 2", NodeWeb = existingNodeweb };
+            var edge = new Edge { PublicId = Guid.NewGuid().ToMySqlBinary(), FromNode = node1, ToNode = node2, Nodeweb = existingNodeweb };
+
+            existingNodeweb.Nodes = new List<Node> { node1, node2 };
+            existingNodeweb.Edges = new List<Edge> { edge };
+            
 
             //Mock the needed services
             _mockUserService.Setup(s => s.GetCurrentUserId()).Returns(userId);

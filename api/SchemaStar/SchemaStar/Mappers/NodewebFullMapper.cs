@@ -11,15 +11,17 @@ namespace SchemaStar.Mappers
     {
         public static NodewebFullResponseDTO ToFullResponseDTO(this Nodeweb web)
         {
+            var nodewebPublicId = web.PublicId.ToGuidFromMySqlBinary();
+
             return new NodewebFullResponseDTO
             {
-                PublicId = web.PublicId.ToGuidFromMySqlBinary(),
+                PublicId = nodewebPublicId,
                 NodeWebName = web.NodeWebName,
                 CreatedAt = web.CreatedAt,
                 UpdatedAt = web.UpdatedAt,
                 LastLayoutAt = web.LastLayoutAt,
-                Nodes = web.Nodes.Select(n => n.ToResponseDTO()).ToList(),
-                Edges = web.Edges.Select(e => e.ToResponseDTO()).ToList()
+                Nodes = web.Nodes.Select(n => n.ToResponseDTO(nodewebPublicId)).ToList(),
+                Edges = web.Edges.Select(e => e.ToResponseDTO(nodewebPublicId)).ToList()
             };
         }
     }

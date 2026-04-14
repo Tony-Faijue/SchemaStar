@@ -137,7 +137,7 @@ namespace SchemaStar.Controllers
             _repository.Add(node);
             await _repository.SaveChangesAsync();
 
-            var response = node.ToResponseDTO();
+            var response = node.ToResponseDTO(request.NodeWebId); //pass the NodeWebId from the request to the mapper
 
             return CreatedAtAction(nameof(GetNode), new { nodeId = response.PublicId }, response);
         }

@@ -9,7 +9,7 @@ namespace SchemaStar.Mappers
     /// </summary>
     public static class NodeMapper
     {
-        public static NodeResponseDTO ToResponseDTO(this Node node)
+        public static NodeResponseDTO ToResponseDTO(this Node node, Guid? nodeWebPublicId = null)
         {
             return new NodeResponseDTO
             {
@@ -23,6 +23,7 @@ namespace SchemaStar.Mappers
                 State = node.State,
                 CreatedAt = node.CreatedAt,
                 UpdatedAt = node.UpdatedAt,
+                NodeWebId = nodeWebPublicId ?? node.NodeWeb.PublicId.ToGuidFromMySqlBinary() //Use the parameter otherwise use the loaded parent object
             };
         }
     }
