@@ -26,6 +26,7 @@ export interface EdgeResponse{
   uiMetadata?: string,
   fromNodeId: string,
   toNodeId: string,
+  nodeWebId: string
 }
 
 export interface UpdateEdge{

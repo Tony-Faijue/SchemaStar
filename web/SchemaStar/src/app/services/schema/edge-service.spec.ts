@@ -18,7 +18,8 @@ describe('EdgeService', () => {
     uiMetadata: 'color:green',
     edgeType: EdgeType.Undirected,
     fromNodeId: '456',
-    toNodeId: '789'
+    toNodeId: '789',
+    nodeWebId: '7979'
   }
 
   beforeEach(() => {
@@ -115,7 +116,7 @@ describe('EdgeService', () => {
     const req = httpTestingContoller.expectOne(mockBaseUrl);
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toEqual(newEdge);
-    req.flush(newEdge);
+    req.flush(mockEdgeResponse);
   });
 
   it('should delete an existing edge', () => {

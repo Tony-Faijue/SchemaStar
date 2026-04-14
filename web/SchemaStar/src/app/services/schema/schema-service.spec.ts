@@ -14,45 +14,50 @@ describe('SchemaService', () => {
 
   const mockBaseUrl = `${SecretData.baseuUrl}/api/nodewebs`;
 
+  const mockSchemaResponse: SchemaResponse = {
+    publicId:'123',
+    nodeWebName: 'Test_Schema',
+    createdAt: '2026-02-18T20:52:02-06:00',
+    updatedAt: '2026-02-18T20:52:02-06:00',
+    lastLayoutAt: '2026-02-18T20:52:02-06:00'
+  };
+
   const node: NodeResponse = {
-        publicId: '123',
-        nodeName: 'Test_Node',
-        positionX: 0,
-        positionY: 0,
-        width: 150,
-        height: 200,
-        state: NodeState.Locked,
-        createdAt: '2026-02-18T20:52:02-06:00'
+    publicId: '123',
+    nodeName: 'Test_Node',
+    positionX: 0,
+    positionY: 0,
+    width: 150,
+    height: 200,
+    state: NodeState.Locked,
+    createdAt: '2026-02-18T20:52:02-06:00',
+    nodeWebId: mockSchemaResponse.publicId
   };
 
   const node2: NodeResponse = {
-        publicId: '456',
-        nodeName: 'Test_Node2',
-        positionX: 0,
-        positionY: 0,
-        width: 150,
-        height: 200,
-        state: NodeState.Locked,
-        createdAt: '2026-02-18T20:52:02-06:00'
+    publicId: '456',
+    nodeName: 'Test_Node2',
+    positionX: 0,
+    positionY: 0,
+    width: 150,
+    height: 200,
+    state: NodeState.Locked,
+    createdAt: '2026-02-18T20:52:02-06:00',
+    nodeWebId: mockSchemaResponse.publicId
   };
 
   const edge: EdgeResponse = {
     publicId: '789',
     edgeType: EdgeType.Directed,
     fromNodeId: node.publicId,
-    toNodeId: node2.publicId
+    toNodeId: node2.publicId,
+    nodeWebId: mockSchemaResponse.publicId
   };
 
   const nodes:NodeResponse[] = [node, node2];
   const edges:EdgeResponse[] = [edge];
 
-  const mockSchemaResponse: SchemaResponse = {
-      publicId:'123',
-      nodeWebName: 'Test_Schema',
-      createdAt: '2026-02-18T20:52:02-06:00',
-      updatedAt: '2026-02-18T20:52:02-06:00',
-      lastLayoutAt: '2026-02-18T20:52:02-06:00'
-  };
+ 
 
   const mockSchemaResponseFull: SchemaResponseFull = {
       publicId:'123',
@@ -165,7 +170,7 @@ describe('SchemaService', () => {
     const req = httpTestingController.expectOne(mockBaseUrl);
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toEqual(newSchema);
-    req.flush(newSchema);
+    req.flush(mockSchemaResponse);
   });
 
   it('should delete an exisitng schema', () => {
