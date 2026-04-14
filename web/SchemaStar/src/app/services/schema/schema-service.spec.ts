@@ -5,8 +5,9 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from '../../http-interceptors/auth-interceptor';
 import { SecretData } from '../../../../environment';
-import { NodeResponse, NodeState } from './node-service';
+import { NodeResponse, NodeResponseFull, NodeState } from './node-service';
 import { EdgeResponse, EdgeType } from './edge-service';
+import { NodeAssetResponse, NodeAssetSource, NodeAssetType } from './node-asset-service';
 
 describe('SchemaService', () => {
   let service: SchemaService;
@@ -57,15 +58,40 @@ describe('SchemaService', () => {
   const nodes:NodeResponse[] = [node, node2];
   const edges:EdgeResponse[] = [edge];
 
- 
+  //----SchemaResponse Full-------
+ const myAsset1: NodeAssetResponse = {
+    publicId: '909',
+    nodeAssetName: 'asset_1',
+    nodeAssetType: NodeAssetType.Link,
+    nodeAssetSource: NodeAssetSource.External,
+    nodeId: node.publicId
+  }
+
+  const myAsset2: NodeAssetResponse = {
+    publicId: '908',
+    nodeAssetName: 'asset_2',
+    nodeAssetType: NodeAssetType.Audio,
+    nodeAssetSource: NodeAssetSource.Upload,
+    nodeId: node.publicId
+  }
+    
+  const nodeAssetsForNode1Full: NodeAssetResponse[] = [myAsset1, myAsset2];
+
+  const node1Full: NodeResponseFull = {
+    ...node,
+    NodeAssets: nodeAssetsForNode1Full
+  };
+
+  const node2Full: NodeResponseFull = {
+    ...node,
+    NodeAssets: []
+  };
+
+  const nodesFull: NodeResponseFull[] = [node1Full, node2Full];
 
   const mockSchemaResponseFull: SchemaResponseFull = {
-      publicId:'123',
-      nodeWebName: 'Test_Schema',
-      createdAt: '2026-02-18T20:52:02-06:00',
-      updatedAt: '2026-02-18T20:52:02-06:00',
-      lastLayoutAt: '2026-02-18T20:52:02-06:00',
-      nodes: nodes,
+     ...mockSchemaResponse,
+      nodes: nodesFull,
       edges: edges
   };
 
