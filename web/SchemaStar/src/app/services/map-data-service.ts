@@ -27,6 +27,18 @@ export class MapDataService {
   //-----Computed Values-----
 
   /**
+   *checks if the current active schema is loaded and ready 
+   */
+  readonly isSchemaLoaded = computed(() => {
+    return !this.isLoading() && this.currentSchema() !== null;
+  });
+
+  /**
+   * check if the there is no schemas and sub resources for the data layer
+   */
+  readonly isEmpty = computed (() => this.schemas().length === 0 && !this.isLoading());
+
+  /**
   * Computed Full Nodes (Nodes + Assets)
   */
   readonly nodesFull = computed<NodeResponseFull[]>(() => {
@@ -120,6 +132,11 @@ export class MapDataService {
 
     //Remove assets belonging to nodes of this schema
     this.assets.update(current => current.filter(a => !nodeIdsSet.has(a.nodeId))); //if the set does not contain the id keep it 
+
+    //If the deleted schema is current schema set to null
+    if (this.selectedSchemaId() === publicId){
+      this.selectedSchemaId.set(null);
+    }
   }
 
   /**
