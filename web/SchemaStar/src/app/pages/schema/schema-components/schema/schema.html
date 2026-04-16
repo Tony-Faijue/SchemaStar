@@ -1,33 +1,54 @@
-<div class="w-full h-[600px] border-2 border-slate-700 bg-purple-300 p-2">
+<div class="w-full h-screen border-2 border-slate-700 bg-purple-300 p-2">
   <!-- Example Use of Foblex Flow -->
-  <f-flow fDraggable class="h-full w-full">
+  <f-flow
+    fDraggable
+    class="h-full w-full"
+    (fMoveNodes)="flowStateService.handlesNodesMovement($event)"
+    (fCreateConnection)="onCreateConnection($event)"
+    (fSelectionChange)="flowStateService.handleSelectionChange($event)"
+  >
     <f-canvas>
-      <!-- Define node connections -->
-      <f-connection fOutputId="output1" fInputId="input1"></f-connection>
-      <!-- Node 1 -->
-      <div
-        fNode
-        fDragHandle
-        fNodeOutput
-        [fNodePosition]="{ x: 32, y: 32 }"
-        fOutputId="output1"
-        fOutputConnectableSide="right"
-        class="bg-white border-2 border-zinc-900 p-4 rounded shadow-lg cursor-move"
-      >
-        <span class="font-bold">Node 1</span>
-      </div>
-      <!-- Node 2 -->
-      <div
-        fNode
-        fDragHandle
-        fNodeInput
-        [fNodePosition]="{ x: 240, y: 32 }"
-        fInputId="input1"
-        fInputConnectableSide="left"
-        class="bg-white border-2 border-zinc-900 p-4 rounded shadow-lg cursor-move"
-      >
-        <span class="font-bold">Node 2</span>
-      </div>
+      <!-- Edges/Connections -->
+      @for (edge of flowStateService.flowEdges(); track edge.id) {
+        <f-connection [fConnectionId]="edge.id" [fOutputId]="edge.source" [fInputId]="edge.target">
+        </f-connection>
+      }
+
+      <!-- Nodes -->
+      @for (node of flowStateService.flowNodes(); track node.id) {
+        <div
+          fNode
+          fDragHandle
+          [fNodeId]="node.id"
+          [fNodePosition]="node.position"
+          class="relative bg-white border-2 border-zinc-900 p-4 rounded shadow-lg cursor-move"
+        >
+          <!-- Node Name -->
+          <div class="font-bold border-b mb-2">{{ node.data.nodeName }}</div>
+
+          <!-- Node Assets -->
+          <div class="text-sm space-y-1">
+            @for (asset of node.data.NodeAssets; track asset.publicId) {
+              <div class="text-blue-600">
+                {{ asset.nodeAssetName }}
+              </div>
+            }
+          </div>
+          <!-- Connectors (I/O)-->
+          <div
+            fNodeInput
+            [fInputId]="node.id"
+            fInputConnectableSide="left"
+            class="absolute -left-2 top-1/2 w-4 h-4 bg-zinc-800 rounded-full"
+          ></div>
+          <div
+            fNodeOutput
+            [fOutputId]="node.id"
+            fOutputConnectableSide="right"
+            class="absolute -right-2 top-1/2 w-4 h-4 bg-zinc-800 rounded-full"
+          ></div>
+        </div>
+      }
     </f-canvas>
   </f-flow>
 </div>
