@@ -1,85 +1,215 @@
-import { Injectable } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
+import { MapDataService } from './map-data-service';
+import { FCreateConnectionEvent, FMoveNodesEvent, FSelectionChangeEvent } from '@foblex/flow';
+import { NodeRequest, NodeResponse, NodeService } from './schema/node-service';
+import { EdgeRequest, EdgeResponse, EdgeService } from './schema/edge-service';
+import { LoggerService } from './logger-service';
+import { NodeAssetRequest, NodeAssetResponse, NodeAssetService } from './schema/node-asset-service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class FlowStateService {
-  /**
-   * ---Translation---
-   * Foblex-Flow has its own requirement for nodes and edges
-   * Q1: Should FlowState Service store its own visual-only version of the nodes,
-   * or should it translate the MapData Service signals into foblex objects? Why?
-   * 
-   */
+
+   private loggerService = inject(LoggerService);
+   private mapData = inject(MapDataService);
+   private edgeService = inject(EdgeService);
+   private nodeService = inject(NodeService);
+   private nodeAssetService = inject(NodeAssetService);
+   
+
+   /**
+    * Selected Node Ids
+    */
+   selectedNodeIds = signal<string[]>([]);
+   /**
+    * Selected Edge Ids
+    */
+   selectedEdgeIds = signal<string[]>([]);
+
+   /**
+    * Transform domain nodes into Flobex compatible node objects
+    */
+   readonly flowNodes = computed(() => {
+    const domainNodes = this.mapData.nodesFull();
+    return domainNodes.map(node => ({
+      id: node.publicId,
+      position : { x: node.positionX, y: node.positionY},
+      data: node
+    }));
+   });
+
+   /**
+    * Transform domain edges into Floblex compatible edge objects
+    */
+   readonly flowEdges = computed(() => {
+    const domainEdges = this.mapData.edges();
+    return domainEdges.map(edge => ({
+      id: edge.publicId,
+      source: edge.fromNodeId,
+      target: edge.toNodeId,
+      data: edge
+    }));
+   });
 
   /**
-  * I think it makes sense to [translate the MapData service signals into foblex objects]
-  * because it will make it easier to directly interact with those objects in the ui rather
-  * trying to sync with a snapshot that will constantly be changing.
-  * --Adapter Pattern--
-  */
-
-  /**
-   * --State vs Persisted Data--
-   * Q2: Should Map Data Service update every single time a pixel changes (Heavy Work)
-   * or should FlowState Service hold temporary movement until the user lets go?
-   * How should the "Live Dragging" state be managed?
+   * Node(s) movement, Foblex emits fMoveNodes when the drag is finished
+   * @param event 
    */
+   handlesNodesMovement(event: FMoveNodesEvent){
+      const updates = event.nodes.map(fNode => {
+        const domainNode = this.mapData.nodes().find(n => n.publicId === fNode.id);
+        
+        if(!domainNode) return null;
+        return {
+          ...domainNode,
+          positionX: fNode.position.x,
+          positionY: fNode.position.y
+        };
+      }).filter((n): n is NodeResponse => n !== null);
 
-  /**
-   * I think the FlowState service should hold temporary movement until the user lets go
-   * since it would slow down performance trying to update every single pixel movement.
-   * The pro of having it update for every pixel movement is that the data would be live one to one
-   * but the con would be the performance.
-   * The pro of having the data be sent after the drag ends it that it reduce the performance load.
-   * The con would be that there could exist an inconsitency between the UI and the database but
-   * this could be offset with holding a [temporary/latest state] that would be sent to the database.
-   * I think overall waiting until the drag ends will be more effective performance wise and data persistence wise.
-   * 
-   */
+      //Update the postions of the node(s)
+      if (updates.length > 0){
+        this.mapData.upsertNodes(updates);
 
-  /**
-   * --User Interactions (Selection)--
-   * Ex: selecting multiple nodes, zooming the canvas
-   * Q3:Does the backend/database care which node is currently highlighted?
-   * If not, where should "Selection List" live?
-   * How does FlowState Service handle a "Select All" command?
-   */
+        //Should look into bulk update for nodes for the API backend to improve peformance
+        //instead of individual calls
+        updates.forEach(node => {
+          this.nodeService.patchNode(node).subscribe();
+        })
+      }
+   }
 
-  /**
-   * I think the backend should not care which nodes are selected or the stat of the nodes related to the UI.
-   * Because of that the flowstate service should care about the currently selected nodes.
-   * The list should live inside the flowstate service that way actions can be directly to related nodes.
-   */
+   /**
+    * Sync UI selection state of nodes and edges
+    * @param event 
+    */
+   handleSelectionChange(event: FSelectionChangeEvent){
+      this.selectedNodeIds.set(event.nodeIds);
+      this.selectedEdgeIds.set(event.connectionIds);
+   }
 
-  /**
-   * --Library events (Event Flow Updates)--
-   * Q4: What is the step by step hanshake between the library, the FlowState service and the MapData service
-   * to ensure that new line on the screen actually results in an EdgeResponse being saved in the database?
-   */
+   /**
+    * Creates a edge/connection between two nodes when user completes the action
+    * @param event 
+    */
+   handlesCreateConnection(event: FCreateConnectionEvent, edgeRequest: EdgeRequest){
+    const time = Date.now();
+    const tempId = `temp-edge-${time}`;
 
-  /**
-   * Optimistic UI vs Pessimistic UI
-   * Issue with optimisitc is that we do work and have to undo the work when the api fails
-   * Issue with pessimistic is that we have to wait for the API response to succeed to complete the work
-   * I think it depends whether or not if speed is imporatant compared to data integrity.
-   * I think it is better to have the UI display the new line/edge so that the applcation is reactive for UX.
-   * So the new line is created and then API request is sent. If it fails then line should be removed because it will
-   * reflect the actual database.
-   */
+    const currentSchemaId = this.mapData.selectedSchemaId();
+    if (!currentSchemaId) return;
 
-  /**
-   * --Component Communication--
-   * Q5: Should components talk directly to the MapDataService or should they talk to FlowStateService?
-   * How to keep components in sync without them knowing about each other?
-   * Ex: Properties panel component need to show the node's name and assets for a clicked node in the Canvas
-   */
+    //Placeholder/Temp edge for UI 
+    const placeHolderEdge: EdgeResponse = {
+      publicId: tempId,
+      nodeWebId: currentSchemaId,
+      fromNodeId: event.sourceId,
+      toNodeId: event.targetId!
+    }
 
-  /**
-   * I think the component should talk with the FlowStateService since it would reduce complexity trying to access the data directly from the
-   * MapDataService. All the component would need is the id and from there it can access the selected node in the flowstate service
-   * which the flowstate service will do the work with the given id to return info so that way data access is consistent.
-   * --Shared State Service Pattern--
-   */
+    const request: EdgeRequest = {
+      ...edgeRequest,
+      nodewebId: currentSchemaId,
+      fromNodeId: event.sourceId,
+      toNodeId: event.targetId!,
+    }
+
+    //Optimistically update UI
+    this.mapData.upsertEdges([placeHolderEdge]);
+
+    //Call API to create the edge if successful
+    this.edgeService.createEdge(request).subscribe({
+      next: (realEdge) => {
+        //Success: remove the temp and add the real edge
+        this.mapData.deleteEdge(tempId);
+        this.mapData.upsertEdges([realEdge]);
+      },
+      error: (err) => {
+        this.loggerService.error('Failed to create edge:', err);
+        this.mapData.deleteEdge(tempId);
+      } 
+    });
+   }
+
+   /**
+    * Creates a new Node
+    */
+   handlesNodeCreation(nodeRequest: NodeRequest){
+      const time = Date.now();
+      const tempId = `temp-node-${time}`;
+
+      const currenSchemaId = this.mapData.selectedSchemaId();
+      if (!currenSchemaId) return;
+
+      //placeholder node for UI
+      const placeholderNode: NodeResponse = {
+        ...nodeRequest,
+        publicId: tempId,
+        createdAt: new Date().toISOString(),
+        nodeWebId: currenSchemaId
+      }
+
+      const request: NodeRequest = {
+        ...nodeRequest,
+        nodewebId: currenSchemaId
+      }
+
+      //Optimistically update the UI
+      this.mapData.upsertNodes([placeholderNode]);
+
+      //Call API to create node if successful
+      this.nodeService.createNode(request).subscribe({
+        next: (realNode) => {
+          //Success: remove the temp and add the real node
+          this.mapData.deleteNode(tempId);
+          this.mapData.upsertNodes([realNode]);
+        },
+        error: (err) => {
+          this.loggerService.error('Failed to create node:', err);
+          this.mapData.deleteNode(tempId);
+        }
+      });
+   }
+
+   /**
+    * Creates node asset
+    * @param assetRequest 
+    * @returns 
+    */
+   handlesAssetCreation(assetRequest: NodeAssetRequest){
+      const time = Date.now();
+      const tempId = `temp-asset-${time}`;
+
+      //placeholder node asset for UI
+      const placeholderAsset: NodeAssetResponse = {
+        ...assetRequest,
+        publicId: tempId
+      }
+
+      //Optimistically update the UI
+      this.mapData.upsertAssets([placeholderAsset]);
+
+      //Call API to create node asset if successful
+      this.nodeAssetService.createNodeAsset(assetRequest).subscribe({
+        next: (realAsset) => {
+          //Success: remove the temp and add the real node asset
+          this.mapData.deleteAsset(tempId);
+          this.mapData.upsertAssets([realAsset]);
+        },
+        error: (err) => {
+          this.loggerService.error('Failed to create node asset:', err);
+          this.mapData.deleteAsset(tempId);
+        }
+      });
+   }
+
+   /**
+    * Clear the selected node and edge ids
+    */
+   clearSelection(){
+    this.selectedNodeIds.set([]);
+    this.selectedEdgeIds.set([]);
+   }
 
 }

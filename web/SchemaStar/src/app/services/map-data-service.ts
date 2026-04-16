@@ -1,8 +1,9 @@
-import { computed, Injectable, signal } from '@angular/core';
-import { NodeResponse, NodeResponseFull } from './schema/node-service';
-import { EdgeResponse } from './schema/edge-service';
-import { SchemaResponse, SchemaResponseFull } from './schema/schema-service';
-import { NodeAssetResponse } from './schema/node-asset-service';
+import { computed, inject, Injectable, signal } from '@angular/core';
+import { NodeResponse, NodeResponseFull, NodeService } from './schema/node-service';
+import { EdgeResponse, EdgeService } from './schema/edge-service';
+import { SchemaResponse, SchemaResponseFull, SchemaService } from './schema/schema-service';
+import { NodeAssetResponse, NodeAssetService } from './schema/node-asset-service';
+import { forkJoin, take } from 'rxjs';
 
 
 @Injectable({
@@ -10,6 +11,11 @@ import { NodeAssetResponse } from './schema/node-asset-service';
 })
 export class MapDataService {
   //Data Layer
+  private schemaService = inject(SchemaService);
+  private nodeService = inject(NodeService);
+  private nodeAssetService = inject(NodeAssetService);
+  private edgeService = inject(EdgeService);
+
   //All resource data for the user
   schemas = signal<SchemaResponse[]>([]);
   nodes = signal<NodeResponse[]>([]);
@@ -226,6 +232,81 @@ export class MapDataService {
     this.assets.set([]);
     this.edges.set([]);
     this.selectedSchemaId.set(null);
+  }
+
+  /**
+   * Loads the schemas for the logged-in user
+   */
+  loadUserWorkspace(){
+    this.isLoading.set(true);
+    this.error.set(null);
+
+    //Get all schemas and update local data here
+    this.schemaService.getSchemas().pipe(take(1)).subscribe({ //right now gets the first schema; modify for selection
+      next: (schemas) => {
+        //Update fresh schemas
+        this.upsertSchemas(schemas);
+
+        if(schemas.length > 0){
+          const firstSchema = schemas[0];
+          this.loadSchemaResources(firstSchema.publicId);
+        } else {
+          //no schemas found
+          this.isLoading.set(false);
+        }
+      },
+      error: () => {
+        this.isLoading.set(false);
+        this.error.set("Failed to load user workspace");
+      }
+    });
+  }
+
+  /**
+   * Loads the specific nodes, edges and assets for a selected schema
+   */
+  loadSchemaResources(schemaId: string){
+    this.selectedSchemaId.set(schemaId);
+    this.isLoading.set(true);
+
+    //Use forkjoin to fetch all sub-resources in parallel for better performance
+    
+    //Get Basic node info and edges
+    forkJoin({
+      nodes: this.nodeService.getNodes(schemaId),
+      edges: this.edgeService.getEdges(schemaId)
+    }).subscribe({
+      next: (data) => {
+        this.upsertEdges(data.edges);
+
+        if (data.nodes.length === 0){
+          this.isLoading.set(false);
+          return;
+        }
+
+        const fullNodeRequests = data.nodes.map((node) =>
+          this.nodeService.getNodeFull(node.publicId)
+        );
+
+        //Update nodes with full nodes and get all assets
+        forkJoin(fullNodeRequests).subscribe({
+          next: (fullNodes: NodeResponseFull[]) => {
+            this.upsertNodes(fullNodes);
+            const allAssets = fullNodes.flatMap(n => n.NodeAssets);
+            this.upsertAssets(allAssets);
+            this.isLoading.set(false);
+          },
+          error: () => {
+            this.isLoading.set(false);
+            this.error.set("Failed to load node details");
+          }
+        });
+      }, 
+      error: () =>{ 
+        this.isLoading.set(false);
+        this.error.set("Failed loading schema resources");
+      }
+    });
   }
 
 }
