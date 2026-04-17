@@ -11,6 +11,8 @@ namespace SchemaStar.DataRepositories
         Task<Node?> GetFullNodeByPublicIdAsync(byte[] publicId, ulong userId);
         void Add(Node node);
         void Delete(Node node);
+        Task UpdateNodesBulkAsync(IEnumerable<Node> updatedNodes, byte[] nodewebPublicId, ulong userId);
+        Task<int> DeleteNodesBulkAsync(IEnumerable<byte[]> publicIds, byte[] nodewebPublicId, ulong userId);
         Task SaveChangesAsync();
 
     }

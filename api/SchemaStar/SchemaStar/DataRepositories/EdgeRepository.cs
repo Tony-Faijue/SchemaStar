@@ -42,7 +42,14 @@ namespace SchemaStar.DataRepositories
                 .Include(e => e.Nodeweb)
                 .FirstOrDefaultAsync(e => e.PublicId == publicId && e.Nodeweb.UserId == userId);
         }
-
+        public async Task<int> DeleteEdgesBulkAsync(IEnumerable<byte[]> publicIds, byte[] nodewebPublicId, ulong userId)
+        {
+            return await _context.Edges
+                .Where(e => publicIds.Contains(e.PublicId)
+                    && e.Nodeweb.PublicId == nodewebPublicId
+                    && e.Nodeweb.UserId == userId)
+                .ExecuteDeleteAsync(); //Bulk SQL Delete
+        }
         public void Add(Edge edge) => _context.Edges.Add(edge);
         public void Delete(Edge edge) => _context.Edges.Remove(edge);
         public Task SaveChangesAsync() => _context.SaveChangesAsync();

@@ -65,6 +65,63 @@ namespace SchemaStar.DataRepositories
                 .Include(n => n.NodeAssets) //Eager Loading
                 .FirstOrDefaultAsync(n => n.PublicId == publicId && n.NodeWeb.UserId == userId);
         }
+        /// <summary>
+        /// Updates in bulk multiple nodes
+        /// </summary>
+        /// <param name="updatedNodes"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public async Task UpdateNodesBulkAsync(IEnumerable<Node> updatedNodes, byte[] nodewebPublicId, ulong userId)
+        {
+            //Use of a dict/map for O(1) search
+            var updatesMap = new Dictionary<string, Node>();
+            foreach (var node in updatedNodes)
+            {
+                string key = Convert.ToBase64String(node.PublicId); //converts byte array to string for key values
+                updatesMap.Add(key, node); //add the node object as the value
+            }
+
+            var publicIdsToUpdate = updatedNodes.Select(n => n.PublicId).ToList();
+            
+            var existingNodes = await _context.Nodes
+                .Where(n => publicIdsToUpdate.Contains(n.PublicId) 
+                    && n.NodeWeb.PublicId == nodewebPublicId
+                    && n.NodeWeb.UserId == userId)
+                .ToListAsync();
+
+            foreach (var existing in existingNodes) 
+            {
+                var key = Convert.ToBase64String(existing.PublicId);
+                if (updatesMap.TryGetValue(key, out var update))
+                {
+                    if (update.NodeName != null) existing.NodeName = update.NodeName;
+                    if (update.NodeDescription != null) existing.NodeDescription = update.NodeDescription;
+
+                    existing.PositionX = update.PositionX;
+                    existing.PositionY = update.PositionY;
+
+                    if (update.Width > 0) existing.Width = update.Width;
+                    if (update.Height > 0) existing.Height = update.Height;
+
+                    existing.State = update.State;
+                }
+            }
+            await _context.SaveChangesAsync();
+        }
+        /// <summary>
+        /// Deletes Nodes in bulk for the given user
+        /// </summary>
+        /// <param name="publicIds"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteNodesBulkAsync(IEnumerable<byte[]> publicIds, byte[] nodeWebPublicId, ulong userId) 
+        {
+            return await _context.Nodes
+                .Where(n => publicIds.Contains(n.PublicId)
+                        && n.NodeWeb.PublicId == nodeWebPublicId
+                        && n.NodeWeb.UserId == userId)
+                .ExecuteDeleteAsync(); //Bulk SQL deletion
+        }
         public void Add(Node node) => _context.Nodes.Add(node);
         public void Delete(Node node) => _context.Nodes.Remove(node);
         public Task SaveChangesAsync() => _context.SaveChangesAsync();

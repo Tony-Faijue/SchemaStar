@@ -189,5 +189,50 @@ namespace SchemaStar.Controllers
             return response; //use FullResponseDTO to get eager loaded Node
         }
 
+        // PATCH: api/nodewebs/{nodewebId}/nodes/bulk
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPatch("/api/nodewebs/{nodewebId}/nodes/bulk")]
+        public async Task<IActionResult> BulkUpdateNodes(Guid nodewebId, [FromBody] List<NodeBulkUpdateRequestDTO> request)
+        {
+            var userId = _userService.GetCurrentUserId();
+            if (userId == null) throw new UnauthorizedException("User does not have permission to modify these Nodes");
+
+            byte[] publicIdBytes = nodewebId.ToMySqlBinary();
+
+            //Update the nodes
+            var nodeUpdates = request.Select(n => new Node { 
+                PublicId = n.PublicId.ToMySqlBinary(),
+                NodeName = n.NodeName!,
+                NodeDescription = n.NodeDescription,
+                PositionX = n.PositionX ?? 0,
+                PositionY = n.PositionY ?? 0,
+                Width = n.Width ?? 0,
+                Height = n.Height ?? 0,
+                State = n.State ?? Models.Enums.NodeState.Unlocked
+            }).ToList();
+            
+            await _repository.UpdateNodesBulkAsync(nodeUpdates, publicIdBytes, (ulong)userId);
+
+            return NoContent();
+        }
+
+        // DELETE: api/nodewebs/{nodewebId}/nodes/bulk
+        [HttpDelete("/api/nodewebs/{nodewebId}/nodes/bulk")]
+        public async Task<IActionResult> BulkDeleteNodes(Guid nodewebId, [FromBody] List<Guid> nodeIds)
+        {
+            var userId = _userService.GetCurrentUserId();
+            if (userId == null) throw new UnauthorizedException("User does not have permission to delete Nodes");
+
+            if (nodeIds == null | nodeIds!.Count == 0) throw new ArgumentException("List of node ids cannot be null or empty");
+
+            byte[] nodewebIdBytes = nodewebId.ToMySqlBinary();
+            var publicIdsToBytes = nodeIds.Select(id => id.ToMySqlBinary()).ToList();
+
+            //Returns the rows affected
+            int deletedCount = await _repository.DeleteNodesBulkAsync(publicIdsToBytes, nodewebIdBytes, (ulong)userId);
+
+            _logger.LogInformation("{Count} nodes deleted from Schema {SchemaId} by {UserId}", deletedCount, nodewebId, userId);
+            return NoContent();
+        }
     }
 }

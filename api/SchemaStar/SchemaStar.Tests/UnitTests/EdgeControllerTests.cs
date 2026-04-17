@@ -607,5 +607,61 @@ namespace SchemaStar.Tests.UnitTests
             _mockRepository.Verify(r => r.Delete(existingEdge), Times.Once);
             _mockRepository.Verify(r => r.SaveChangesAsync(), Times.Once);
         }
+
+        [Fact]
+        public async Task BulkDeleteEdges_WhenUserIdNull_ThrowsUnauthorizedException()
+        {
+            //Arrange
+            var userId = 1UL;
+            var nodewebId = Guid.NewGuid();
+            var edgeIds = new List<Guid> { Guid.NewGuid(), Guid.NewGuid() };
+
+            //Mock the needed services
+            _mockUserService.Setup(s => s.GetCurrentUserId()).Returns((ulong?)null);
+            //Act and Assert
+            await Assert.ThrowsAsync<UnauthorizedException>(() => _controller.BulkDeleteEdges(nodewebId, edgeIds));
+        }
+
+        [Fact]
+        public async Task BulkDeleteEdges_WhenListIsEmpty_ThrowsArgumentException()
+        {
+            //Arrange
+            var userId = 1UL;
+            var nodewebId = Guid.NewGuid();
+            var edgeIds = new List<Guid> { };
+
+            //Mock the needed services
+            _mockUserService.Setup(s => s.GetCurrentUserId()).Returns((ulong?)userId);
+            //Act and Assert
+            await Assert.ThrowsAsync<ArgumentException>(() => _controller.BulkDeleteEdges(nodewebId, edgeIds));
+        }
+
+        [Fact]
+        public async Task BulkDeleteNodes_WhenDeleteSucceeds_ReturnsNoContent()
+        {
+            //Arrange
+            var userId = 1UL;
+            var nodewebId = Guid.NewGuid();
+            var edgeIds = new List<Guid> { Guid.NewGuid(), Guid.NewGuid() };
+
+            //Mock the needed services
+            _mockUserService.Setup(s => s.GetCurrentUserId()).Returns((ulong?)userId);
+            //Act and Assert
+
+            //return 2 which is the number of rows deleted
+            _mockRepository.Setup(r => r.DeleteEdgesBulkAsync(It.IsAny<IEnumerable<byte[]>>(), It.IsAny<byte[]>(), userId))
+                .ReturnsAsync(2);
+
+            var result = await _controller.BulkDeleteEdges(nodewebId, edgeIds);
+
+            Assert.IsType<NoContentResult>(result);
+
+            _mockRepository.Verify(r => r.DeleteEdgesBulkAsync(
+                It.Is<IEnumerable<byte[]>>(ids => ids.Count() == 2),
+                It.IsAny<byte[]>(),
+                userId),
+                Times.Once
+             );
+        }
     }
 }
