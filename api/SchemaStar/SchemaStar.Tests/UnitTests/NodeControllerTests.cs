@@ -452,5 +452,113 @@ namespace SchemaStar.Tests.UnitTests
             Assert.Equal(nodeAsset1.PublicId.ToGuidFromMySqlBinary(), response.NodeAssets[0].PublicId);
             Assert.Equal("NodeAsset 2", response.NodeAssets[1].NodeAssetName);
         }
+
+        [Fact]
+        public async Task BulkUpdateNodes_WhenUserIdNull_ThrowsUnauthorizedException()
+        {
+            //Arrange
+            var nodewebId = Guid.NewGuid();
+
+            var nodeIds = new List<Guid> { Guid.NewGuid(), Guid.NewGuid() };
+
+            var request = new List<NodeBulkUpdateRequestDTO>
+            {
+                new NodeBulkUpdateRequestDTO { PublicId = nodeIds[0], NodeName = "Updated 1"},
+                new NodeBulkUpdateRequestDTO { PublicId = nodeIds[1], NodeName = "Updated 2"}
+            };
+
+            //Mock the needed services
+            _mockUserService.Setup(s => s.GetCurrentUserId()).Returns((ulong?)null);
+            //Act and Assert
+            await Assert.ThrowsAsync<UnauthorizedException>(() => _controller.BulkUpdateNodes(nodewebId, request));
+        }
+
+        [Fact]
+        public async Task BulkUpdateNodes_WhenUpdateSucceeds_ReturnsNoContent()
+        {
+            //Arrange
+            var userId = 1UL;
+            var nodewebId = Guid.NewGuid();
+            var nodeIds = new List<Guid> { Guid.NewGuid(), Guid.NewGuid() };
+
+            var request = new List<NodeBulkUpdateRequestDTO>
+            {
+                new NodeBulkUpdateRequestDTO { PublicId = nodeIds[0], NodeName = "Updated 1"},
+                new NodeBulkUpdateRequestDTO { PublicId = nodeIds[1], NodeName = "Updated 2"}
+            };
+
+            //Mock the needed services
+            _mockUserService.Setup(s => s.GetCurrentUserId()).Returns((ulong?)userId);
+            //Act and Assert
+            _mockRepository.Setup(r => r.UpdateNodesBulkAsync(It.IsAny<IEnumerable<Node>>(), It.IsAny<byte[]>(), userId))
+                .Returns(Task.CompletedTask);
+
+            var result = await _controller.BulkUpdateNodes(nodewebId, request);
+
+            Assert.IsType<NoContentResult>(result);
+
+            _mockRepository.Verify(r => r.UpdateNodesBulkAsync(
+                It.Is<IEnumerable<Node>>(list => list.Count() == 2),
+                It.IsAny<byte[]>(),
+                userId),
+                Times.Once
+             );
+        }
+
+        [Fact]
+        public async Task BulkDeleteNodes_WhenUserIdNull_ThrowsUnauthorizedException()
+        {
+            //Arrange
+            var userId = 1UL;
+            var nodewebId = Guid.NewGuid();
+            var nodeIds = new List<Guid> { Guid.NewGuid(), Guid.NewGuid() };
+
+            //Mock the needed services
+            _mockUserService.Setup(s => s.GetCurrentUserId()).Returns((ulong?)null);
+            //Act and Assert
+            await Assert.ThrowsAsync<UnauthorizedException>(() => _controller.BulkDeleteNodes(nodewebId, nodeIds));
+        }
+
+        [Fact]
+        public async Task BulkDeleteNodes_WhenListIsEmpty_ThrowsArgumentException()
+        {
+            //Arrange
+            var userId = 1UL;
+            var nodewebId = Guid.NewGuid();
+            var nodeIds = new List<Guid> { };
+
+            //Mock the needed services
+            _mockUserService.Setup(s => s.GetCurrentUserId()).Returns((ulong?)userId);
+            //Act and Assert
+            await Assert.ThrowsAsync<ArgumentException>(() => _controller.BulkDeleteNodes(nodewebId, nodeIds));
+        }
+
+        [Fact]
+        public async Task BulkDeleteNodes_WhenDeleteSucceeds_ReturnsNoContent()
+        {
+            //Arrange
+            var userId = 1UL;
+            var nodewebId = Guid.NewGuid();
+            var nodeIds = new List<Guid> { Guid.NewGuid(), Guid.NewGuid() };
+
+            //Mock the needed services
+            _mockUserService.Setup(s => s.GetCurrentUserId()).Returns((ulong?)userId);
+            //Act and Assert
+
+            //return 2 which is the number of rows deleted
+            _mockRepository.Setup(r => r.DeleteNodesBulkAsync(It.IsAny<IEnumerable<byte[]>>(), It.IsAny<byte[]>(), userId))
+                .ReturnsAsync(2);
+
+            var result = await _controller.BulkDeleteNodes(nodewebId, nodeIds);
+
+            Assert.IsType<NoContentResult>(result);
+
+            _mockRepository.Verify(r => r.DeleteNodesBulkAsync(
+                It.Is<IEnumerable<byte[]>>(ids => ids.Count() == 2),
+                It.IsAny<byte[]>(),
+                userId),
+                Times.Once
+             );
+        }
     }
 }

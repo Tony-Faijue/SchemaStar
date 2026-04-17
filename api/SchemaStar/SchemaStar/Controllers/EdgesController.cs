@@ -215,5 +215,24 @@ namespace SchemaStar.Controllers
 
             return NoContent();
         }
+
+        // DELETE: api/nodewebs/{nodewebId}/edges/bulk
+        [HttpDelete("/api/nodewebs/{nodewebId}/edges/bulk")]
+        public async Task<IActionResult> BulkDeleteEdges(Guid nodewebId, [FromBody] List<Guid> edgeIds)
+        {
+            var userId = _userService.GetCurrentUserId();
+            if (userId == null) throw new UnauthorizedException("User does not have permission to delete Edges");
+
+            if (edgeIds == null | edgeIds!.Count == 0) throw new ArgumentException("List of edge ids cannot be null or empty");
+
+            byte[] nodewebIdBytes = nodewebId.ToMySqlBinary();
+            var publicIdsToBytes = edgeIds.Select(id => id.ToMySqlBinary()).ToList();
+
+            //Returns the rows affected
+            int deletedCount = await _repository.DeleteEdgesBulkAsync(publicIdsToBytes, nodewebIdBytes, (ulong)userId);
+
+            _logger.LogInformation("{Count} edges deleted from Schema {SchemaId} by {UserId}", deletedCount, nodewebId, userId);
+            return NoContent();
+        }
     }
 }
