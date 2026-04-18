@@ -112,4 +112,16 @@ export class EdgeService {
     const url = this.getUrl(id);
     return this.http.delete<void>(url);
   }
+
+  /**
+   * Bulk deletes edges
+   * @param id nodeweb id
+   * @param edgeIds string of edge ids
+   * @returns 
+   */
+  bulkDeleteEdges(id: string, edgeIds: string[]):Observable<void>{
+    const baseUrl = this.getEdgesUrl(id);
+    const url = `${baseUrl}/bulk`;
+    return this.http.delete<void>(url, {body: edgeIds});
+  }
 }

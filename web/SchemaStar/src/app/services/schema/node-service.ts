@@ -151,4 +151,27 @@ export class NodeService {
     return this.http.get<NodeResponseFull>(url);
   }
 
+  /**
+   * Updates nodes in bulk
+   * @param id  the nodeweb id 
+   * @param nodes the nodes to be updated
+   */
+  bulkUpdateNodes(id: string, nodes: UpdateNode[]):Observable<void>{
+    const baseUrl = this.getNodesUrl(id);
+    const url = `${baseUrl}/bulk`;
+    return this.http.patch<void>(url, nodes);
+  }
+
+  /**
+   * Bulk delete nodes
+   * @param id nodeweb id
+   * @param nodeIds string of node ids
+   * @returns 
+   */
+  bulkDeleteNodes(id: string, nodeIds: string[]):Observable<void>{
+    const baseUrl = this.getNodesUrl(id);
+    const url = `${baseUrl}/bulk`;
+    return this.http.delete<void>(url, {body:nodeIds});
+  }
+
 }
