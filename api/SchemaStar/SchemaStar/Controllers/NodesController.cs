@@ -223,7 +223,7 @@ namespace SchemaStar.Controllers
             var userId = _userService.GetCurrentUserId();
             if (userId == null) throw new UnauthorizedException("User does not have permission to delete Nodes");
 
-            if (nodeIds == null | nodeIds!.Count == 0) throw new ArgumentException("List of node ids cannot be null or empty");
+            if (nodeIds == null || nodeIds.Count == 0) throw new ArgumentException("List of node ids cannot be null or empty");
 
             byte[] nodewebIdBytes = nodewebId.ToMySqlBinary();
             var publicIdsToBytes = nodeIds.Select(id => id.ToMySqlBinary()).ToList();

@@ -223,7 +223,7 @@ namespace SchemaStar.Controllers
             var userId = _userService.GetCurrentUserId();
             if (userId == null) throw new UnauthorizedException("User does not have permission to delete Edges");
 
-            if (edgeIds == null | edgeIds!.Count == 0) throw new ArgumentException("List of edge ids cannot be null or empty");
+            if (edgeIds == null || edgeIds.Count == 0) throw new ArgumentException("List of edge ids cannot be null or empty");
 
             byte[] nodewebIdBytes = nodewebId.ToMySqlBinary();
             var publicIdsToBytes = edgeIds.Select(id => id.ToMySqlBinary()).ToList();
