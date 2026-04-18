@@ -59,6 +59,18 @@ describe('NodeService', () => {
     nodeWebId: '9999'
   }
 
+  const nodeUpdate1: UpdateNode = {
+    publicId: '1010',
+    nodeName: 'nodeUpdate1' 
+  }
+
+  const nodeUpdate2: UpdateNode = {
+    publicId: '1020',
+    nodeName: 'nodeUpdate2' 
+  }
+
+  const nodesToUpdate: UpdateNode[] = [nodeUpdate1, nodeUpdate2];
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
@@ -188,4 +200,35 @@ describe('NodeService', () => {
     req.flush(mockNodeResponseFull);
   });
 
+  it('should update partially the nodes when given the node ids and the Schema id when bulkUpdateNodes succeeds', () => {
+    //Arrange
+    const schemaId = '555';
+    const mockNodesBulkURL = `${SecretData.baseuUrl}/api/nodewebs/${schemaId}/nodes/bulk`;
+
+    //Act and Assert
+    service.bulkUpdateNodes(schemaId, nodesToUpdate).subscribe();
+
+    //Verify
+    const req = httpTestingController.expectOne(mockNodesBulkURL);
+
+    expect(req.request.method).toBe('PATCH');
+    expect(req.request.body).toEqual(nodesToUpdate);
+    req.flush(null);
+  });
+
+  it('should delete the nodes when given the node ids and the Schema id when bulkDeleteNodes succeeds', () => {
+    //Arrange
+    const schemaId = '555';
+    const nodeIds: string[] = ['1', '12', '16', '78'];
+    const mockNodesBulkURL = `${SecretData.baseuUrl}/api/nodewebs/${schemaId}/nodes/bulk`;
+
+    //Act and Assert
+    service.bulkDeleteNodes(schemaId, nodeIds).subscribe();
+
+    //Verify
+    const req = httpTestingController.expectOne(mockNodesBulkURL);
+    expect(req.request.method).toBe('DELETE');
+    req.flush(null);
+  });
+  
 });
