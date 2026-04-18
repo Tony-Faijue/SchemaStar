@@ -132,5 +132,20 @@ describe('EdgeService', () => {
     expect(req.request.method).toBe('DELETE');
     req.flush(null);
   });
+
+  it('should delete the edges when given the edge ids and the Schema id when bulkDeleteEdges succeeds', () => {
+    //Arrange
+    const schemaId = '555';
+    const edgeIds: string[] = ['1', '12', '16', '78'];
+    const mockEdgesBulkURL = `${SecretData.baseuUrl}/api/nodewebs/${schemaId}/edges/bulk`;
+
+    //Act and Assert
+    service.bulkDeleteEdges(schemaId, edgeIds).subscribe();
+
+    //Verify
+    const req = httpTestingContoller.expectOne(mockEdgesBulkURL);
+    expect(req.request.method).toBe('DELETE');
+    req.flush(null);
+  });
   
 });
