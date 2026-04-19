@@ -1,10 +1,10 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { MapDataService } from './map-data-service';
 import { FCreateConnectionEvent, FMoveNodesEvent, FSelectionChangeEvent } from '@foblex/flow';
-import { NodeRequest, NodeResponse, NodeService } from './schema/node-service';
-import { EdgeRequest, EdgeResponse, EdgeService } from './schema/edge-service';
+import { NodeRequest, NodeResponse, NodeService, UpdateNode } from './schema/node-service';
+import { EdgeRequest, EdgeResponse, EdgeService, UpdateEdge } from './schema/edge-service';
 import { LoggerService } from './logger-service';
-import { NodeAssetRequest, NodeAssetResponse, NodeAssetService } from './schema/node-asset-service';
+import { NodeAssetRequest, NodeAssetResponse, NodeAssetService, UpdateNodeAsset } from './schema/node-asset-service';
 
 @Injectable({
   providedIn: 'root',
@@ -53,12 +53,16 @@ export class FlowStateService {
    });
 
   /**
-   * Node(s) movement, Foblex emits fMoveNodes when the drag is finished
+   * Node(s) movement, Foblex emits fMoveNodes when the drag is finished.
+   * Updates the postions of the node(s)
    * @param event 
    */
    handlesNodesMovement(event: FMoveNodesEvent){
+      const currentSchemaId = this.mapData.selectedSchemaId();
+      if (!currentSchemaId) return;
+
       const updates = event.nodes.map(fNode => {
-        const domainNode = this.mapData.nodes().find(n => n.publicId === fNode.id);
+      const domainNode = this.mapData.nodes().find(n => n.publicId === fNode.id);
         
         if(!domainNode) return null;
         return {
@@ -72,11 +76,12 @@ export class FlowStateService {
       if (updates.length > 0){
         this.mapData.upsertNodes(updates);
 
-        //Should look into bulk update for nodes for the API backend to improve peformance
-        //instead of individual calls
-        updates.forEach(node => {
-          this.nodeService.patchNode(node).subscribe();
-        })
+        //bulk updates for nodes
+        this.nodeService.bulkUpdateNodes(currentSchemaId, updates).subscribe({
+          error: (err) => {
+            this.loggerService.error('Failed to sync node positions', err);
+          }
+        });
       }
    }
 
@@ -203,6 +208,185 @@ export class FlowStateService {
         }
       });
    }
+
+  /**
+   * Deletes the node
+   * @param id the node id
+   * @returns 
+   */
+   handlesNodeDeletion(id: string){
+    if (id == null) return;
+    const currentSchemaId = this.mapData.selectedSchemaId();
+    if (!currentSchemaId) return;
+    
+    //Optimistically remove from UI
+    this.mapData.deleteNode(id);
+
+    this.nodeService.deleteNode(id).subscribe({
+      error: (err) => {
+        this.loggerService.error('Failed to delete node:', err);
+      }
+    });
+   }
+
+  /**
+   * Deletes the node asset
+   * @param id the node asset id
+   * @returns 
+   */
+   handlesAssetDeletion(id: string){
+    if (id == null) return;
+    const currentSchemaId = this.mapData.selectedSchemaId();
+    if (!currentSchemaId) return;
+
+    //Optimistically remove from UI
+    this.mapData.deleteAsset(id);
+
+    this.nodeAssetService.deleteNodeAsset(id).subscribe({
+      error: (err) => {
+        this.loggerService.error('Failed to delete node asset:', err);
+      }
+    });
+   }
+
+   /**
+   * Deletes the edge 
+   * @param id the edge id
+   * @returns 
+   */
+   handlesEdgeDeletion(id: string){
+    if (id == null) return;
+    const currentSchemaId = this.mapData.selectedSchemaId();
+    if (!currentSchemaId) return;
+    
+    //Optimistically remove from UI
+    this.mapData.deleteEdge(id);
+
+    this.edgeService.deleteEdge(id).subscribe({
+      error: (err) => {
+        this.loggerService.error('Failed to delete edge:', err);
+      }
+    });
+   }   
+
+    /**
+    * Updates the node
+    * @param update data to update the node
+    * @returns 
+    */
+   handlesNodeUpdate(update: UpdateNode){
+    if (!update || !update.publicId) return;
+
+    //Get the existing node to update
+    const existingNode = this.mapData.nodes().find(n => n.publicId === update.publicId);
+    if (!existingNode) return;
+
+    //Merges the updated data into the existing node
+    const updatedNode: NodeResponse = {
+      ...existingNode,
+      ...update,
+      publicId: existingNode.publicId //ensure public id is not overwrite for data layer
+    }
+
+    //Optimistically update the UI
+    this.mapData.upsertNodes([updatedNode]);
+
+    this.nodeService.patchNode(update).subscribe({
+      error: (err) => {
+        this.loggerService.error('Failed to update node:', err);
+      }
+    });
+   }
+
+   /**
+    * Updates the node asset
+    * @param update data to update the node asset
+    * @returns 
+    */
+   handlesAssetUpdate(update: UpdateNodeAsset){
+    if (!update || !update.publicId) return;
+
+    //Get the existing node to update
+    const existingAsset = this.mapData.assets().find(a => a.publicId === update.publicId);
+    if (!existingAsset) return;
+
+    //Merges the updated data into the existing node asset
+    const updatedAsset: NodeAssetResponse = {
+      ...existingAsset,
+      ...update,
+      publicId: existingAsset.publicId //ensure public id is not overwrite for data layer
+    }
+
+    //Optimistically update the UI
+    this.mapData.upsertAssets([updatedAsset]);
+
+    this.nodeAssetService.patchNodeAsset(update).subscribe({
+      error: (err) => {
+        this.loggerService.error('Failed to update node asset:', err);
+      }
+    });
+   }
+
+   /**
+    * Updates the edge
+    * @param update data to update the edge
+    * @returns 
+    */
+   handlesEdgeUpdate(update: UpdateEdge){
+    if (!update || !update.publicId) return;
+
+    //Get the existing edge to update
+    const existingEdge = this.mapData.edges().find(e => e.publicId === update.publicId);
+    if (!existingEdge) return;
+
+    //Merges the updated data into the existing edge
+    const updatedEdge: EdgeResponse = {
+      ...existingEdge,
+      ...update,
+      publicId: existingEdge.publicId //ensure public id is not overwrite for data layer
+    }
+
+    //Optimistically update the UI
+    this.mapData.upsertEdges([updatedEdge]);
+
+    this.edgeService.patchEdge(update).subscribe({
+      error: (err) => {
+        this.loggerService.error('Failed to update edge:', err);
+      }
+    });
+   }   
+   
+   /**
+    * Deletes all currently selected nodes and edges in bulk
+    */
+   handlesBulkDeletion(){
+    const currentSchemaId = this.mapData.selectedSchemaId();
+    const nodeIds = this.selectedNodeIds();
+    const edgeIds = this.selectedEdgeIds();
+
+    if (!currentSchemaId || (nodeIds.length === 0 && edgeIds.length === 0)) return;
+
+    //Optimistically update the UI state
+    nodeIds.forEach(id => this.mapData.deleteNode(id)); //handles cascade deletion of edges
+    edgeIds.forEach(id => this.mapData.deleteEdge(id)); //delete oprhan edges just in case
+
+    this.clearSelection();
+    
+    //Bulk delete edges  
+    if (edgeIds.length > 0) {
+      this.edgeService.bulkDeleteEdges(currentSchemaId, edgeIds).subscribe({
+        error: (err) => this.loggerService.error('Bulk edge deletion failed: ', err)
+      });
+    }
+
+    //Bulk delete nodes; also cascade deletes depending edges
+    if (nodeIds.length > 0) {
+      this.nodeService.bulkDeleteNodes(currentSchemaId, nodeIds).subscribe({
+        error: (err) => this.loggerService.error('Bulk node deletion failed: ', err)
+      });
+    }
+   }
+
 
    /**
     * Clear the selected node and edge ids
