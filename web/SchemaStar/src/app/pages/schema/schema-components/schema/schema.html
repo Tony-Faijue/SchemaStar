@@ -7,7 +7,7 @@
     (fCreateConnection)="onCreateConnection($event)"
     (fSelectionChange)="flowStateService.handleSelectionChange($event)"
   >
-    <f-canvas>
+    <f-canvas fZoom [fZoom]="zoomLevel()" (fZoomChange)="onZoomChange($event)">
       <!-- Edges/Connections -->
       @for (edge of flowStateService.flowEdges(); track edge.id) {
         <f-connection [fConnectionId]="edge.id" [fOutputId]="edge.source" [fInputId]="edge.target">
