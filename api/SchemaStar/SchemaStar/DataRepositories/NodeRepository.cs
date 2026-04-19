@@ -83,13 +83,18 @@ namespace SchemaStar.DataRepositories
 
             var publicIdsToUpdate = updatedNodes.Select(n => n.PublicId).ToList();
             
+            //Get the nodes for the schema & user
             var existingNodes = await _context.Nodes
-                .Where(n => publicIdsToUpdate.Contains(n.PublicId) 
-                    && n.NodeWeb.PublicId == nodewebPublicId
+                .Where(n => n.NodeWeb.PublicId == nodewebPublicId
                     && n.NodeWeb.UserId == userId)
                 .ToListAsync();
 
-            foreach (var existing in existingNodes) 
+            //Identify which internal Ids match the public ids to update
+            var filterNodes = existingNodes
+                .Where(n => publicIdsToUpdate.Any(p => p.SequenceEqual(n.PublicId)))
+                .ToList();
+
+            foreach (var existing in filterNodes) 
             {
                 var key = Convert.ToBase64String(existing.PublicId);
                 if (updatesMap.TryGetValue(key, out var update))
@@ -116,10 +121,23 @@ namespace SchemaStar.DataRepositories
         /// <returns></returns>
         public async Task<int> DeleteNodesBulkAsync(IEnumerable<byte[]> publicIds, byte[] nodeWebPublicId, ulong userId) 
         {
-            return await _context.Nodes
-                .Where(n => publicIds.Contains(n.PublicId)
-                        && n.NodeWeb.PublicId == nodeWebPublicId
+            //Get the internal ids for nodes in the schema
+            var nodesInSchema = await _context.Nodes
+                .Where(n => n.NodeWeb.PublicId == nodeWebPublicId
                         && n.NodeWeb.UserId == userId)
+                .Select(n => new { n.Id, n.PublicId }) //gets just the internal and public ids
+                .ToListAsync();
+
+            //Identify which internal IDs match the PublicIds to delete
+            var idsToRemove = nodesInSchema
+                .Where(n => publicIds.Any(p => p.SequenceEqual(n.PublicId)))
+                .Select(n => n.Id)
+                .ToList();
+
+            if (!idsToRemove.Any()) return 0;
+
+            return await _context.Nodes
+                .Where(n => idsToRemove.Contains(n.Id)) //SQl can map the list of numbers
                 .ExecuteDeleteAsync(); //Bulk SQL deletion
         }
         public void Add(Node node) => _context.Nodes.Add(node);

@@ -44,10 +44,23 @@ namespace SchemaStar.DataRepositories
         }
         public async Task<int> DeleteEdgesBulkAsync(IEnumerable<byte[]> publicIds, byte[] nodewebPublicId, ulong userId)
         {
-            return await _context.Edges
-                .Where(e => publicIds.Contains(e.PublicId)
-                    && e.Nodeweb.PublicId == nodewebPublicId
+            //Get the internal ids for edges in the schema
+            var edgesInSchema = await _context.Edges
+                .Where(e => e.Nodeweb.PublicId == nodewebPublicId
                     && e.Nodeweb.UserId == userId)
+                .Select(e => new { e.Id, e.PublicId }) //gets the internal and public ids
+                .ToListAsync();
+
+            //Identify which internal IDs match the PublicIds to delete
+            var idsToRemove = edgesInSchema
+                .Where(e => publicIds.Any(p => p.SequenceEqual(e.PublicId)))
+                .Select(e => e.Id)
+                .ToList();
+
+            if (!idsToRemove.Any()) return 0;
+
+            return await _context.Edges
+                .Where(e => idsToRemove.Contains(e.Id)) //SQl can map the list of numbers
                 .ExecuteDeleteAsync(); //Bulk SQL Delete
         }
         public void Add(Edge edge) => _context.Edges.Add(edge);
