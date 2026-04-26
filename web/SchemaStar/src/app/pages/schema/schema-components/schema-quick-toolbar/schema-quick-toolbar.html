@@ -1,0 +1,64 @@
+<div
+  class="absolute bottom-14 left-1/2 -translate-x-1/2 z-50 bg-white rounded-2xl w-max border-2 border-dark-purple p-2 px-4 drop-shadow-lg"
+>
+  <div class="flex items-center justify-evenly gap-4">
+    <div
+      class="w-16 flex-1 border border-purple-400 rounded-lg hover:bg-slate-50 transition-colors"
+    >
+      <p class="w-full p-4 flex items-center justify-center text-xs text-base-purple font-bold">
+        {{ (schemaUiStateService.zoomLevel() * 100).toFixed(0) }}%
+      </p>
+    </div>
+    <div
+      class="group flex-1 border border-purple-400 rounded-lg hover:bg-slate-50 transition-colors"
+    >
+      <button
+        class="w-full p-4 flex items-center justify-center"
+        (click)="schemaUiStateService.zoomOut()"
+      >
+        <i
+          class="fa-solid fa-magnifying-glass-minus text-base-purple transition-transform duration-200 ease-in-out group-hover:text-medium-purple group-hover:scale-125"
+        ></i>
+      </button>
+    </div>
+    <div
+      class="group flex-1 border border-purple-400 rounded-lg hover:bg-slate-50 transition-colors"
+    >
+      <button
+        class="w-full p-4 flex items-center justify-center"
+        (click)="schemaUiStateService.zoomIn()"
+      >
+        <i
+          class="fa-solid fa-magnifying-glass-plus text-base-purple transition-transform duration-200 ease-in-out group-hover:text-medium-purple group-hover:scale-125"
+        ></i>
+      </button>
+    </div>
+    <div
+      class="group flex-1 border border-purple-400 rounded-lg hover:bg-slate-50 transition-colors"
+    >
+      <button class="w-full p-4 flex items-center justify-center">
+        <i
+          class="fa-solid fa-expand text-base-purple transition-transform duration-200 ease-in-out group-hover:text-medium-purple group-hover:scale-125"
+        ></i>
+      </button>
+    </div>
+    <div
+      class="group flex-1 border border-purple-400 rounded-lg hover:bg-slate-50 transition-colors"
+    >
+      <button class="w-full p-4 flex items-center justify-center">
+        <i
+          class="fa-solid fa-ruler-combined text-base-purple transition-transform duration-200 ease-in-out group-hover:text-medium-purple group-hover:scale-125"
+        ></i>
+      </button>
+    </div>
+    <div
+      class="group flex-1 border border-purple-400 rounded-lg hover:bg-slate-50 transition-colors"
+    >
+      <button class="w-full p-4 flex items-center justify-center">
+        <i
+          class="fa-solid fa-arrows-to-eye text-base-purple transition-transform duration-200 ease-in-out group-hover:text-medium-purple group-hover:scale-125"
+        ></i>
+      </button>
+    </div>
+  </div>
+</div>
