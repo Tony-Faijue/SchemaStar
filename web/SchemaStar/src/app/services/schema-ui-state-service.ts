@@ -44,7 +44,7 @@ export class SchemaUiStateService {
   //--------------Functions------------
 
   /**
-   * Set the canvas to reference the given FCanvasComponent
+   * Set the canvas to reference the given FCanvasComponent and FZoomDirective
    * @param canvas 
    */
   public setCanvas(canvas: FCanvasComponent, zoom: FZoomDirective){
@@ -53,22 +53,21 @@ export class SchemaUiStateService {
     this.zoomLevel.set(this.fCanvas.getScale());
   }
 
-  //-Zoom and View Functions-
+  //--------------Zoom and View Functions---------------
 
   /**
-   * updates the zoom level to the given newScale value
-   * @param newScale 
-   */
-  public updateZoom(newScale: number){
-    this.zoomLevel.set(newScale);
-  } 
-
-  /**
-   * increases the zoom level by 10% to maximum of 200%
+   * increases the zoom level by 10% to maximum of 400%
    */
   public zoomIn(){
     if(this.fZoom){
       this.fZoom.zoomIn();
+
+      setTimeout(() => {
+        if(this.fCanvas){
+          const currentScale = this.fCanvas.getScale(); //get the scale from the canvas directly
+          this.onZoomChange(currentScale);
+        }
+      }, 10);
     }
   }
 
@@ -78,7 +77,14 @@ export class SchemaUiStateService {
   public zoomOut(){
     if(this.fZoom){
       this.fZoom.zoomOut();
-    }  
+     
+      setTimeout(() => {
+        if(this.fCanvas){
+          const currentScale = this.fCanvas.getScale(); //get scale from the canvas directly
+          this.onZoomChange(currentScale);
+        }
+      }, 10);
+    }    
   }
 
   /**
@@ -87,6 +93,7 @@ export class SchemaUiStateService {
    */
   public onZoomChange(newScale: number | any): void {
     if (typeof newScale === 'number'){
+      this.loggerService.log(newScale);
       this.zoomLevel.set(newScale);
     }
   }
@@ -111,11 +118,14 @@ export class SchemaUiStateService {
 
   /**
    * Triggers the native browswer full-screen mode
-   * @param element the Schema graph to expand
+   * @param element the HTML Element that contains the f-flow root
    */
-  public toggleBrowserFullScreen(element: HTMLElement){
+  public async toggleBrowserFullScreen(element: HTMLElement){
     if(!document.fullscreenElement){
-      element.requestFullscreen()
+      await element.requestFullscreen()
+      .then(() => {
+        this.onFitScreenView(); //Resize for elements to fit the screen
+      })
       .catch((err) => {
         this.loggerService.error(`Error enabling full screen view:${err.message}`);
       });
@@ -123,5 +133,4 @@ export class SchemaUiStateService {
       document.exitFullscreen();
     }
   }
-
 }

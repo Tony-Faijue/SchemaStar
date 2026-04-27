@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { SchemaUiStateService } from '../../../../services/schema-ui-state-service';
 
 @Component({
@@ -8,5 +8,10 @@ import { SchemaUiStateService } from '../../../../services/schema-ui-state-servi
   styleUrl: './schema-quick-toolbar.css',
 })
 export class SchemaQuickToolbar {
- schemaUiStateService = inject(SchemaUiStateService);
+  /**
+   * Container HTML element for the f-flow root
+   */
+  public container = input.required<HTMLElement>();
+  
+  schemaUiStateService = inject(SchemaUiStateService);
 }

@@ -1,5 +1,5 @@
-<div class="w-full h-screen border-2 border-slate-700 bg-purple-100 p-2 relative">
-  <app-schema-quick-toolbar></app-schema-quick-toolbar>
+<div #flowContainer class="w-full h-screen border-2 border-slate-700 bg-purple-100 p-2 relative">
+  <app-schema-quick-toolbar [container]="flowContainer"></app-schema-quick-toolbar>
   <!-- Example Use of Foblex Flow -->
   <f-flow
     fDraggable
@@ -13,11 +13,7 @@
       <f-rect-pattern></f-rect-pattern>
     </f-background>
 
-    <f-canvas
-      fZoom
-      [fZoom]="schemaUiStateService.zoomLevel()"
-      (fZoomChange)="schemaUiStateService.onZoomChange($event)"
-    >
+    <f-canvas fZoom (fZoomChange)="schemaUiStateService.onZoomChange($event)">
       <!-- Edges/Connections -->
       @for (edge of flowStateService.flowEdges(); track edge.id) {
         <f-connection [fConnectionId]="edge.id" [fOutputId]="edge.source" [fInputId]="edge.target">
