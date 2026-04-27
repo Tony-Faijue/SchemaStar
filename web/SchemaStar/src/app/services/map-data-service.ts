@@ -108,9 +108,9 @@ export class MapDataService {
     //update the schemas signal
     this.schemas.update((current: SchemaResponse[]) => {
       //create schema map with key(schemaresponse publicId), value (schemaresponse)
-      const schemaMap = new Map<string, SchemaResponse>(current.map(s => [s.publicId, s]));
+      const schemaMap = new Map<string, SchemaResponse>(current.filter(s => !!s).map(s =>[s.publicId, s])); //filter before mapping for null values
       //Add a schema or update and exisiting schema
-      newSchemas.forEach(n => schemaMap.set(n.publicId, n));
+      newSchemas.filter(n => !!n).forEach(n => schemaMap.set(n.publicId, n));
       //Converts the Map iterator type to an Array
       return Array.from(schemaMap.values());
     });
@@ -152,9 +152,9 @@ export class MapDataService {
     //update the nodes signal
     this.nodes.update((current: NodeResponse[]) => {
       //create node map with key(noderesponse publicId), value (noderesponse)
-      const nodeMap = new Map<string, NodeResponse>(current.map(n => [n.publicId, n]));
+      const nodeMap = new Map<string, NodeResponse>(current.filter(n => !!n).map(n => [n.publicId, n])); //filter before mapping for null values
       //Add a new node or update and exisiting node
-      newNodes.forEach(n => nodeMap.set(n.publicId, n));
+      newNodes.filter(n => !!n).forEach(n => nodeMap.set(n.publicId, n));
       //Converts the Map iterator type to an Array
       return Array.from(nodeMap.values());
     });
@@ -183,9 +183,9 @@ export class MapDataService {
     //update the assets signal
     this.assets.update((current: NodeAssetResponse[]) => {
       //create asset map with key(nodeassetresponse publicId), value (nodeassetresponse)
-      const assetMap = new Map<string, NodeAssetResponse>(current.map(a => [a.publicId, a]));
+      const assetMap = new Map<string, NodeAssetResponse>(current.filter(a => !!a).map(a =>[a.publicId, a])); //filter current assets before mapping for null
       //Add a new asset or update and exisiting asset
-      newAssets.forEach(a => assetMap.set(a.publicId, a));
+      newAssets.filter(a => !!a).forEach(a => assetMap.set(a.publicId, a)); //filter before mapping
       //Converts the Map iterator type to an Array
       return Array.from(assetMap.values());
     });
@@ -207,9 +207,9 @@ export class MapDataService {
     //update the edges signal
     this.edges.update((current: EdgeResponse[]) => {
       //create edge map with key(edgeresponse publicId), value (edgeresponse)
-      const edgeMap = new Map<string, EdgeResponse>(current.map(e => [e.publicId, e]));
+      const edgeMap = new Map<string, EdgeResponse>(current.filter(e => !!e).map(e => [e.publicId, e])); //filter before mapping for null values
       //Add a new edge or update and exisiting edge
-      newEdges.forEach(e => edgeMap.set(e.publicId, e));
+      newEdges.filter(e => !!e).forEach(e => edgeMap.set(e.publicId, e));
       //Converts the Map iterator type to an Array
       return Array.from(edgeMap.values());
     });

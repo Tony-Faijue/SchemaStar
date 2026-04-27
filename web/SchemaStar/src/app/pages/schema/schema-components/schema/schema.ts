@@ -46,7 +46,7 @@ export class Schema {
    */
   ngOnInit(){
     this.mapDataService.loadUserWorkspace();
-    //Register the fcanvas with schemauistate service
+    //Register the fcanvas and fzoom with schemauistate service
     this.schemaUiStateService.setCanvas(this.fCanvas, this.fZoom);
   }
 }
