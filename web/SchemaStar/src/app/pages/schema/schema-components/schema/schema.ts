@@ -6,10 +6,11 @@ import { MapDataService } from '../../../../services/map-data-service';
 import { LoggerService } from '../../../../services/logger-service';
 import { SchemaUiStateService } from '../../../../services/schema-ui-state-service';
 import { SchemaQuickToolbar } from "../schema-quick-toolbar/schema-quick-toolbar";
+import { SchemaToolbar } from "../schema-toolbar/schema-toolbar";
 
 @Component({
   selector: 'app-schema',
-  imports: [FFlowModule, SchemaQuickToolbar],
+  imports: [FFlowModule, SchemaQuickToolbar, SchemaToolbar],
   templateUrl: './schema.html',
   styleUrl: './schema.css',
 })
