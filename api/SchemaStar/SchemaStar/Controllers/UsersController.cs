@@ -243,7 +243,7 @@ namespace SchemaStar.Controllers
         /// </summary>
         /// <returns></returns>
         /// <exception cref="NotFoundException"></exception>
-        [Authorize(AuthenticationSchemes = "Bearer,Identity.Application")]
+        [Authorize()]
         [HttpGet("me")]
         public async Task<ActionResult<UserResponseDTO>> GetCurrentUserInfo() {
 
