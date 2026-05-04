@@ -44,9 +44,14 @@ try
     //-------------Database Connection String & Database Context-------------
 
     //Register the Dbcontext classes in DI Container
-    string connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection String not found");
-    //Register with MySQL
-    builder.Services.AddDbContext<SchemastarContext>(o => o.UseMySQL(connectionString));
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+    if (!builder.Environment.IsEnvironment("Testing"))
+    {
+         connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection String not found");
+        //Register with MySQL
+        builder.Services.AddDbContext<SchemastarContext>(o => o.UseMySQL(connectionString));
+    }
 
     //Register AspNetCore Identity
     builder.Services.AddIdentityServices();
