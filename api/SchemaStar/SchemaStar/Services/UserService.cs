@@ -115,13 +115,14 @@ namespace SchemaStar.Services
 
             //Environment Context Development or Production
             bool isDev = _webHostEnvironment.IsDevelopment();
+            bool isTesting = _webHostEnvironment.IsEnvironment("Testing");
 
             //Set JWT in HttpOnly cookie
             var cookieOptions = new CookieOptions
             {
                 HttpOnly = true, //the cookie is not accessible by client side-script
-                Secure = !isDev,  //true - sent through HTTPS for production, false for development
-                SameSite = isDev ? SameSiteMode.Lax : SameSiteMode.Strict, //Strict - CRSF protection, Lax for development
+                Secure = !isDev && !isTesting,  //true - sent through HTTPS for production, false for development/testing
+                SameSite = (isDev || isTesting) ? SameSiteMode.Lax : SameSiteMode.Strict, //Strict - CRSF protection, Lax for development/testing
                 Expires = DateTime.UtcNow.AddMinutes(_jwt.Value.DurationInMinutes), //Duration of the Cookie
                 Path = "/" //ensures the cookie is available for all routes
             };
