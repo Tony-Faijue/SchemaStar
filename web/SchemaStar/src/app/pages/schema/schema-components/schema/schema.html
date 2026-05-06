@@ -15,7 +15,7 @@
       <f-rect-pattern></f-rect-pattern>
     </f-background>
 
-    <f-canvas fZoom (fZoomChange)="schemaUiStateService.onZoomChange($event)">
+    <f-canvas fZoom (fCanvasChange)="schemaUiStateService.onZoomChange($event)">
       <!-- Edges/Connections -->
       @for (edge of flowStateService.flowEdges(); track edge.id) {
         <f-connection [fConnectionId]="edge.id" [fOutputId]="edge.source" [fInputId]="edge.target">
