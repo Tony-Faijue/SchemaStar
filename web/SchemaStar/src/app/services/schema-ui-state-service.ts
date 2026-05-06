@@ -1,5 +1,5 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { FCanvasComponent, FZoomDirective } from '@foblex/flow';
+import { FCanvasChangeEvent, FCanvasComponent, FZoomDirective } from '@foblex/flow';
 import { LoggerService } from './logger-service';
 
 @Injectable({
@@ -59,16 +59,8 @@ export class SchemaUiStateService {
    * increases the zoom level by 10% to maximum of 400%
    */
   public zoomIn(){
-    if(this.fZoom){
+    if(this.fZoom)
       this.fZoom.zoomIn();
-
-      setTimeout(() => {
-        if(this.fCanvas){
-          const currentScale = this.fCanvas.getScale(); //get the scale from the canvas directly
-          this.onZoomChange(currentScale);
-        }
-      }, 10);
-    }
   }
 
   /**
@@ -77,21 +69,16 @@ export class SchemaUiStateService {
   public zoomOut(){
     if(this.fZoom){
       this.fZoom.zoomOut();
-     
-      setTimeout(() => {
-        if(this.fCanvas){
-          const currentScale = this.fCanvas.getScale(); //get scale from the canvas directly
-          this.onZoomChange(currentScale);
-        }
-      }, 10);
     }    
   }
 
   /**
-   * Updates the zoom level to the newScale value passing this event to the fZoomChange event
-   * @param newScale 
+   * U
+   * @param event 
    */
-  public onZoomChange(newScale: number | any): void {
+  public onZoomChange(event: FCanvasChangeEvent | number): void {
+    //cast the event as a number directly otherwise pass the event
+    const newScale = typeof event === 'number' ? event : event.scale;
     if (typeof newScale === 'number'){
       this.loggerService.log(newScale);
       this.zoomLevel.set(newScale);

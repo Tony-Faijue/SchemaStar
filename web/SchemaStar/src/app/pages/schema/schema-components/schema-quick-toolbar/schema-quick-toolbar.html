@@ -2,10 +2,10 @@
   class="absolute bottom-14 left-1/2 -translate-x-1/2 z-50 bg-white rounded-2xl w-max border-2 border-dark-purple p-2 px-4 drop-shadow-lg"
 >
   <div class="flex items-center justify-evenly gap-4">
-    <div
-      class="w-16 flex-1 border border-purple-400 rounded-lg hover:bg-slate-50 transition-colors"
-    >
-      <p class="w-full p-4 flex items-center justify-center text-xs text-base-purple font-bold">
+    <div class="w-16 border border-purple-400 rounded-lg hover:bg-slate-50 transition-colors">
+      <p
+        class="w-full p-4 flex items-center justify-center text-xs text-base-purple font-bold tabular-nums"
+      >
         {{ (schemaUiStateService.zoomLevel() * 100).toFixed(0) }}%
       </p>
     </div>
