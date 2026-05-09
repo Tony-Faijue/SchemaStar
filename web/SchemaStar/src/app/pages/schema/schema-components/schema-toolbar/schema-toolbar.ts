@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { SchemaUiStateService } from '../../../../services/schema-ui-state-service';
 
 @Component({
   selector: 'app-schema-toolbar',
@@ -8,4 +9,21 @@ import { Component } from '@angular/core';
 })
 export class SchemaToolbar {
 
+  schemaUiStateService = inject(SchemaUiStateService);
+
+  /**
+   * Sets the active menu state
+   * @param menu 
+   */
+  public setActiveMenu(menu: string){
+    this.schemaUiStateService.setActiveMenuSchemaToolBar(menu);
+  }
+
+  /**
+   * Clears the active menu state
+   */
+  public clearActiveMenu(){
+    this.schemaUiStateService.setActiveMenuSchemaToolBar();
+  }
+  
 }
