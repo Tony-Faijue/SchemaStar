@@ -37,6 +37,11 @@ export class SchemaUiStateService {
   public isToolBarOpen = signal(false);
 
   /**
+   * DropDown menu state of SchemaToolBar 
+   */
+  public activeMenuSchemaToolBar = signal('');
+
+  /**
    * Toggle state of SchemaQuickToolBar
    */
   public isQuickToolBarOpen = signal(false);
@@ -120,4 +125,30 @@ export class SchemaUiStateService {
       document.exitFullscreen();
     }
   }
+
+  //--------------SchemaToolBar Functions---------------
+  
+  /**
+   * Sets the activeMenuSchemaToolBar state to menu
+   * @param menu 
+   */
+  public setActiveMenuSchemaToolBar(menu?: string){
+    switch(menu){
+      case 'file': 
+        this.activeMenuSchemaToolBar.set('file');
+      break;
+     case 'edit': 
+        this.activeMenuSchemaToolBar.set('edit');
+      break;
+     case 'view': 
+        this.activeMenuSchemaToolBar.set('view');
+      break;
+     case 'help': 
+        this.activeMenuSchemaToolBar.set('help');
+      break;
+      default:
+        this.activeMenuSchemaToolBar.set('');
+    }
+  }
+
 }
