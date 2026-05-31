@@ -2,12 +2,52 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { FCanvasChangeEvent, FCanvasComponent, FZoomDirective } from '@foblex/flow';
 import { LoggerService } from './logger-service';
 
+/**
+ * Menu Item Structure for Schema Toolbar
+ */
+export interface MenuItem {
+  label : string,
+  shortcut: string, 
+  action: (...args: any[]) => void // function to execute
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class SchemaUiStateService {
   
   private loggerService = inject(LoggerService);
+
+  //--------------Menu Items---------------------
+
+  public viewMenuItems: MenuItem[] = [
+    {
+      label: 'Zoom In',
+      shortcut: 'Ctrl +',
+      action: () => this.zoomIn()
+    },
+    {
+      label: 'Zoom Out',
+      shortcut: 'Ctrl -',
+      action: () => this.zoomOut()
+    },
+     {
+      label: 'Fit Screen View',
+      shortcut: 'Ctrl+Alt+P',
+      action: () => this.onFitScreenView()
+    },
+    {
+      label: 'Reset View',
+      shortcut: 'Ctrl+Alt+O',
+      action: () => this.onResetView()
+    },
+    {
+      label: 'Fullscreen',
+      shortcut: 'Ctrl+Alt+K',
+      action: (element: HTMLElement) => this.toggleBrowserFullScreen(element)
+    },
+  ];
+
   //--------------UI state Properties------------
   /**
    * FCanvas reference for the schema component
