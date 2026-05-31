@@ -51,24 +51,7 @@
 
   <!-- DropDown Menus -->
   @if (schemaUiStateService.activeMenuSchemaToolBar() == 'view') {
-    <!-- Template component for Specific Menu Items -->
-    <div
-      class="absolute z-50 top-20 left-52 w-max bg-gray-100 shadow-md shadow-purple-400 border-2 border-slate-900 rounded-lg"
-    >
-      <div class="flex flex-col gap-2">
-        <button>
-          <p class="flex justify-between items-center gap-8">
-            <span>Zoom In</span>
-            <span>Ctrl + </span>
-          </p>
-        </button>
-        <button>
-          <p class="flex justify-between items-center gap-8">
-            <span>Zoom Out</span>
-            <span>Ctrl - </span>
-          </p>
-        </button>
-      </div>
-    </div>
+    <!-- View Menu Component -->
+    <app-view-menu [container]="container"></app-view-menu>
   }
 </div>

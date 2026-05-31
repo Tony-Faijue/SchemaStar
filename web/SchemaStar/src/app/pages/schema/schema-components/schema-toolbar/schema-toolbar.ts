@@ -1,15 +1,17 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, Input } from '@angular/core';
 import { SchemaUiStateService } from '../../../../services/schema-ui-state-service';
+import { ViewMenu } from "./toolbar-dropdown/view-menu/view-menu";
 
 @Component({
   selector: 'app-schema-toolbar',
-  imports: [],
+  imports: [ViewMenu],
   templateUrl: './schema-toolbar.html',
   styleUrl: './schema-toolbar.css',
 })
 export class SchemaToolbar {
 
   schemaUiStateService = inject(SchemaUiStateService);
+  @Input() container!: HTMLElement; // receives the container html wrapper element for the canvas
 
   /**
    * Sets the active menu state
