@@ -28,9 +28,21 @@
     <div
       class="lg:flex flex-col lg:flex-row lg:space-x-4 lg:mt-0 mt-4 flex items-center text-xl sm:text-lg"
     >
-      <a href="" class="menu-item">About</a>
-      <a href="" class="menu-item">Contact</a>
-      <a [routerLink]="['login']" class="menu-item">Login/SignUp</a>
+      <a
+        href=""
+        class="menu-item font-medium px-4 py-2 border-2 border-transparent transition-all duration-200 hover:border-slate-900 hover:text-zinc-100"
+        >About</a
+      >
+      <a
+        href=""
+        class="menu-item font-medium px-4 py-2 border-2 border-transparent transition-all duration-200 hover:border-slate-900 hover:text-zinc-100"
+        >Contact</a
+      >
+      <a
+        [routerLink]="['login']"
+        class="menu-item font-medium px-4 py-2 border-2 border-transparent transition-all duration-200 hover:border-slate-900 hover:text-zinc-100"
+        >Login/SignUp</a
+      >
     </div>
   </div>
 </nav>

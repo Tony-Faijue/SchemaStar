@@ -8,8 +8,49 @@
     --color-medium-purple:#431DB6;
     --color-dark-purple:#2F0F8E;
 
+    --color-dark-yellow:#FFE600;
+
 }
+/*-----------------Global Styles-----------------*/
 
 .auth-btn{
     @apply w-45 bg-purple-400 hover:bg-purple-700 hover:shadow-sm hover:shadow-slate-100 text-zinc-100 font-semibold py-3 rounded-lg shadow-md transition-all duration-200 text-center;
+}
+
+/*-----------------Authentication Form Styles-----------------*/
+.heading-form-title{
+    @apply text-3xl font-extrabold text-center text-zinc-800 mb-6;
+}
+.label-form{
+    @apply  text-lg font-medium text-zinc-800 mr-4;
+}
+.input-form{
+    @apply w-full px-4 py-3 text-zinc-600 rounded-lg border border-purple-400;
+}
+.input-form-focus{
+    @apply  focus:outline-dark-yellow focus:ring-2 focus:ring-light-medium-purple focus:border-transparent transition;
+}
+.form-shadow {
+    @apply border border-slate-900;
+    box-shadow: 2px 2px 0px 0px rgb(34, 7, 43);
+}
+
+/*-----------------Schema Form Styles-----------------*/
+.input-form-schema{
+    @apply w-full px-4 py-3 text-zinc-50 rounded-lg border border-purple-400;
+}
+.input-form-focus-schema{
+    @apply  focus:outline-purple-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition;
+}
+.confirm-schema-btn{
+    @apply  bg-purple-400 hover:bg-purple-700 hover:shadow-sm hover:shadow-slate-100 text-zinc-100 font-semibold py-3 rounded-lg shadow-md transition-all duration-200 text-center;
+}
+.create-schema-btn{
+    @apply  bg-purple-500 hover:bg-purple-700 hover:shadow-sm hover:shadow-slate-100 text-zinc-100 font-semibold py-3 rounded-lg shadow-md transition-all duration-200 text-center;
+}
+
+/*-----------------Search Form Styles-----------------*/
+.input-search-form{
+    @apply bg-white w-full pl-4 py-3 text-zinc-600 rounded-lg border border-purple-400;
+    padding-right: 2.5rem;
 }
