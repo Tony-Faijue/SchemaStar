@@ -7,10 +7,11 @@ import { LoggerService } from '../../../../services/logger-service';
 import { SchemaUiStateService } from '../../../../services/schema-ui-state-service';
 import { SchemaQuickToolbar } from "../schema-quick-toolbar/schema-quick-toolbar";
 import { SchemaToolbar } from "../schema-toolbar/schema-toolbar";
+import { NodePalette } from "../node-palette/node-palette";
 
 @Component({
   selector: 'app-schema',
-  imports: [FFlowModule, SchemaQuickToolbar, SchemaToolbar],
+  imports: [FFlowModule, SchemaQuickToolbar, SchemaToolbar, NodePalette],
   templateUrl: './schema.html',
   styleUrl: './schema.css',
   host: {
