@@ -5,10 +5,10 @@
     @for (item of this.schemaUiStateService.viewMenuItems; track item.label) {
       <button class="group" (click)="item.action(this.container)">
         <p class="flex justify-between items-center gap-8">
-          <span class="text-medium-purple group-hover:text-light-medium-purple">{{
+          <span class="text-sm text-medium-purple group-hover:text-light-medium-purple">{{
             item.label
           }}</span>
-          <span class="text-medium-purple group-hover:text-light-medium-purple">{{
+          <span class="text-sm text-medium-purple group-hover:text-light-medium-purple">{{
             item.shortcut
           }}</span>
         </p>
