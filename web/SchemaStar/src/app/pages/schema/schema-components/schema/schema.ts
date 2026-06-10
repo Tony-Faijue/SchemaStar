@@ -1,7 +1,8 @@
 import { Component, ElementRef, inject, signal, ViewChild } from '@angular/core';
-import {FCanvasComponent, FCreateConnectionEvent, FFlowModule, FZoomDirective} from '@foblex/flow';
+import {FCanvasComponent, FCreateConnectionEvent, FCreateNodeEvent, FFlowModule, FZoomDirective} from '@foblex/flow';
 import { FlowStateService } from '../../../../services/flow-state-service';
 import { EdgeRequest, EdgeType } from '../../../../services/schema/edge-service';
+import { NodeRequest, NodeState } from '../../../../services/schema/node-service';
 import { MapDataService } from '../../../../services/map-data-service';
 import { LoggerService } from '../../../../services/logger-service';
 import { SchemaUiStateService } from '../../../../services/schema-ui-state-service';
@@ -109,6 +110,21 @@ export class Schema {
     };
     //Call handlesCreateConnection with default values
     this.flowStateService.handlesCreateConnection(event, defaultRequest as EdgeRequest);
+  }
+
+  /**
+   * Function to handle passing Node Request data to handleNodeCreation method in flowstate service
+   * @param event 
+   * @param node 
+   */
+  public onCreateNode(event: FCreateNodeEvent){
+    const defaultRequest: Partial<NodeRequest> = {
+      width: 200,
+      height: 152,
+      state: NodeState.Unlocked,
+    }
+    //Call handlesNodeCreation with default values
+    this.flowStateService.handlesNodeCreation(event, defaultRequest as NodeRequest);
   }
 
   /**

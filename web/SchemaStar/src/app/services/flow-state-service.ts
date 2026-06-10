@@ -1,6 +1,6 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { MapDataService } from './map-data-service';
-import { FCreateConnectionEvent, FMoveNodesEvent, FSelectionChangeEvent } from '@foblex/flow';
+import { FCreateConnectionEvent, FCreateNodeEvent, FMoveNodesEvent, FSelectionChangeEvent } from '@foblex/flow';
 import { NodeRequest, NodeResponse, NodeService, UpdateNode } from './schema/node-service';
 import { EdgeRequest, EdgeResponse, EdgeService, UpdateEdge } from './schema/edge-service';
 import { LoggerService } from './logger-service';
@@ -140,16 +140,21 @@ export class FlowStateService {
    /**
     * Creates a new Node
     */
-   handlesNodeCreation(nodeRequest: NodeRequest){
+   handlesNodeCreation(event: FCreateNodeEvent, nodeRequest: NodeRequest){
       const time = Date.now();
       const tempId = `temp-node-${time}`;
 
       const currenSchemaId = this.mapData.selectedSchemaId();
       if (!currenSchemaId) return;
 
+      const count = this.mapData.nodes().length + 1 //default name with node count
+
       //placeholder node for UI
       const placeholderNode: NodeResponse = {
         ...nodeRequest,
+        nodeName:'Node: ' + count,
+        positionX: event.externalItemRect.x,
+        positionY: event.externalItemRect.y,
         publicId: tempId,
         createdAt: new Date().toISOString(),
         nodeWebId: currenSchemaId
@@ -157,6 +162,10 @@ export class FlowStateService {
 
       const request: NodeRequest = {
         ...nodeRequest,
+        // Use the positions from the event and default name for the new node
+        nodeName: placeholderNode.nodeName,
+        positionX: placeholderNode.positionX,
+        positionY: placeholderNode.positionY,
         nodewebId: currenSchemaId
       }
 
