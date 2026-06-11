@@ -1,0 +1,9 @@
+.f-node.f-selected{
+    outline: 2px solid #431DB6;
+    box-shadow: 0px 0px 4px 4px rgba(70, 6, 91, 0.8);
+}
+
+.f-selection-area{
+    background-color: rgba(211, 44, 253, 0.132);
+    border: 1px dashed #9E87E1;
+}

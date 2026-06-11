@@ -1,5 +1,5 @@
 import { Component, ElementRef, inject, signal, ViewChild } from '@angular/core';
-import {FCanvasComponent, FCreateConnectionEvent, FCreateNodeEvent, FFlowModule, FZoomDirective} from '@foblex/flow';
+import {FCanvasComponent, FCreateConnectionEvent, FCreateNodeEvent, FFlowComponent, FFlowModule, FZoomDirective} from '@foblex/flow';
 import { FlowStateService } from '../../../../services/flow-state-service';
 import { EdgeRequest, EdgeType } from '../../../../services/schema/edge-service';
 import { NodeRequest, NodeState } from '../../../../services/schema/node-service';
@@ -18,6 +18,9 @@ import { NodePalette } from "../node-palette/node-palette";
   host: {
     //-----------------Global Shortcuts/Hot-Keys for Schema Component-----------
 
+    // Edit Shortcuts
+    '(document:keydown.control.a)': 'onSelectAll($event)',
+    '(document:keydown.control.d)': 'onDeselectAll($event)',
     //Zoom and View Shortcuts
     '(document:keydown.control.=)': 'onZoomIn($event)',
     '(document:keydown.control.-)': 'onZoomOut($event)',
@@ -42,12 +45,44 @@ export class Schema {
   @ViewChild('flowContainer', {static: true})
   protected flowContainer!: ElementRef<HTMLElement>;
 
+  /**
+   * FFlow Component reference to interact directly with the flow root container and its methods
+   */
+  @ViewChild(FFlowComponent, {static: false})
+  protected flowComponent!: FFlowComponent;
+
+  // Main Services used in the schema component
   public flowStateService = inject(FlowStateService);
   public schemaUiStateService = inject(SchemaUiStateService);
   private mapDataService = inject(MapDataService);
   private loggerService = inject(LoggerService);
 
   //----------------------------------------------HotKeys/Shortcuts---------------------------------------------------------
+  
+  //--- Edit Shortcuts---
+
+  /**
+   * Calls the selectAll() function from FFlowComponent to select all nodes and edges on the canvas
+   * @param event 
+   */
+  public onSelectAll(event: Event){
+    (event as KeyboardEvent).preventDefault();
+    if((event as KeyboardEvent).repeat) return;
+    this.flowComponent.selectAll();
+  }
+
+  /**
+   * Calls the clearSelection() function from FFlowComponent to deselect all nodes and edges on the canvas
+   * @param event 
+   * @returns 
+   */
+  public onDeselectAll(event: Event){
+    (event as KeyboardEvent).preventDefault();
+    if((event as KeyboardEvent).repeat) return;
+    this.flowComponent.clearSelection();
+  }
+
+  //--- View and Zoom Shortcuts---
 
   /**
    * Calls the zoomIn() function from SchemaUiStateService
