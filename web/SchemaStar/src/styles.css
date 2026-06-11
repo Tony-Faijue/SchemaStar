@@ -54,3 +54,13 @@
     @apply bg-white w-full pl-4 py-3 text-zinc-600 rounded-lg border border-purple-400;
     padding-right: 2.5rem;
 }
+
+/*-----------------Schema Flow Styles-----------------*/
+
+f-flow .f-connection.f-selected .f-connection-path {
+  stroke: #8f0cb4 !important;      
+  stroke-width: 4px !important;
+}
+f-flow .f-connection.f-selected {
+  filter: drop-shadow(0px 0px 4px rgba(226, 14, 249, 0.462)) !important;
+}

@@ -3,7 +3,7 @@
 <div #flowContainer class="w-full h-screen border-2 border-slate-700 bg-purple-100 p-2 relative">
   <app-schema-quick-toolbar [container]="flowContainer"></app-schema-quick-toolbar>
   <app-node-palette></app-node-palette>
-  <!-- Example Use of Foblex Flow -->
+  <!-- Flow Root Container -->
   <f-flow
     fDraggable
     class="h-full w-full relative"
@@ -12,6 +12,8 @@
     (fSelectionChange)="flowStateService.handleSelectionChange($event)"
     (fCreateNode)="onCreateNode($event)"
   >
+    <!-- Allows Box Selection Area  -->
+    <f-selection-area></f-selection-area>
     <!-- Background -->
     <f-background>
       <f-rect-pattern></f-rect-pattern>
