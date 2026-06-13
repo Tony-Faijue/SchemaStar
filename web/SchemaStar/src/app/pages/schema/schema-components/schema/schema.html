@@ -32,43 +32,39 @@
       @for (node of flowStateService.flowNodes(); track node.id) {
         <div
           fNode
-          fDragHandle
           [fNodeId]="node.id"
           [fNodePosition]="node.position"
           class="relative bg-white border-2 border-zinc-900 p-4 rounded shadow-lg cursor-move group/node"
         >
-          <!-- Node Name -->
-          <div class="font-bold border-b mb-2">{{ node.data.nodeName }}</div>
+          <!-- Drag Handle Area/Space -->
+          <div
+            fDragHandle
+            class="w-full h-full p-4 flex items-center justify-center cursor-move text-center"
+          >
+            <!-- Node Name -->
+            <div class="font-bold border-b mb-2">{{ node.data.nodeName }}</div>
 
-          <!-- Node Assets -->
-          <div class="text-sm space-y-1">
-            @for (asset of node.data.NodeAssets; track asset.publicId) {
-              <div class="text-blue-600">
-                {{ asset.nodeAssetName }}
-              </div>
-            }
+            <!-- Node Assets -->
+            <div class="text-sm space-y-1">
+              @for (asset of node.data.NodeAssets; track asset.publicId) {
+                <div class="text-blue-600">
+                  {{ asset.nodeAssetName }}
+                </div>
+              }
+            </div>
           </div>
+
           <!-- Connectors (I/O)-->
           <div
             fNodeInput
             [fInputId]="node.id"
-            fInputConnectableSide="left"
-            class="no-drag absolute left-0 top-0 bottom-0 w-4 h-full flex items-center justify-start z-50 cursor-crosshair"
-          >
-            <div
-              class="w-3 h-3 bg-zinc-800 rounded-full -translate-x-1/2 opacity-0 group-hover/node:opacity-100 transition-opacity duration-150"
-            ></div>
-          </div>
-          <div
+            fInputConnectableSide="auto"
             fNodeOutput
             [fOutputId]="node.id"
-            fOutputConnectableSide="right"
-            class="no-drag absolute right-0 top-0 bottom-0 w-4 h-full flex items-center justify-end z-50 cursor-crosshair"
-          >
-            <div
-              class="w-3 h-3 bg-zinc-800 rounded-full translate-x-1/2 opacity-0 group-hover/node:opacity-100 transition-opacity duration-150"
-            ></div>
-          </div>
+            [fOutputMultiple]="true"
+            fOutputConnectableSide="auto"
+            class="clip-path no-drag absolute -inset-2 rounded-lg border-2 border-transparent group-hover/node:border-purple-400 group-hover/node:bg-purple-500/5 transition-all duration-150 z-50 cursor-crosshair"
+          ></div>
         </div>
       }
     </f-canvas>
