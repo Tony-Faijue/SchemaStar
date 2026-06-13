@@ -20,6 +20,8 @@
     </f-background>
 
     <f-canvas fZoom (fCanvasChange)="schemaUiStateService.onZoomChange($event)">
+      <!-- Allow Creation of Edges/Connections -->
+      <f-connection-for-create fBehavior="floating" fType="straight"></f-connection-for-create>
       <!-- Edges/Connections -->
       @for (edge of flowStateService.flowEdges(); track edge.id) {
         <f-connection [fConnectionId]="edge.id" [fOutputId]="edge.source" [fInputId]="edge.target">
@@ -33,7 +35,7 @@
           fDragHandle
           [fNodeId]="node.id"
           [fNodePosition]="node.position"
-          class="relative bg-white border-2 border-zinc-900 p-4 rounded shadow-lg cursor-move"
+          class="relative bg-white border-2 border-zinc-900 p-4 rounded shadow-lg cursor-move group/node"
         >
           <!-- Node Name -->
           <div class="font-bold border-b mb-2">{{ node.data.nodeName }}</div>
@@ -51,14 +53,22 @@
             fNodeInput
             [fInputId]="node.id"
             fInputConnectableSide="left"
-            class="absolute -left-2 top-1/2 w-4 h-4 bg-zinc-800 rounded-full"
-          ></div>
+            class="no-drag absolute left-0 top-0 bottom-0 w-4 h-full flex items-center justify-start z-50 cursor-crosshair"
+          >
+            <div
+              class="w-3 h-3 bg-zinc-800 rounded-full -translate-x-1/2 opacity-0 group-hover/node:opacity-100 transition-opacity duration-150"
+            ></div>
+          </div>
           <div
             fNodeOutput
             [fOutputId]="node.id"
             fOutputConnectableSide="right"
-            class="absolute -right-2 top-1/2 w-4 h-4 bg-zinc-800 rounded-full"
-          ></div>
+            class="no-drag absolute right-0 top-0 bottom-0 w-4 h-full flex items-center justify-end z-50 cursor-crosshair"
+          >
+            <div
+              class="w-3 h-3 bg-zinc-800 rounded-full translate-x-1/2 opacity-0 group-hover/node:opacity-100 transition-opacity duration-150"
+            ></div>
+          </div>
         </div>
       }
     </f-canvas>

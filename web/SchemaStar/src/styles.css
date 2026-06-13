@@ -64,3 +64,12 @@ f-flow .f-connection.f-selected .f-connection-path {
 f-flow .f-connection.f-selected {
   filter: drop-shadow(0px 0px 4px rgba(226, 14, 249, 0.462)) !important;
 }
+.f-connection-drag-line path {
+    stroke: #9333ea;
+    stroke-width: 2px;
+    stroke-dasharray: 5, 5;
+}
+/*-----------------Drag Handle Styles-----------------*/
+.f-drag-handle .no-drag {
+  cursor: crosshair;
+}
