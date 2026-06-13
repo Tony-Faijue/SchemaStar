@@ -7,3 +7,21 @@
     background-color: rgba(211, 44, 253, 0.132);
     border: 1px dashed #9E87E1;
 }
+/**The polygon clip-path cuts an absolute hollow window out of the center of the div
+Clicks in the middle pass straight through to Layer 1 (fDragHandle).
+Clicks within 8px of the outer border are captured for drawing connections.
+**/
+.clip-path{
+    clip-path: polygon(
+        0% 0%,
+        100% 0%,
+        100% 100%,
+        0% 100%,
+        0% 0%,
+        8px 8px,
+        8px calc(100% - 8px),
+        calc(100% - 8px) calc(100% - 8px),
+        calc(100% - 8px) 8px,
+        8px 8px
+    );
+}
