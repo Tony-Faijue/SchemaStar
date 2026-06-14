@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using SchemaStar.Models;
 using SchemaStar.Services;
+using Serilog;
 using System.Data.Common;
 using Testcontainers.MySql;
 
@@ -90,6 +91,8 @@ namespace SchemaStar.IntegrationTests.Factory
         protected override IHost CreateHost(IHostBuilder builder)
         {
             //create the application based on the configurartion of ConfigureWebHost method
+            Log.CloseAndFlush(); //close the bootstrap logger to prevent conflicts with the application logger
+            Log.Logger = Serilog.Core.Logger.None; //set the logger to None to prevent logging during host creation, which can cause issues with Serilog configuration in tests
             var host = base.CreateHost(builder);
             return host;
         } 

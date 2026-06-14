@@ -6,8 +6,9 @@ namespace SchemaStar.Services
     {
         public static void AddLoggingConfiguration(this WebApplicationBuilder builder) 
         {
-            builder.Services.AddSerilog((services, lc) => lc
-                .ReadFrom.Configuration(builder.Configuration)
+            // Use the UseSerilog extension method to configure Serilog as the logging provider for the application
+            builder.Host.UseSerilog((context, services, lc) => lc
+                .ReadFrom.Configuration(context.Configuration)
                 .ReadFrom.Services(services)
             );
         }
