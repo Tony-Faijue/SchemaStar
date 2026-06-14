@@ -10,7 +10,7 @@ using Serilog;
 //Bootstrap logger for logging initial project setup errors
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
-    .CreateBootstrapLogger();
+    .CreateLogger(); //Call the CreateLogger Function here to build the logger and assign it to the static Log class
 
 try
 {
@@ -103,9 +103,10 @@ try
 
     app.Run();
 }
-catch (Exception ex)
+catch (Exception ex) when (ex is not HostAbortedException)
 {
     Log.Fatal(ex, "SchemaStar terminated unexpectedly");
+    throw;
 }
 finally 
 {
