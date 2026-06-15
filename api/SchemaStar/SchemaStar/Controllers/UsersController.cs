@@ -87,28 +87,19 @@ namespace SchemaStar.Controllers
         [HttpPatch("{publicId}")]
         public async Task<ActionResult<UserResponseDTO>> UpdateUser(Guid publicId, UpdateUserRequestDTO request)
         {
-            //Verify the same user is updating themself
-            //Get the UID from the token claims
-            var tokenUid = User.FindFirstValue("uid");
-
-            //Compare uid token strings
-            if (tokenUid == null || !string.Equals(tokenUid, publicId.ToString(), StringComparison.OrdinalIgnoreCase)) 
-            {
-                throw new ForbiddenException("Users");
-            }
-
-            byte[] publicIdBytes = publicId.ToMySqlBinary();
-
+            var currentUserId = _userService.GetCurrentUserId();
+            if (currentUserId == null) throw new UnauthorizedException("User does not have permission to update this user");
+            
             var isChanged = request.Email != null || request.Username != null || request.PhoneNumber != null;
 
-            var user = await _userManager
-                .Users
-                .FirstOrDefaultAsync(u => u.PublicId == publicIdBytes);
+            var user = await _userManager.FindByIdAsync(currentUserId.ToString()!);
+            if (user == null) throw new NotFoundException("User does not exists");
 
-            if (user == null)
-            {
-                throw new NotFoundException("Users");
-            }
+            //Verify the user is updating themself
+
+            var userPublicId = user.PublicId.ToGuidFromMySqlBinary();
+            if (userPublicId != publicId) throw new ForbiddenException("User does not match updating User");
+            
 
             //Update fields
             if (request.Username != null)
@@ -167,26 +158,18 @@ namespace SchemaStar.Controllers
         [HttpDelete("{publicId}")]
         public async Task<IActionResult> DeleteUser(Guid publicId)
         {
-            //Check to make sure the user is deleting themself
-            //Get the UID from the token claims
-            var tokenUid = User.FindFirstValue("uid");
 
-            //Compare uid token strings
-            if (tokenUid == null || !string.Equals(tokenUid, publicId.ToString(), StringComparison.OrdinalIgnoreCase))
-            {
-                throw new ForbiddenException("Users");
-            }
+            var currentUserId = _userService.GetCurrentUserId();
+            if (currentUserId == null) throw new UnauthorizedException("User does not have permission to delete this user");
 
-            byte[] publicIdBytes = publicId.ToMySqlBinary();
 
-            var user = await _userManager
-                .Users
-                .FirstOrDefaultAsync(u => u.PublicId == publicIdBytes);
+            var user = await _userManager.FindByIdAsync(currentUserId.ToString()!);
+            if (user == null) throw new NotFoundException("User does not exists");
             
-            if (user == null)
-            {
-                throw new NotFoundException("Users");
-            }
+            //Verify the user is deleting themself
+
+            var userPublicId = user.PublicId.ToGuidFromMySqlBinary();
+            if (userPublicId != publicId) throw new ForbiddenException("User does not match deleting User");
 
             var result = await _userManager.DeleteAsync(user);
 
