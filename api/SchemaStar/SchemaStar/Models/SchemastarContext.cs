@@ -69,7 +69,7 @@ public partial class SchemastarContext : IdentityDbContext<User, IdentityRole<ul
 
             entity.HasOne(d => d.ToNode).WithMany(p => p.EdgeToNodes)
                 .HasForeignKey(d => d.ToNodeId)
-                .OnDelete(DeleteBehavior.NoAction)
+                .OnDelete(DeleteBehavior.Cascade) //Delete edge when node is deleted
                 .HasConstraintName("edge_ibfk_2");
         });
 
