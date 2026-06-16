@@ -21,6 +21,7 @@ import { NodePalette } from "../node-palette/node-palette";
     // Edit Shortcuts
     '(document:keydown.control.a)': 'onSelectAll($event)',
     '(document:keydown.control.d)': 'onDeselectAll($event)',
+    '(document:keydown.delete)': 'onDelete($event)',
     //Zoom and View Shortcuts
     '(document:keydown.control.=)': 'onZoomIn($event)',
     '(document:keydown.control.-)': 'onZoomOut($event)',
@@ -80,6 +81,16 @@ export class Schema {
     (event as KeyboardEvent).preventDefault();
     if((event as KeyboardEvent).repeat) return;
     this.schemaUiStateService.deselectAll();
+  }
+
+  /**
+   * Calls the handlesBulkDeletion() function from FlowStateService
+   * @param event 
+   */
+  public onDelete(event: Event){
+    (event as KeyboardEvent).preventDefault();
+    if((event as KeyboardEvent).repeat) return;
+    this.flowStateService.handlesBulkDeletion();
   }
 
   //--- View and Zoom Shortcuts---

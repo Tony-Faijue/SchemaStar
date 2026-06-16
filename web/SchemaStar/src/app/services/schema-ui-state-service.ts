@@ -1,6 +1,7 @@
 import { computed, inject, Injectable, signal, ViewChild } from '@angular/core';
 import { FCanvasChangeEvent, FCanvasComponent, FFlowComponent, FZoomDirective } from '@foblex/flow';
 import { LoggerService } from './logger-service';
+import { FlowStateService } from './flow-state-service';
 
 /**
  * Menu Item Structure for Schema Toolbar
@@ -17,6 +18,7 @@ export interface MenuItem {
 export class SchemaUiStateService {
   
   private loggerService = inject(LoggerService);
+  private flowStateService = inject(FlowStateService);
 
   //--------------Edit Items---------------------
   public editMenuItems: MenuItem[] = [
@@ -29,6 +31,11 @@ export class SchemaUiStateService {
       label:'Deselect All',
       shortcut: 'Ctrl+D',
       action: () => this.deselectAll()
+    }, 
+    {
+      label:'Delete',
+      shortcut: 'Delete',
+      action: () => this.deleteSelected()
     }
 
   ];
@@ -120,7 +127,7 @@ export class SchemaUiStateService {
 
   /**
    * Set the flow component to reference the given FFlowComponent
-   * @param flow 
+   * @param flowComponent
    */
   public setFlowComponent(flowComponent: FFlowComponent){
     this.flowComponent = flowComponent;
@@ -143,6 +150,15 @@ export class SchemaUiStateService {
   public deselectAll(){
     if(this.flowComponent){
       this.flowComponent.clearSelection();
+    }
+  }
+
+  /**
+   * Deletes the selected items (nodes and edges) in the flow component
+   */
+  public deleteSelected(){
+    if(this.flowComponent){
+      this.flowStateService.handlesBulkDeletion();
     }
   }
 
