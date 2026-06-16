@@ -1,10 +1,11 @@
 import { Component, inject, Input } from '@angular/core';
 import { SchemaUiStateService } from '../../../../services/schema-ui-state-service';
 import { ViewMenu } from "./toolbar-dropdown/view-menu/view-menu";
+import { EditMenu } from './toolbar-dropdown/edit-menu/edit-menu';
 
 @Component({
   selector: 'app-schema-toolbar',
-  imports: [ViewMenu],
+  imports: [ViewMenu, EditMenu],
   templateUrl: './schema-toolbar.html',
   styleUrl: './schema-toolbar.css',
 })

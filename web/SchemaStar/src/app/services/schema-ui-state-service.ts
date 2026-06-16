@@ -1,5 +1,5 @@
-import { computed, inject, Injectable, signal } from '@angular/core';
-import { FCanvasChangeEvent, FCanvasComponent, FZoomDirective } from '@foblex/flow';
+import { computed, inject, Injectable, signal, ViewChild } from '@angular/core';
+import { FCanvasChangeEvent, FCanvasComponent, FFlowComponent, FZoomDirective } from '@foblex/flow';
 import { LoggerService } from './logger-service';
 
 /**
@@ -17,6 +17,21 @@ export interface MenuItem {
 export class SchemaUiStateService {
   
   private loggerService = inject(LoggerService);
+
+  //--------------Edit Items---------------------
+  public editMenuItems: MenuItem[] = [
+    {
+      label:'Select All',
+      shortcut: 'Ctrl+A',
+      action: () => this.selectAll()
+    },
+    {
+      label:'Deselect All',
+      shortcut: 'Ctrl+D',
+      action: () => this.deselectAll()
+    }
+
+  ];
 
   //--------------Menu Items---------------------
 
@@ -53,6 +68,11 @@ export class SchemaUiStateService {
    * FCanvas reference for the schema component
    */
   private fCanvas?: FCanvasComponent;
+
+  /**
+   * FFlow Component reference to interact directly with the flow root container and its methods
+   */
+  private flowComponent?: FFlowComponent;
 
   /**
    * Fzoom directive to interact directly with the zoom functionality
@@ -96,6 +116,34 @@ export class SchemaUiStateService {
     this.fCanvas = canvas;
     this.fZoom = zoom;
     this.zoomLevel.set(this.fCanvas.getScale());
+  }
+
+  /**
+   * Set the flow component to reference the given FFlowComponent
+   * @param flow 
+   */
+  public setFlowComponent(flowComponent: FFlowComponent){
+    this.flowComponent = flowComponent;
+  }
+
+  //--------------Edit Functions---------------
+  
+/**
+ * Selects all items (nodes and edges) in the flow component
+ */
+  public selectAll(){
+    if(this.flowComponent){
+      this.flowComponent.selectAll();
+    }
+  }
+  
+  /**
+   * Deselects all items (nodes and edges) in the flow component
+   */
+  public deselectAll(){
+    if(this.flowComponent){
+      this.flowComponent.clearSelection();
+    }
   }
 
   //--------------Zoom and View Functions---------------

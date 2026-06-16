@@ -1,0 +1,18 @@
+<div
+  class="absolute z-50 top-20 left-36 w-max bg-gray-100 shadow-md shadow-purple-400 border-2 border-slate-900 rounded-lg"
+>
+  <div class="flex flex-col gap-2 pl-4 pr-2">
+    @for (item of this.schemaUiStateService.editMenuItems; track item.label) {
+      <button class="group" (click)="item.action()">
+        <p class="flex justify-between items-center gap-8">
+          <span class="text-sm text-medium-purple group-hover:text-light-medium-purple">{{
+            item.label
+          }}</span>
+          <span class="text-sm text-medium-purple group-hover:text-light-medium-purple">{{
+            item.shortcut
+          }}</span>
+        </p>
+      </button>
+    }
+  </div>
+</div>
