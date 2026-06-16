@@ -48,7 +48,7 @@ export class Schema {
   /**
    * FFlow Component reference to interact directly with the flow root container and its methods
    */
-  @ViewChild(FFlowComponent, {static: false})
+  @ViewChild(FFlowComponent, {static: true})
   protected flowComponent!: FFlowComponent;
 
   // Main Services used in the schema component
@@ -62,24 +62,24 @@ export class Schema {
   //--- Edit Shortcuts---
 
   /**
-   * Calls the selectAll() function from FFlowComponent to select all nodes and edges on the canvas
+   * Calls the selectAll() function from SchemaUiStateService
    * @param event 
    */
   public onSelectAll(event: Event){
     (event as KeyboardEvent).preventDefault();
     if((event as KeyboardEvent).repeat) return;
-    this.flowComponent.selectAll();
+    this.schemaUiStateService.selectAll();
   }
 
   /**
-   * Calls the clearSelection() function from FFlowComponent to deselect all nodes and edges on the canvas
+   * Calls the deselectAll() function from SchemaUiStateService
    * @param event 
    * @returns 
    */
   public onDeselectAll(event: Event){
     (event as KeyboardEvent).preventDefault();
     if((event as KeyboardEvent).repeat) return;
-    this.flowComponent.clearSelection();
+    this.schemaUiStateService.deselectAll();
   }
 
   //--- View and Zoom Shortcuts---
@@ -169,5 +169,7 @@ export class Schema {
     this.mapDataService.loadUserWorkspace();
     //Register the fcanvas and fzoom with schemauistate service
     this.schemaUiStateService.setCanvas(this.fCanvas, this.fZoom);
+    //Register the flow component with schemauistate service
+    this.schemaUiStateService.setFlowComponent(this.flowComponent);
   }
 }

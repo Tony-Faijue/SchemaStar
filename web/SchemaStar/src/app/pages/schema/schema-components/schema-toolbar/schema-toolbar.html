@@ -50,6 +50,10 @@
   </div>
 
   <!-- DropDown Menus -->
+  @if (schemaUiStateService.activeMenuSchemaToolBar() == 'edit') {
+    <!-- Edit Menu Component -->
+    <app-edit-menu></app-edit-menu>
+  }
   @if (schemaUiStateService.activeMenuSchemaToolBar() == 'view') {
     <!-- View Menu Component -->
     <app-view-menu [container]="container" (mouseleave)="clearActiveMenu()"></app-view-menu>
