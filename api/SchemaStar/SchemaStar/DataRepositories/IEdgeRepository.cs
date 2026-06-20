@@ -10,5 +10,6 @@ namespace SchemaStar.DataRepositories
         void Delete(Edge edge);
         Task<int> DeleteEdgesBulkAsync(IEnumerable<byte[]> publicIds, byte[] nodewebPublicId, ulong userId);
         Task SaveChangesAsync();
+        Task<bool> IsEdgeExistsAsync(ulong fromNodeId, ulong toNodeId, ulong userId);
     }
 }
