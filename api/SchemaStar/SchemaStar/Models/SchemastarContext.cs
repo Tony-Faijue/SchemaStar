@@ -35,7 +35,8 @@ public partial class SchemastarContext : IdentityDbContext<User, IdentityRole<ul
 
             entity.ToTable("edge");
 
-            entity.HasIndex(e => e.FromNodeId, "from_node_id");
+            //Composite Index: Handles (FromNodeId + ToNodeID) and (FromNodeId) queries, for efficient retrieval lookups
+            entity.HasIndex(e => new { e.FromNodeId, e.ToNodeId }, "ix_edge_from_to");
 
             entity.HasIndex(e => e.PublicId, "public_id").IsUnique();
 
