@@ -126,6 +126,14 @@ namespace SchemaStar.Controllers
                 throw new ValidationException("An edge cannot connect a node to itself.");
             }
 
+            //Check if the edge already exists between the two nodes in the same nodeweb
+            var exisitngEdge = await _repository.IsEdgeExistsAsync(edge.FromNodeId, edge.ToNodeId, (ulong)userId);
+            if (exisitngEdge) 
+            {
+                _logger.LogWarning("Exisiting edge between these two nodes: {FromNodeId}, {ToNodeId} for user: {UserId}", request.FromNodeId, request.ToNodeId, userId);
+                throw new ConflictException("An edge already exist between these nodes");
+            }
+
             await _repository.SaveChangesAsync();
 
             return NoContent();
@@ -162,12 +170,21 @@ namespace SchemaStar.Controllers
                 throw new NotFoundException("FromNode does not exists for the Edge");
             }
 
-            //Validate the ToNode and get tomnode internal id and assign it for the edge
+            //Validate the ToNode and get tonode internal id and assign it for the edge
             var toNodeId = await _nodeRepository.GetInternalIdByPublicIdAsync(request.ToNodeId.ToMySqlBinary(), (ulong)userId);
             if (toNodeId == null)
             {
                 _logger.LogWarning("ToNode {PublicId} not found for User {UserId}", request.ToNodeId, userId);
                 throw new NotFoundException("ToNode does not exists for the Edge");
+            }
+
+            // Check if the edge already exists between the two nodes in the same nodeweb
+            var exisitngEdge = await _repository.IsEdgeExistsAsync((ulong)fromNodeId, (ulong)toNodeId, (ulong)userId);
+
+            if (exisitngEdge) 
+            {
+                _logger.LogWarning("Exisiting edge between these two nodes: {FromNodeId}, {ToNodeId} for user: {UserId}", request.FromNodeId, request.ToNodeId, userId);
+                throw new ConflictException("An edge already exist between these nodes");
             }
 
             //Create the new Edge

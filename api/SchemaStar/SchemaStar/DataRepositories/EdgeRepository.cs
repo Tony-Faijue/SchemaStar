@@ -63,6 +63,23 @@ namespace SchemaStar.DataRepositories
                 .Where(e => idsToRemove.Contains(e.Id)) //SQl can map the list of numbers
                 .ExecuteDeleteAsync(); //Bulk SQL Delete
         }
+        /// <summary>
+        /// Checks if an edge already exists between the fromNodeId and toNodeId for the user. (Prevents duplicate edges)
+        /// </summary>
+        /// <param name="fromNodeId"></param>
+        /// <param name="toNodeId"></param>
+        /// <param name="userId"></param>
+        /// <returns>return true if an edge with the fromnode and tonode already exists, false otherwise</returns>
+        public async Task<bool> IsEdgeExistsAsync(ulong fromNodeId, ulong toNodeId, ulong userId) 
+        { 
+            return await _context.Edges
+                .AnyAsync(e => e.Nodeweb.UserId == userId &&
+                    ((e.FromNodeId == fromNodeId
+                    && e.ToNodeId == toNodeId) ||
+                    (e.FromNodeId == toNodeId && e.ToNodeId == fromNodeId))
+                );
+        }
+
         public void Add(Edge edge) => _context.Edges.Add(edge);
         public void Delete(Edge edge) => _context.Edges.Remove(edge);
         public Task SaveChangesAsync() => _context.SaveChangesAsync();

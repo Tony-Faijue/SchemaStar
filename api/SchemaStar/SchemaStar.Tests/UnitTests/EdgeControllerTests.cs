@@ -325,6 +325,48 @@ namespace SchemaStar.Tests.UnitTests
         }
 
         [Fact]
+        public async Task UpdateEdge_WhenEdgeAlreadyExists_ThrowsConflictException() 
+        {
+            var userId = 1UL;
+            var publicId = Guid.NewGuid();
+
+            var fromNodeUL = 1UL;
+            var toNodeUL = 2UL;
+
+            var fromNode = new Node { PublicId = Guid.NewGuid().ToMySqlBinary() };
+            var toNode = new Node { PublicId = Guid.NewGuid().ToMySqlBinary() };
+
+            var fromNodeId = Guid.NewGuid();
+            var toNodeId = Guid.NewGuid();
+
+            var existingEdge = new Edge
+            {
+                PublicId = publicId.ToMySqlBinary(),
+                FromNode = fromNode,
+                ToNode = toNode,
+                EdgeType = Models.Enums.EdgeType.Directed
+            };
+            var request = new EdgeUpdateRequestDTO
+            {
+                EdgeType = Models.Enums.EdgeType.Undirected,
+                FromNodeId = fromNodeId,
+                ToNodeId = toNodeId,
+            };
+            //Mock services
+            _mockUserService.Setup(s => s.GetCurrentUserId()).Returns(userId);
+
+            _mockRepository.Setup(r => r.GetEdgeByPublicIdAsync(It.IsAny<byte[]>(), userId)).ReturnsAsync(existingEdge);
+
+            _mockNodeRepository.Setup(n => n.GetInternalIdByPublicIdAsync(fromNodeId.ToMySqlBinary(), userId)).ReturnsAsync(fromNodeUL);
+
+            _mockNodeRepository.Setup(n => n.GetInternalIdByPublicIdAsync(toNodeId.ToMySqlBinary(), userId)).ReturnsAsync(toNodeUL);
+
+            _mockRepository.Setup(r => r.IsEdgeExistsAsync(fromNodeUL, toNodeUL, userId)).ReturnsAsync(true);
+
+            await Assert.ThrowsAsync<ConflictException>(() => _controller.UpdateEdge(publicId, request));
+        }
+
+        [Fact]
         public async Task UpdateEdge_WhenEdgeUpdateSucceds_ReturnsNoContent()
         {
             //Arrange
@@ -363,6 +405,8 @@ namespace SchemaStar.Tests.UnitTests
             _mockNodeRepository.Setup(n => n.GetInternalIdByPublicIdAsync(fromNodeId.ToMySqlBinary(), userId)).ReturnsAsync(fromNodeUL);
 
             _mockNodeRepository.Setup(n => n.GetInternalIdByPublicIdAsync(toNodeId.ToMySqlBinary(), userId)).ReturnsAsync(toNodeUL);
+
+            _mockRepository.Setup(r => r.IsEdgeExistsAsync(fromNodeUL, toNodeUL, userId)).ReturnsAsync(false);
 
             //Act and assert
             var result = await _controller.UpdateEdge(publicId, request);
@@ -484,6 +528,53 @@ namespace SchemaStar.Tests.UnitTests
             await Assert.ThrowsAsync<NotFoundException>(() => _controller.PostEdge(request));
         }
 
+        [Fact]
+        public async Task PostEdge_WhenEdgeAlreadyExists_ThrowsConflictException() 
+        {
+            //Arrange
+            var userId = 1UL;
+            var publicId = Guid.NewGuid();
+
+            var nodewebPublicId = Guid.NewGuid();
+            var nodewebId = 5UL;
+
+            var nodeWeb = new Nodeweb { Id = nodewebId, PublicId = nodewebPublicId.ToMySqlBinary(), UserId = userId };
+
+            var fromNodeUL = 1UL;
+            var toNodeUL = 1UL;
+
+            var fromNode = new Node { PublicId = Guid.NewGuid().ToMySqlBinary() };
+            var toNode = new Node { PublicId = Guid.NewGuid().ToMySqlBinary() };
+
+            //Request node ids
+            var fromNodeId = Guid.NewGuid();
+            var toNodeId = Guid.NewGuid();
+
+            //Exisitng Edge
+            var exisitngEdge = new Edge { PublicId = Guid.NewGuid().ToMySqlBinary(), FromNodeId = fromNodeUL, ToNodeId = toNodeUL, NodeWebId = nodewebId };
+
+            var request = new EdgeRequestDTO
+            {
+                EdgeType = Models.Enums.EdgeType.Undirected,
+                FromNodeId = fromNodeId,
+                ToNodeId = toNodeId,
+                NodeWebId = nodewebPublicId
+            };
+
+            //Mock services
+            _mockUserService.Setup(s => s.GetCurrentUserId()).Returns(userId);
+
+            _mockNodewebRepository.Setup(r => r.GetInternalIdByPublicIdAsync(It.IsAny<byte[]>(), userId)).ReturnsAsync(nodewebId);
+
+            _mockNodeRepository.Setup(n => n.GetInternalIdByPublicIdAsync(fromNodeId.ToMySqlBinary(), userId)).ReturnsAsync(fromNodeUL);
+
+            _mockNodeRepository.Setup(n => n.GetInternalIdByPublicIdAsync(toNodeId.ToMySqlBinary(), userId)).ReturnsAsync(toNodeUL);
+
+            _mockRepository.Setup(r => r.IsEdgeExistsAsync(fromNodeUL, toNodeUL, userId)).ReturnsAsync(true);
+
+            await Assert.ThrowsAsync<ConflictException>(() => _controller.PostEdge(request));
+        }
+
 
         [Fact]
         public async Task PostEdge_WhenEdgeSucceeds_Returns201CreationActionResult()
@@ -514,11 +605,13 @@ namespace SchemaStar.Tests.UnitTests
             //Mock services
             _mockUserService.Setup(s => s.GetCurrentUserId()).Returns(userId);
 
-            _mockNodewebRepository.Setup(r => r.GetInternalIdByPublicIdAsync(It.IsAny<byte[]>(), userId)).ReturnsAsync(userId);
+            _mockNodewebRepository.Setup(r => r.GetInternalIdByPublicIdAsync(It.IsAny<byte[]>(), userId)).ReturnsAsync(nodewebId);
 
             _mockNodeRepository.Setup(n => n.GetInternalIdByPublicIdAsync(fromNodeId.ToMySqlBinary(), userId)).ReturnsAsync(fromNodeUL);
 
             _mockNodeRepository.Setup(n => n.GetInternalIdByPublicIdAsync(toNodeId.ToMySqlBinary(), userId)).ReturnsAsync(toNodeUL);
+
+            _mockRepository.Setup(r => r.IsEdgeExistsAsync(fromNodeUL, toNodeUL, userId)).ReturnsAsync(false);
 
             //Act and assert
             var result = await _controller.PostEdge(request);
