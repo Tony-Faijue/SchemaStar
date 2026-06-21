@@ -35,8 +35,9 @@ public partial class SchemastarContext : IdentityDbContext<User, IdentityRole<ul
 
             entity.ToTable("edge");
 
-            //Composite Index: Handles (FromNodeId + ToNodeID) and (FromNodeId) queries, for efficient retrieval lookups
-            entity.HasIndex(e => new { e.FromNodeId, e.ToNodeId }, "ix_edge_from_to");
+            //Composite Index: handles soft delete lookups with isDeleted 
+            //Handles (FromNodeId + ToNodeID) and (FromNodeId) queries, for efficient retrieval lookups
+            entity.HasIndex(e => new {e.IsDeleted, e.FromNodeId, e.ToNodeId }, "ix_edge_lookup");
 
             entity.HasIndex(e => e.PublicId, "public_id").IsUnique();
 
@@ -72,6 +73,9 @@ public partial class SchemastarContext : IdentityDbContext<User, IdentityRole<ul
                 .HasForeignKey(d => d.ToNodeId)
                 .OnDelete(DeleteBehavior.Cascade) //Delete edge when node is deleted
                 .HasConstraintName("edge_ibfk_2");
+
+            //Named query filter
+            entity.HasQueryFilter("SoftDelete", e => !e.IsDeleted);
         });
 
         modelBuilder.Entity<Node>(entity =>
@@ -81,6 +85,9 @@ public partial class SchemastarContext : IdentityDbContext<User, IdentityRole<ul
             entity.ToTable("node");
 
             entity.HasIndex(e => e.NodeWebId, "node_web_id");
+
+            // Composite index to improve query performance
+            entity.HasIndex(e => new {e.IsDeleted, e.NodeWebId }, "ix_node_web_active");
 
             entity.HasIndex(e => e.PublicId, "public_id").IsUnique();
 
@@ -122,6 +129,9 @@ public partial class SchemastarContext : IdentityDbContext<User, IdentityRole<ul
             entity.HasOne(d => d.NodeWeb).WithMany(p => p.Nodes)
                 .HasForeignKey(d => d.NodeWebId)
                 .HasConstraintName("node_ibfk_3");
+
+            // Named query filter
+            entity.HasQueryFilter("SoftDelete", e => !e.IsDeleted);
         });
 
         modelBuilder.Entity<Nodeweb>(entity =>

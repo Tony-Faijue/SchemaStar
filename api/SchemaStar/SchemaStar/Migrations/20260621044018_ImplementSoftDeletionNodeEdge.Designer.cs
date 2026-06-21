@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SchemaStar.Models;
 
@@ -10,9 +11,11 @@ using SchemaStar.Models;
 namespace SchemaStar.Migrations
 {
     [DbContext(typeof(SchemastarContext))]
-    partial class SchemastarContextModelSnapshot : ModelSnapshot
+    [Migration("20260621044018_ImplementSoftDeletionNodeEdge")]
+    partial class ImplementSoftDeletionNodeEdge
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -192,6 +195,8 @@ namespace SchemaStar.Migrations
                     b.HasKey("Id")
                         .HasName("PRIMARY");
 
+                    b.HasIndex("FromNodeId");
+
                     b.HasIndex("NodeWebId");
 
                     b.HasIndex(new[] { "IsDeleted", "FromNodeId", "ToNodeId" }, "ix_edge_lookup");
@@ -284,7 +289,8 @@ namespace SchemaStar.Migrations
                     b.HasIndex(new[] { "NodeWebId" }, "node_web_id");
 
                     b.HasIndex(new[] { "PublicId" }, "public_id")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("public_id1");
 
                     b.ToTable("node", (string)null);
                 });
