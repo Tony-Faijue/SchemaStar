@@ -1,4 +1,5 @@
 ﻿using SchemaStar.Models.Enums;
+using SchemaStar.Models.SoftDeletion;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -7,7 +8,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace SchemaStar.Models;
 
 [Table("node")]
-public partial class Node
+public partial class Node : ISoftDeletable
 {
     [Key]
     [Column("id")]
@@ -51,6 +52,13 @@ public partial class Node
 
     [Column("updated_at")]
     public DateTime? UpdatedAt { get; set; }
+
+    [Required]
+    [Column("is_deleted")]
+    public bool IsDeleted { get; set; } = false;
+
+    [Column("deleted_at")]
+    public DateTime? DeletedAt { get; set; }
 
     [Required]
     [Column("node_web_id")]

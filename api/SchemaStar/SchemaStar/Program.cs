@@ -4,6 +4,7 @@ using SchemaStar.DataRepositories;
 using SchemaStar.ExceptionHandlers;
 using SchemaStar.JWT;
 using SchemaStar.Models;
+using SchemaStar.Models.SoftDeletion;
 using SchemaStar.Services;
 using Serilog;
 
@@ -34,6 +35,9 @@ try
 
     //-------------Added UserService-------------
     builder.Services.AddScoped<IUserService, UserService>();
+
+    //-------------Added SoftDeleteInterceptor-------------
+    builder.Services.AddSingleton<SoftDeleteInterceptor>();
 
     //-------------Added Data Repositories
     builder.Services.AddScoped<INodewebRepository, NodewebRepository>();
