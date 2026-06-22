@@ -138,7 +138,9 @@ namespace SchemaStar.DataRepositories
 
             return await _context.Nodes
                 .Where(n => idsToRemove.Contains(n.Id)) //SQl can map the list of numbers
-                .ExecuteDeleteAsync(); //Bulk SQL deletion
+                .ExecuteUpdateAsync(s => s    //Bulk Solft deletion; with updates
+                    .SetProperty(n => n.IsDeleted, true)
+                    .SetProperty(n => n.DeletedAt, DateTime.UtcNow)); 
         }
         public void Add(Node node) => _context.Nodes.Add(node);
         public void Delete(Node node) => _context.Nodes.Remove(node);

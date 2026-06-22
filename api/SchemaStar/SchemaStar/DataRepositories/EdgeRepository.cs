@@ -61,7 +61,9 @@ namespace SchemaStar.DataRepositories
 
             return await _context.Edges
                 .Where(e => idsToRemove.Contains(e.Id)) //SQl can map the list of numbers
-                .ExecuteDeleteAsync(); //Bulk SQL Delete
+                .ExecuteUpdateAsync(s => s    //Bulk Solft deletion; with updates
+                    .SetProperty(n => n.IsDeleted, true)
+                    .SetProperty(n => n.DeletedAt, DateTime.UtcNow));
         }
         /// <summary>
         /// Checks if an edge already exists between the fromNodeId and toNodeId for the user. (Prevents duplicate edges)
