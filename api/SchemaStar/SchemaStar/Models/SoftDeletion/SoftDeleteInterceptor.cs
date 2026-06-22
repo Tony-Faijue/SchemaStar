@@ -64,6 +64,24 @@ namespace SchemaStar.Models.SoftDeletion
                     edge.IsDeleted = true;
                     edge.DeletedAt = timeStamp;
                 }
+
+                //Query node assets that are not marked isDeleted = true 
+                var connectedAssets = context.Set<NodeAsset>()
+                    .Where(a => a.Node.Id == node.Id && !a.IsDeleted)
+                    .ToList();
+
+                //Modify the node assets by updates to soft deletion
+                foreach (var asset in connectedAssets)
+                {
+                    var assetEntry = context.Entry(asset);
+
+                    // Check if node asset is already deleted avoid updating it
+                    if (asset.IsDeleted) continue;
+
+                    assetEntry.State = EntityState.Modified;
+                    asset.IsDeleted = true;
+                    asset.DeletedAt = timeStamp;
+                }
             }
         }
     }
