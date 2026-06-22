@@ -35,7 +35,11 @@ namespace SchemaStar.Models.SoftDeletion
             return ValueTask.FromResult(result);
         }
 
-        //
+        /// <summary>
+        /// Soft Deletion which updates/modify the entities instead of hard deletion
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="parentEntity"></param>
         private static void CascadeSoftDelete(DbContext context, ISoftDeletable parentEntity) 
         {
             if (parentEntity is Node node) 
