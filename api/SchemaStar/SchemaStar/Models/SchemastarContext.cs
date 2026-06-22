@@ -231,6 +231,9 @@ public partial class SchemastarContext : IdentityDbContext<User, IdentityRole<ul
 
             entity.HasIndex(e => e.PublicId, "public_id").IsUnique();
 
+            // Composite index to improve query performance
+            entity.HasIndex(e => new { e.IsDeleted, e.NodeId }, "ix_node_active");
+
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.NodeId).HasColumnName("node_id");
 
@@ -276,6 +279,9 @@ public partial class SchemastarContext : IdentityDbContext<User, IdentityRole<ul
                 .HasForeignKey(d => d.NodeId)
                 .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("fk_node_assets_node");
+
+            // Named query filter
+            entity.HasQueryFilter("SoftDelete", e => !e.IsDeleted);
         });
 
         //----------Identity Tables------------

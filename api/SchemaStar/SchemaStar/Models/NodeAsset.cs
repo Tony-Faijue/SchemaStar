@@ -1,11 +1,12 @@
 ﻿using SchemaStar.Models.Enums;
+using SchemaStar.Models.SoftDeletion;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SchemaStar.Models
 {
     [Table("node_asset")]
-    public partial class NodeAsset
+    public partial class NodeAsset : ISoftDeletable
     {
         [Key]
         [Column("id")]
@@ -43,6 +44,13 @@ namespace SchemaStar.Models
         [Column("blob_path")]
         [StringLength(1024)]
         public string? BlobPath { get; set; } //the file path for the blob resource
+
+        [Required]
+        [Column("is_deleted")]
+        public bool IsDeleted { get; set; } = false;
+
+        [Column("deleted_at")]
+        public DateTime? DeletedAt { get; set; }
 
         [Required]
         [Column("node_id")]
