@@ -1,0 +1,55 @@
+name: schemastar
+services:
+  api:
+    container_name: schemastar-api
+    build:
+      context: ./api/SchemaStar
+      dockerfile: Dockerfile
+    networks:
+      - schemastar
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=mysql;Database=schemastardb;User=schemastar_user;Password=schemastaruserpassword
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: on-failure
+
+  mysql:
+    container_name: mysql
+    image: mysql:8.4
+    networks:
+      - schemastar
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpassword
+      - MYSQL_DATABASE=schemastardb
+      - MYSQL_USER=schemastar_user
+      - MYSQL_PASSWORD=schemastaruserpassword
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysqldata:/var/lib/mysql
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "localhost",
+          "-u",
+          "root",
+          "-prootpassword",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mysqldata:
+
+networks:
+  schemastar:
+    name: schemastar
