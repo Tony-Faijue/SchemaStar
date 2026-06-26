@@ -17,6 +17,19 @@ services:
         condition: service_healthy
     restart: on-failure
 
+  web:
+    container_name: schemastar-web
+    build:
+      context: ./web/SchemaStar
+      dockerfile: Dockerfile
+    networks:
+      - schemastar
+    ports:
+      - "8081:80"
+    depends_on:
+      - api
+    restart: on-failure
+
   mysql:
     container_name: mysql
     image: mysql:8.4

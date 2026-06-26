@@ -1,8 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { SecretData } from '../../../../environment';
+import { environment } from '../../../../environments/environment';
 import { Observable } from 'rxjs';
-
 
 /**
  * Edge Types
@@ -43,7 +42,7 @@ export interface UpdateEdge{
 export class EdgeService {
   
   private http = inject(HttpClient);
-  private readonly edgeUrl = `${SecretData.baseuUrl}/api/edges`;
+  private readonly edgeUrl = `${environment.apiUrl}/api/edges`;
 
   /**
    * 
@@ -60,7 +59,7 @@ export class EdgeService {
    * @returns the edge url with the nodeweb id for HTTP GET method
    */
   private getEdgesUrl (id: string): string{
-    return `${SecretData.baseuUrl}/api/nodewebs/${id}/edges`;
+    return `${environment.apiUrl}/api/nodewebs/${id}/edges`;
   }
 
   /**

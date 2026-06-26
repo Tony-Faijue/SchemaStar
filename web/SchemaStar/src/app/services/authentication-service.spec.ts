@@ -4,7 +4,7 @@ import { AuthenticationService, AuthResponse, LoginUser, RegisterUser, UserRespo
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 import { authInterceptor } from '../http-interceptors/auth-interceptor';
-import { SecretData } from '../../../environment';
+import { environment } from '../../../environments/environment'; 
 
 describe('AuthenticationService', () => {
   let service: AuthenticationService;
@@ -103,7 +103,7 @@ describe('AuthenticationService', () => {
     //Act
     service.loginUser(credentials).subscribe();
     //Intercept, expect POST request
-    const req = httpTestingController.expectOne(`${SecretData.baseuUrl}/api/users/token`);
+    const req = httpTestingController.expectOne(`${environment.apiUrl}/api/users/token`);
     expect(req.request.method).toBe('POST');
     req.flush(mockResponse);
     //Assert
@@ -126,7 +126,7 @@ describe('AuthenticationService', () => {
     //Act
     service.logoutUser().subscribe();
     //Intercept, expect POST request
-    const req = httpTestingController.expectOne(`${SecretData.baseuUrl}/api/users/logout`);
+    const req = httpTestingController.expectOne(`${environment.apiUrl}/api/users/logout`);
     expect(req.request.method).toBe('POST');
     req.flush({ message: 'Logged out successfully'});
     //Assert
@@ -157,7 +157,7 @@ describe('AuthenticationService', () => {
       response => actualResponse = response //get the UserResponse 
     );
     //Intercept, expect POST request
-    const req = httpTestingController.expectOne(`${SecretData.baseuUrl}/api/users`);
+    const req = httpTestingController.expectOne(`${environment.apiUrl}/api/users`);
     expect(req.request.method).toBe('POST');
     req.flush(mockResponse);
     //Assert
@@ -187,7 +187,7 @@ describe('AuthenticationService', () => {
       }
     });
     //Intercept
-    const req = httpTestingController.expectOne(`${SecretData.baseuUrl}/api/users`);
+    const req = httpTestingController.expectOne(`${environment.apiUrl}/api/users`);
     req.flush('At an error occured', {status: 400, statusText: 'Bad Request'});
     
     //Assert

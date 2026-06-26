@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { SecretData } from '../../../../environment';
+import { environment } from '../../../../environments/environment';
 import { Observable } from 'rxjs';
 import { NodeAssetResponse } from './node-asset-service';
 
@@ -70,7 +70,7 @@ export interface UpdateNode {
 export class NodeService {
 
   private http = inject(HttpClient);
-  private readonly nodeUrl = `${SecretData.baseuUrl}/api/nodes`;
+  private readonly nodeUrl = `${environment.apiUrl}/api/nodes`;
 
   /**
    * 
@@ -87,7 +87,7 @@ export class NodeService {
    * @returns the node url with the nodeweb id for HTTP GET method
    */
   private getNodesUrl (id: string): string{
-    return `${SecretData.baseuUrl}/api/nodewebs/${id}/nodes`;
+    return `${environment.apiUrl}/api/nodewebs/${id}/nodes`;
   }
 
   /**

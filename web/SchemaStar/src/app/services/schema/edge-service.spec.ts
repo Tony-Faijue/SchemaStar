@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { EdgeRequest, EdgeResponse, EdgeService, EdgeType, UpdateEdge } from './edge-service';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { SecretData } from '../../../../environment';
+import { environment } from '../../../../environments/environment';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from '../../http-interceptors/auth-interceptor';
 
@@ -10,7 +10,7 @@ describe('EdgeService', () => {
   let service: EdgeService;
   let httpTestingContoller: HttpTestingController;
 
-  const mockBaseUrl = `${SecretData.baseuUrl}/api/edges`;
+  const mockBaseUrl = `${environment.apiUrl}/api/edges`;
 
   const mockEdgeResponse: EdgeResponse = 
   {
@@ -48,7 +48,7 @@ describe('EdgeService', () => {
   it('should get all edges for the given SchemaId when getEdges succeed', () => {
     //Arrange
     const schemaId = '389';
-    const mockGetsEdgesUrl = `${SecretData.baseuUrl}/api/nodewebs/${schemaId}/edges`;
+    const mockGetsEdgesUrl = `${environment.apiUrl}/api/nodewebs/${schemaId}/edges`;
     const mockEdges: EdgeResponse[] = [mockEdgeResponse];
 
     //Act and Asset
@@ -137,7 +137,7 @@ describe('EdgeService', () => {
     //Arrange
     const schemaId = '555';
     const edgeIds: string[] = ['1', '12', '16', '78'];
-    const mockEdgesBulkURL = `${SecretData.baseuUrl}/api/nodewebs/${schemaId}/edges/bulk`;
+    const mockEdgesBulkURL = `${environment.apiUrl}/api/nodewebs/${schemaId}/edges/bulk`;
 
     //Act and Assert
     service.bulkDeleteEdges(schemaId, edgeIds).subscribe();

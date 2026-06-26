@@ -1,7 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { catchError, map, Observable, tap, of } from 'rxjs'; 
-import {SecretData} from '../../../environment';
+import { catchError, map, Observable, tap, of } from 'rxjs';
+import { environment } from '../../../environments/environment'; 
 
 /**
  * Data to register a new user
@@ -61,10 +61,10 @@ export class AuthenticationService {
   public currentUser = signal<AuthResponse|null>(null);
 
   //The url api endpoint for login and registeration
-  private registerUserURL = `${SecretData.baseuUrl}/api/users`;
-  private loginUserURL = `${SecretData.baseuUrl}/api/users/token`;
-  private logoutUserUrl = `${SecretData.baseuUrl}/api/users/logout`;
-  private checkAuthUrl = `${SecretData.baseuUrl}/api/users/me`;
+  private registerUserURL = `${environment.apiUrl}/api/users`;
+  private loginUserURL = `${environment.apiUrl}/api/users/token`;
+  private logoutUserUrl = `${environment.apiUrl}/api/users/logout`;
+  private checkAuthUrl = `${environment.apiUrl}/api/users/me`;
 
   private http = inject(HttpClient);
 
