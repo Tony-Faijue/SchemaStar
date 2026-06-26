@@ -4,7 +4,7 @@ import { RegisterSchema, SchemaResponse, SchemaResponseFull, SchemaService, Upda
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from '../../http-interceptors/auth-interceptor';
-import { SecretData } from '../../../../environment';
+import { environment } from '../../../../environments/environment';
 import { NodeResponse, NodeResponseFull, NodeState } from './node-service';
 import { EdgeResponse, EdgeType } from './edge-service';
 import { NodeAssetResponse, NodeAssetSource, NodeAssetType } from './node-asset-service';
@@ -13,7 +13,7 @@ describe('SchemaService', () => {
   let service: SchemaService;
   let httpTestingController: HttpTestingController
 
-  const mockBaseUrl = `${SecretData.baseuUrl}/api/nodewebs`;
+  const mockBaseUrl = `${environment.apiUrl}/api/nodewebs`;
 
   const mockSchemaResponse: SchemaResponse = {
     publicId:'123',

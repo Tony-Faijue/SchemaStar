@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { NodeAssetRequest, NodeAssetResponse, NodeAssetService, NodeAssetSource, NodeAssetType, UpdateNodeAsset } from './node-asset-service';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { SecretData } from '../../../../environment';
+import { environment } from '../../../../environments/environment';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from '../../http-interceptors/auth-interceptor';
 
@@ -10,7 +10,7 @@ describe('NodeAssetService', () => {
   let service: NodeAssetService;
   let httpTestingController: HttpTestingController;
 
-  const mockBaseUrl = `${SecretData.baseuUrl}/api/nodeassets`;
+  const mockBaseUrl = `${environment.apiUrl}/api/nodeassets`;
 
   const mockNodeAssetResponse: NodeAssetResponse = {
     publicId: '123',
@@ -46,7 +46,7 @@ describe('NodeAssetService', () => {
 
   it('should get all node assets for the given node when getNodeAssets succeeds', () => {
     const nodeId = '6565';
-    const mockGetsNodeAssetsURL = `${SecretData.baseuUrl}/api/nodes/${nodeId}/nodeassets`;
+    const mockGetsNodeAssetsURL = `${environment.apiUrl}/api/nodes/${nodeId}/nodeassets`;
     const mockNodeAssets: NodeAssetResponse[] = [mockNodeAssetResponse];
 
     //Act and Assert

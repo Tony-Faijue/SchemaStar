@@ -42,4 +42,4 @@ testem.log
 Thumbs.db
 
 # Environment Variables
-environment.ts
+environments/

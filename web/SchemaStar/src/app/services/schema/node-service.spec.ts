@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { NodeRequest, NodeResponse, NodeResponseFull, NodeService, NodeState, UpdateNode } from './node-service';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { SecretData } from '../../../../environment';
+import { environment } from '../../../../environments/environment';
 import { NodeAssetResponse, NodeAssetSource, NodeAssetType } from './node-asset-service';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from '../../http-interceptors/auth-interceptor';
@@ -11,7 +11,7 @@ describe('NodeService', () => {
   let service: NodeService;
   let httpTestingController: HttpTestingController;
 
-  const mockBaseUrl = `${SecretData.baseuUrl}/api/nodes`;
+  const mockBaseUrl = `${environment.apiUrl}/api/nodes`;
 
   const mockNodeResponse: NodeResponse = 
   {
@@ -97,7 +97,7 @@ describe('NodeService', () => {
   it('should get all nodes for the given SchemaId when getNodes succeds', () => {
     //Arrange
       const schemaId = '389';
-      const mockGetsNodesURL = `${SecretData.baseuUrl}/api/nodewebs/${schemaId}/nodes`;
+      const mockGetsNodesURL = `${environment.apiUrl}/api/nodewebs/${schemaId}/nodes`;
       const mockNodes: NodeResponse[] = [mockNodeResponse];
 
       //Act and Assert
@@ -203,7 +203,7 @@ describe('NodeService', () => {
   it('should update partially the nodes when given the node ids and the Schema id when bulkUpdateNodes succeeds', () => {
     //Arrange
     const schemaId = '555';
-    const mockNodesBulkURL = `${SecretData.baseuUrl}/api/nodewebs/${schemaId}/nodes/bulk`;
+    const mockNodesBulkURL = `${environment.apiUrl}/api/nodewebs/${schemaId}/nodes/bulk`;
 
     //Act and Assert
     service.bulkUpdateNodes(schemaId, nodesToUpdate).subscribe();
@@ -220,7 +220,7 @@ describe('NodeService', () => {
     //Arrange
     const schemaId = '555';
     const nodeIds: string[] = ['1', '12', '16', '78'];
-    const mockNodesBulkURL = `${SecretData.baseuUrl}/api/nodewebs/${schemaId}/nodes/bulk`;
+    const mockNodesBulkURL = `${environment.apiUrl}/api/nodewebs/${schemaId}/nodes/bulk`;
 
     //Act and Assert
     service.bulkDeleteNodes(schemaId, nodeIds).subscribe();

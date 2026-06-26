@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { SecretData } from '../../../../environment';
+import { environment } from '../../../../environments/environment';
 import { Observable } from 'rxjs';
 
 export enum NodeAssetType {
@@ -55,7 +55,7 @@ export interface UpdateNodeAsset{
 export class NodeAssetService {
   
   private http = inject(HttpClient);
-  private readonly nodeAssetUrl = `${SecretData.baseuUrl}/api/nodeassets`;
+  private readonly nodeAssetUrl = `${environment.apiUrl}/api/nodeassets`;
 
   /**
    * 
@@ -72,7 +72,7 @@ export class NodeAssetService {
    * @returns the node asset url with the node id for HTTP GET method
    */
   private getNodeAssetsUrl (id: string): string{
-    return `${SecretData.baseuUrl}/api/nodes/${id}/nodeassets`;
+    return `${environment.apiUrl}/api/nodes/${id}/nodeassets`;
   }
 
   /**

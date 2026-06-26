@@ -1,5 +1,5 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { SecretData } from '../../../../environment';
+import { environment } from '../../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { NodeResponse, NodeResponseFull } from './node-service';
@@ -50,7 +50,7 @@ export class SchemaService {
   public currentSchema = signal<SchemaResponse | SchemaResponseFull| null>(null);
 
   private http = inject(HttpClient);
-  private readonly schemaUrl = `${SecretData.baseuUrl}/api/nodewebs`;
+  private readonly schemaUrl = `${environment.apiUrl}/api/nodewebs`;
 
   /**
    * 
