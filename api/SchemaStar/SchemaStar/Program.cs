@@ -74,7 +74,7 @@ try
     builder.Services.AddJwtAuthentication(builder.Configuration);
 
     //CORS configuration
-    builder.Services.AddCorsConfiguration();
+    builder.Services.AddCorsConfiguration(builder.Configuration);
 
     var app = builder.Build();
 
