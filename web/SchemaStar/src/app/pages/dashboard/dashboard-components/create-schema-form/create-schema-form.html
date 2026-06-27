@@ -9,15 +9,15 @@
     >
       <h1 class="text-3xl font-extrabold text-center text-zinc-50 mb-6">Create New Schema</h1>
       <!-- FormGroup -->
-      <form>
+      <form [formGroup]="schemaForm" (submit)="createSchema()">
         <div class="grid gap-4">
           <div class="grid grid-cols-1">
             <!--Schema Name-->
             <div class="flex items-center space-x-4">
               <input
                 type="text"
-                id="schema_name"
-                formControlName="schema_name"
+                id="schemaName"
+                formControlName="schemaName"
                 placeholder="Enter Schema Name"
                 required
                 class="w-full input-form-schema input-form-focus-schema"

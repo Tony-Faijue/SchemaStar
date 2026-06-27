@@ -15,7 +15,7 @@ RUN npm install
 COPY . .
 
 # Build the application
-RUN npm run build
+RUN npm run build -- --configuration=docker
 
 #--- Stage 2: Run Stage Image ---
 FROM nginx:alpine
