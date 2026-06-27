@@ -32,8 +32,8 @@
             "docker": {
               "fileReplacements": [
                 {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.docker.ts"
+                  "replace": "environments/environment.ts",
+                  "with": "environments/environment.docker.ts"
                 }
               ]
             },

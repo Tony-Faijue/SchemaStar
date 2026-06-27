@@ -145,7 +145,18 @@ export class FlowStateService {
       const tempId = `temp-node-${time}`;
 
       const currenSchemaId = this.mapData.selectedSchemaId();
-      if (!currenSchemaId) return;
+
+      // Check the state of the schema
+      this.loggerService.warn('Checking productions state variables:', {
+        currenSchemaId: currenSchemaId,
+        nodesCount: this.mapData.nodes()?.length
+      });
+
+      //Check if the current Schema is null
+      if (!currenSchemaId) {
+        this.loggerService.error('CRITICAL FAILURE: Execution stopped because selectedSchemaId is undefined or empty!'); 
+        return;
+      }
 
       const count = this.mapData.nodes().length + 1 //default name with node count
 
